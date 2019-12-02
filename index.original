@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      .rotate {
+      /* FF3.5+ */
+      -moz-transform: rotate(-90.0deg);
+      /* Opera 10.5 */
+      -o-transform: rotate(-90.0deg);
+      /* Saf3.1+, Chrome */
+      -webkit-transform: rotate(-90.0deg);
+      /* IE6,IE7 */
+      filter: progid: DXImageTransform.Microsoft.BasicImage(rotation=0.083);
+      /* IE8 */
+      -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)";
+      /* Standard */
+      transform: rotate(-90.0deg);
+      }
+      .wrapper {
+      position: relative;
+      &:after {
+      content: '';
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      position: absolute;
+      }
+      }
+      .path {
+      float: left;
+      //width: 100px;
+      height: 22px;
+      padding: 5px;
+      color: black;
+      border: 1px dashed white;
+      };
+      .transparent {
+      padding: 0pt 0pt;
+      color: darkblue;
+      background-color: #4CAF50;
+      border: none;
+      text-decoration: none;
+      }
+      .hdr {
+      padding: 5pt 5pt;
+      border: none;
+      text-decoration: none;
+      }
+      .full {
+      padding: 0pt 0pt;
+      border: none;
+      text-decoration: none;
+      }
+      .canvas {
+      padding: 0pt 0pt;
+      border: none;
+      text-decoration: none;
+      }
+    </style>
+  </head>
+  <body  onLoad="init()">
+    <script src="alasql.min.js"></script>
+    <script src="js/Database.js"></script>
+    <script src="js/Colors.js"></script>
+    <script src="js/Default.js"></script>
+    <script src="js/Matrix.js"></script>
+    <script src="js/Navigate.js"></script>
+    <script src="js/Path.js"></script>
+    <script src="js/Show.js"></script>
+    <script src="js/Table0D.js"></script>
+    <script src="js/Table1D.js"></script>
+    <script src="js/Table2D.js"></script>
+    <script src="js/Series0D.js"></script>
+    <script src="js/Series1D.js"></script>
+    <script src="js/Series2D.js"></script>
+    <script src="js/Map0D.js"></script>
+    <script src="js/Map1D.js"></script>
+    <script src="js/Map2D.js"></script>
+    <script src="js/Html.js"></script>
+    <script src="js/Layout.js"></script>
+    <script src="js/Threshold.js"></script>
+    <script src="js/Utils.js"></script>
+    <script>
+      'use strict';
+      function init() {
+         console.log("Initialising alarm.")
+         Colors.init();
+         Path.init();
+         Show.init();
+         Threshold.init();
+         console.log("Update database.")
+         Database.update();
+      }
+    </script>
+    <table width="100%">
+      <tr>
+        <td width="100%">
+	  <table width="100%">
+	    <tr>
+	      <td id="path" align="left"></td>
+	      <td id="trashRest" align="right"></td>
+	    </tr>
+	  </table>
+	</td>
+	<td align="center">
+	  <div class="path" id="divTrash" pid="trash" ptp="trash"
+	       ondrop="Navigate.drop(event)" ondragover="Navigate.dropCheck(event)"
+	       onclick="Show.state.qtrash=(Show.state.qtrash+1)%2;Show.showTrash();"
+	       title=
+	       "Drag and Navigate.drop data that should be ignored on trash.
+Drag and Navigate.drop trash on eye, path, columns, rows or 
+cells to restore data and default behaviour.">
+	    <text draggable="true" ondragstart="Navigate.dragStart(event)"
+		  ondragend="Navigate.dragEnd(event)" id="trash" pid="trash" ptyp="trash" readonly>&#128465</text>
+	  </div>
+	</td>
+      <tr>
+	<table><tbody id="matrix"/></table>
+      </tr>
+      <tr>
+	<table width="100%">
+          <tr>
+            <td>
+              <button id="modeSum"     onclick="Show.setCellMode(Show.code.mSum)"><text focus=false>Sum</text></button>
+              <button id="modeSeries"  onclick="Show.setCellMode(Show.code.mSeries)"><text focus=false>Series</text></button>
+              <button id="modeSingle"  onclick="Show.setCellMode(Show.code.mSingle)"><text focus=false>Single</text></button>
+	       &ensp;
+              <button id="modeTable"   onclick="Show.setLayoutMode(Show.code.mTable)"><text focus=false>Table</text></button>
+              <button id="modeMap"     onclick="Show.setLayoutMode(Show.code.mMap)"><text focus=false>Map</text></button>
+            </td>
+	    <td align="right">
+	      <button id="fullscreen" onclick="Utils.toggleFullScreen()">&#9974;</button>
+            </td>
+	  </tr>
+	</table>
+      <tr>
+      <tr>
+	<table width="100%">
+	  <tr>
+	    <td id="log">status</td>
+	    <td id="info">progress</td>
+	    <td align="right" id="mod">age</td>
+	  </tr>
+	</table>
+      <tr>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+
+MatrixLib.js:680 Element: 0 {"colval":"Regn","rowval":"2019-09-04_00-00-00.000Z","maxlev":3,"minlev":0,"maxrank":7.940784912000001,"cnt":6384,"def":0,
+"tooltip":{"Regn":{"maxrank":7.940784912000001,"docs":[
+
+{"Duration":"12t","Issued":"2019-09-04_00-00-00.000Z","Method":"P95","Model":"MEPS","Partner":"MetNo","Phenomenon":"Regn","Region":"Nordland","Type":"Fylke","date":"2019-09-06","dtg":"2019-09-06_16","level":3,"max":"198.51962280","maxlat":"67.38","maxlon":"15.87","min":".00000000","minlat":"65.65","minlon":"11.89","cnt":19195,"rank":7.940784912000001,"lat":"67.38","lon":"15.87","_thr":{"level":3,"val":198.5196228,"lat":"67.38","lon":"15.87","max":[0,5,10,25]},"_title":"Phenomenon=Regn, Duration=12t, max=198.51962280, lat=67.38, lon=15.87"},
+
+{"Duration":"12t","Issued":"2019-09-04_00-00-00.000Z","Method":"MBR0","Model":"MEPS","Partner":"MetNo","Phenomenon":"Regn","Region":"Nordland","Type":"Fylke","date":"2019-09-06","dtg":"2019-09-06_16","level":3,"max":"198.51962280","maxlat":"67.38","maxlon":"15.87","min":".00000000","minlat":"65.65","minlon":"11.89","cnt":21931,"rank":7.940784912000001,"lat":"67.38","lon":"15.87","_thr":{"level":3,"val":198.5196228,"lat":"67.38","lon":"15.87","max":[0,5,10,25]},"_title":"Phenomenon=Regn, Duration=12t, max=198.51962280, lat=67.38, lon=15.87"}]}}}
+SubTableComponent.js:116 BBX width/height: 152.72726440429688 95.45454406738281
