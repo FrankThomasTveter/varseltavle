@@ -22,16 +22,16 @@ function getModes(state,mode) {
     if (mode !== undefined) {
 	var layoutMode=0;
 	var cellMode=0;
-	if (mode === "Flags") {
-	    layoutMode=state.Layout.code.layout.Table;
-	    cellMode=state.Layout.code.cell.Sum;
-	} else if (mode === "Bars") {
-	    layoutMode=state.Layout.code.layout.Table;
-	    cellMode=state.Layout.code.cell.Series;
+	if (mode === "FlagChart") {
+	    layoutMode=state.Layout.modes.layout.Table;
+	    cellMode=state.Layout.modes.cell.Sum;
+	} else if (mode === "BarChart") {
+	    layoutMode=state.Layout.modes.layout.Table;
+	    cellMode=state.Layout.modes.cell.Series;
 	} else if (mode === "List") {
-	    layoutMode=state.Layout.code.layout.List;
-	} else if (mode === "Map") {
-	    layoutMode=state.Layout.code.layout.Map;
+	    layoutMode=state.Layout.modes.layout.List;
+	} else if (mode === "MapChart") {
+	    layoutMode=state.Layout.modes.layout.Map;
 	}
 	return {layout:layoutMode,cell:cellMode};
     } else {
@@ -43,13 +43,13 @@ function ModeIcon (props) {
     var modes=getModes(state,mode);
     var layoutMode=modes.layout;
     var cellMode=modes.cell;
-    if (layoutMode === state.Layout.code.layout.Table) {
-	if (cellMode === state.Layout.code.cell.Sum) {
+    if (layoutMode === state.Layout.modes.layout.Table) {
+	if (cellMode === state.Layout.modes.cell.Sum) {
 	    return (<FlagIcon/>);
 	} else {
 	    return (<BarIcon/>);
 	}
-    } else if (layoutMode === state.Layout.code.layout.List) {
+    } else if (layoutMode === state.Layout.modes.layout.List) {
 	return (<ListIcon/>);
     } else {
 	return (<MapIcon/>);
@@ -70,7 +70,7 @@ class Mode extends Component {
     state = {anchor: null,};
     render() {
 	const {classes, state}=this.props;
-	var modes=["Flags","Bars","List","Map"];
+	var modes=["FlagChart","BarChart","List","MapChart"];
 	this.onClose = () => {this.setState({ anchor: null });};
 	this.onClick = (event) => {this.setState({ anchor: event.currentTarget });};
 	var mapFunction= (mode,index)=>renderMode(state,classes,this.onClose,mode,index);

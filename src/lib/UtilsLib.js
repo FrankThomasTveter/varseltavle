@@ -239,6 +239,11 @@ function Utils() {
 	    if (urlDatabase ===undefined) {urlDatabase={};}
 	    urlDatabase.data=this.cp(state.Database.data);
 	};
+	var urlColors=undefined;
+	if (state.Default.hasChanged(state,["Colors","colors"])) {
+	    if (urlColors ===undefined) {urlColors={};}
+	    urlColors.colors=this.cp(state.Colors.colors);
+	};
 	var urlPath=undefined;
 	if (state.Default.hasChanged(state,["Path","keys"])) {
 	    if (urlPath ===undefined) {urlPath={};}
@@ -275,6 +280,9 @@ function Utils() {
 	};
 	if (urlPath !== undefined) {
 	    url=url + "Path=" + encodeURI(JSON.stringify(urlPath)+"&");
+	};
+	if (urlColors !== undefined) {
+	    url=url + "Colors=" + encodeURI(JSON.stringify(urlColors)+"&");
 	};
 	if (urlLayout !== undefined) {
 	    url=url + "Layout=" + encodeURI(JSON.stringify(urlLayout)+"&");
@@ -420,7 +428,7 @@ function Utils() {
 	}
 	return ss;
     }
-    this.setItemForce=function(state,t,trg,ss) {
+    this.setForce=function(state,t,trg,ss) {
 	var ll=t.length;
 	if (trg===undefined) { 
 	    return;
@@ -434,10 +442,11 @@ function Utils() {
 		tt=tt[t[ii]];
 	    }
 	    tt[t[ll-1]]=state.Utils.cp(ss)
+	    //console.log("Force copied:",JSON.stringify(t),JSON.stringify(tt[t[ll-1]]));
 	    return tt[t[ll-1]];
 	}
     }
-    this.setItemFill=function(state,t,trg,ss) {
+    this.setFill=function(state,t,trg,ss) {
 	var ll=t.length;
 	if (trg===undefined) { 
 	    return;
@@ -457,20 +466,20 @@ function Utils() {
 	    return tt[t[ll-1]];
 	}
     }
-    this.mapItemForce=function(state,t,s,trg,src) {
+    this.cpForce=function(state,t,s,trg,src) {
 	var ss=this.getItem(state,s,src);
-	this.setItemForce(state,t,trg,ss);
+	this.setForce(state,t,trg,ss);
     }
-    this.mapItemFill=function(state,t,s,trg,src) {
+    this.cpFill=function(state,t,s,trg,src) {
 	var ss=this.getItem(state,s,src);
 	//console.log("Filling:",s,'->',t,! this.isEmpty(state,ss),JSON.stringify());
 	//if (! this.isEmpty(state,ss) ) {
         if (ss !== undefined) {
-	    this.setItemFill(state,t,trg,ss);
+	    this.setFill(state,t,trg,ss);
 	}
     };
     // map src onto target always
-    this.mapForce=function(state,map,trg,src) {
+    this.copyForce=function(state,src,trg,map) {
 	if (src===undefined) {
 	    console.log("ERROR: MapForce with no src.");
 	} else if (trg===undefined) {
@@ -482,12 +491,12 @@ function Utils() {
 	    for (var ii=0;ii<len;ii++){
 		var t=map[ii][0];
 		var s=map[ii][1];
-		this.mapItemForce(state,t,s,trg,src)
+		this.cpForce(state,t,s,trg,src)
 	    }
 	}
     };
     // map src onto target if target is empty and src is not
-    this.mapFill=function(state,map,trg,src) {
+    this.copyFill=function(state,src,trg,map) {
 	if (src===undefined) {
 	    console.log("ERROR: MapFill with no src.");
 	} else if (trg===undefined) {
@@ -499,11 +508,11 @@ function Utils() {
 	    for (var ii=0;ii<len;ii++){
 		var t=map[ii][0];
 		var s=map[ii][1];
-		this.mapItemFill(state,t,s,trg,src)
+		this.cpFill(state,t,s,trg,src)
 	    }
 	}
     };
-    this.invertMap=function(map) {
+    this.invert=function(map) {
 	var ret=[];
 	var len=map.length;
 	for (var ii=0;ii<len;ii++){

@@ -5,9 +5,20 @@ function Colors() {
     this.init=function(state){
 	state.Utils.init("Colors",this);
     };
-    this.getLevelColor=function(level) {
+    this.setLevelBgColor=function(level,color) {
+	this.colors.background[level]=color;
+    };
+    this.setLevelFgColor=function(level,color) {
+	this.colors.foreground[level]=color;
+    };
+    this.getLevelBgColor=function(level) {
 	if (level !== undefined && level >= 0 && this.colors !== undefined) {
-	    return this.colors.level[level];
+	    return this.colors.background[level];
+	};
+    };
+    this.getLevelFgColor=function(level) {
+	if (level !== undefined && level >= 0 && this.colors !== undefined) {
+	    return this.colors.foreground[level];
 	};
     };
     this.setPathBorderColor=function(state,color) {

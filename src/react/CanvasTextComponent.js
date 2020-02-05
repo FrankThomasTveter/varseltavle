@@ -46,9 +46,11 @@ function updateCanvas(item) {
     //ctx.stroke();
     //console.log(">>>> Plan:",JSON.stringify(plan),item.width,item.height);
     if (color !== undefined) {
+	//console.log("Using color:",color);
 	ctx.fillStyle=color;
     } else {
 	ctx.fillStyle='black';
+	//console.log("Using black...");
     };
     if (plan.rotate !== undefined && plan.rotate) {
 	ctx.textAlign = "left"; //left right center
@@ -85,6 +87,7 @@ class CanvasTextComponent extends Component {
 	this.height=plan.height;
 	this.invalid=invalid;
 	this.color=color;
+	//console.log("Got color:",color);
         return (
 		<canvas {...other} className={classes.canvas} classes={classes} onClick={onclick} title={title} 
 	            plan={plan} width={plan.width} height={plan.height} ref="text" />

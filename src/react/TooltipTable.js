@@ -65,23 +65,24 @@ function FirstDataCell (props) {
 }
 //{rowval}
 function DataCell(props) {
-    const {classes,val,onclick,bgcolor}=props;//state,rowindex,
+    const {classes,val,onclick,fgcolor,bgcolor}=props;//state,rowindex,
     var rval=val;
     if (isNaN(rval)) {
 	rval=val;
     } else {
 	rval=parseFloat(rval,0).toFixed(2);
     };
-    return <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} style={{backgroundColor:bgcolor}} onClick={onclick}>{rval}</div>
+    return <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} style={{color:fgcolor,backgroundColor:bgcolor}} onClick={onclick}>{rval}</div>
 }
 function renderDataCell(classes,state,key,click,sub,rowindex,colindex) {
     var maxlev=sub["level"]||0;
-    var bgcolor=state.Colors.getLevelColor(maxlev);
+    var bgcolor=state.Colors.getLevelBgColor(maxlev);
+    var fgcolor=state.Colors.getLevelFgColor(maxlev);
     var rowkey=key;
     var rowval=sub[key];
     var rowwhere=state.Database.getWhereDetail(rowkey,rowval);
     var onclick=(click.indexOf(rowkey)===-1?undefined: () => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1)});
-    return (<DataCell classes={classes} state={state} key={`${rowindex}-${colindex}`} val={sub[key]} rowindex={rowindex} bgcolor={bgcolor} onclick={onclick}/>);
+    return (<DataCell classes={classes} state={state} key={`${rowindex}-${colindex}`} val={sub[key]} rowindex={rowindex} fgcolor={fgcolor} bgcolor={bgcolor} onclick={onclick}/>);
 }
 //{{rowkey:'test1',colkey:'test2',title:title}}
 function dataRow(classes,state,key,click,subs,rowindex) {

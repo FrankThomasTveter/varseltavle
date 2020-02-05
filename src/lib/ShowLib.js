@@ -70,6 +70,11 @@ function Show() {
 	} else {
 	    console.log("No react-location available.");
 	}
+	if (state.React.Disclaimer !== undefined) {
+	    state.React.Disclaimer.showDisclaimer(state); // forceUpdate()
+	} else {
+	    console.log("No react-disclaimer available.");
+	}
     };
     this.showConfig=function(state) {
 	if (state.React.Config !== undefined) {
@@ -84,8 +89,15 @@ function Show() {
 	}
     };
     this.showTable=function(state,matrix) {
-	if (state.React.Table !== undefined) {
-	    state.React.Table.showTable(state);
+	//console.log("ShowTable:",state.Layout.state.layoutMode,state.Layout.modes.layout.Map);
+	if (state.Layout.state.layoutMode === state.Layout.modes.layout.Map) {
+	    if (state.React.Map !== undefined) {
+		state.React.Map.showMap(state);
+	    }
+	} else {
+	    if (state.React.Table !== undefined) {
+		state.React.Table.showTable(state);
+	    }
 	}
     };
     this.showTooltip=function(state) {

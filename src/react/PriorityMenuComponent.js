@@ -32,7 +32,7 @@ class PriorityMenu extends Component {
 	var mapFunction= (item,index)=>renderMenuItem(classes,state,item,index);
 	//console.log("Priorities.rendering",items.length,JSON.stringify(anchor),Boolean(anchor));
 	return (
-		<div className={classes.prioritys}>
+		<div>
 		   <Button
                       className={classes.button}
                       aria-owns={this.state.anchor ? 'prioritys-menu' : undefined}
@@ -42,7 +42,7 @@ class PriorityMenu extends Component {
 		    >
 	  	       {<PriorityIcon state={state}/>}
                      </Button>
-		     <Menu
+		     <Menu className={classes.prioritys}
                         id="prioritys-menu"
 	                anchorEl={this.state.anchor}
                         open={Boolean(this.state.anchor)}

@@ -10,18 +10,8 @@
     }
   },
   "colors": {
-    "level": ["lightgreen","yellow","orange","red","pink"],
-    "bg": "rgb(255,255,255)",
-    "bo": "rgb(200,200,200)",
-    "fg": "rgb(0,0,0)",
-    "val": "rgb(0,0,255)",
-    "trash": "rgb(255, 100, 100)",
-    "path": "rgb(240,240,240)",
-    "grp": "rgb(240,200,200)",
-    "eye": "rgb(173, 216, 230)",
-    "table": "rgb(173, 216, 230)",
-    "rest": "rgb(240,240,240)",
-    "hdr": "rgb(173, 216, 230)"
+      "background":["rgb(200,200,255)","rgb(150,150,255)","rgb(50,50,255)","purple","pink"],
+      "foreground":["rgb(  0,  0,  0)","rgb(  0,  0,  0)","rgb(255,255,255)","white","white"]
   },
   "order": {
     "Duration": ["1t","3t","6t","12t","24t"],

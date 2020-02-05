@@ -378,35 +378,34 @@ function Database() {
 	var nrec= (cntDocs0.length===0?0:cntDocs0[0].cnt);
 	var m={};
 	state.Matrix.cnt=nrec;
-	if (nrec > state.Matrix.popSeries) { // only use counts...
-	    state.Matrix.initKeyCnt(state);
+	if (nrec > state.Matrix.popSeries) { // maintain keyCnt
 	    var buff=[];
 	    state.Utils.cpArray(buff,state.Path.keys.path);
 	    state.Utils.cpArray(buff,state.Path.keys.other);
 	    state.Utils.cpArray(buff,state.Path.trash);
-	    state.Matrix.mapKeyCnt(state,where,nrec,buff);
-	    //console.log("Setup:",
-	    //	    JSON.stringify(state.Matrix.values),
-	    //	    JSON.stringify(state.Matrix.keyCnt));
-	    state.Path.exportAllKeys(state); // can not export keys before we have a cnt-map
+	    state.Matrix.initKeyCnt(state);
+	    state.Matrix.makeKeyCnt(state,where,nrec,buff);
+	    //
+	    state.Path.exportAllKeys(state); // can not export keys before we have a keyCnt
 	    state.Matrix.sortMatrixValues(state);
 	    //console.log("Count:",JSON.stringify(docs));
 	    // add "undefined" range of keys that are not present in every doc...
 	    var cntDocs=state.Database.getDocsCnt(state,where,state.Path.other.table);
-	    state.Matrix.makeMatrixCnt(state,cntDocs,m);
-	} else {
+	    state.Matrix.makeMatrixCntMap(state,cntDocs,m);
+	    state.Matrix.makeMapRange(state);
+	} else {                              // maintain map data and keyCnt...
 	    //console.log("Database where:",where);
 	    var docs=this.getDocs(state,where); // get all docs
 	    //console.log(">>>Extraction key (where='",where,"') Docs:",docs.length);
 	    state.Matrix.initKeyCnt(state);
-	    state.Matrix.mapKeys(state,docs);
-	    state.Matrix.addMapKeys(state,docs);
-	    //console.log("Setup=",JSON.stringify(setup));
-	    //console.log ("Maprange:",JSON.stringify(state.Matrix.values));
-	    // subset contains the keys being displayed in matrix...
-	    state.Path.exportAllKeys(state); // can not export keys before we have a cnt-map
+	    state.Matrix.makeKeyCntMap(state,docs);
+	    state.Matrix.makeMapRange(state);
+	    state.Matrix.addUndefinedKeyCnt(state,docs); // add "undefined"
+	    state.Matrix.addUndefinedKeyCntValues(state);
+	    state.Matrix.addMapAreaKeys(state,docs);
+	    //
+	    state.Path.exportAllKeys(state); // can not export keys before we have a keyCnt
 	    state.Matrix.sortMatrixValues(state);
-	    // make matrix
 	    state.Matrix.makeMatrix(state,docs,m);
 	    //console.log ("Matrix:",JSON.stringify(m));
 	}

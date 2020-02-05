@@ -16,6 +16,7 @@ const styles = theme => ({
     tooltip:{
 	border: '0px solid #999999',
 	backgroundColor:teal_palette.main,
+	zIndex:100,
     },
     button: {
 	color:'white',
@@ -43,7 +44,7 @@ function TableDetails(props){
     //console.log("Keys:",JSON.stringify(keys),JSON.stringify(state.Path.keys.path));
     var key=data.rowkey+":"+data.colkey;
     return (<div key={key}>
-	       <Table state={state} keys={keys} click={click} subs={tooltip}/>
+	    <Table state={state} keys={keys} click={click} subs={tooltip}/>
 	    </div>
 	   );
 };
@@ -106,18 +107,22 @@ class TooltipContainer extends Component {
 	    }
 	};
 	//console.log("##### Rendering TooltipContainer.");
-	return (<ReactTooltip id={type}
-		className={classes.tooltip}
-		overridePosition={overridePosition}
-		getContent={getConstant}
-		effect='solid'
-		delayHide={500}
-		delayShow={200}
-		delayUpdate={500}
-		place={'bottom'}
-		border={true}
-		type={'light'}
-		/>);
+	if (state.Layout.state.tooltip===2) {
+	    return null;
+	} else {
+	    return (<ReactTooltip id={type}
+		    className={classes.tooltip}
+		    overridePosition={overridePosition}
+		    getContent={getConstant}
+		    effect='solid'
+		    delayHide={500}
+		    delayShow={200}
+		    delayUpdate={500}
+		    place={'bottom'}
+		    border={true}
+		    type={'light'}
+		    />);
+	}
     };
 };
 TooltipContainer.propTypes = {

@@ -60,7 +60,7 @@ const styles = theme => ({
     }
 });
 // ---------------- DATA
-function renderDataList(classes,state,doc,plan,skey,bgcolor,index){
+function renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index){
     if (doc===undefined) {
 	return <div className={classes.divTableCell} style={{backgroundColor:'#EEE'}}/>
     } else {    
@@ -68,7 +68,7 @@ function renderDataList(classes,state,doc,plan,skey,bgcolor,index){
 	if (val === undefined) {val="";};
 	//console.log("Key:",skey," Val:",JSON.stringify(val),JSON.stringify(doc[skey]));
 	return (
-            <div className={classes.divTableCell} style={{backgroundColor:bgcolor}} key={skey}>
+            <div className={classes.divTableCell} style={{color:fgcolor,backgroundColor:bgcolor}} key={skey}>
 		{val}
 	    </div>
 	);
@@ -77,8 +77,9 @@ function renderDataList(classes,state,doc,plan,skey,bgcolor,index){
 function renderDoc(classes,state,skeys,plan,doc,lev,index) {
     //console.log("We have a matrix(",rowval,") with range:",JSON.stringify(range));
     //var lev=doc.level;
-    var bgcolor=state.Colors.getLevelColor(lev);
-    var mapFunction= (skey,index)=>renderDataList(classes,state,doc,plan,skey,bgcolor,index);
+    var bgcolor=state.Colors.getLevelBgColor(lev);
+    var fgcolor=state.Colors.getLevelFgColor(lev);
+    var mapFunction= (skey,index)=>renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index);
     return (<div className={classes.divTableRow} key={index.toString()}>
 	    {skeys.map(mapFunction)}
 	    </div>);
@@ -145,8 +146,9 @@ function Details(props) {
  	//DOM.style.font
 	var border=2;
 	var label="";
-	var width=0.8*window.innerWidth;
-	var height=0.8*(window.innerHeight-200);
+	var width=0.9*window.innerWidth;
+	var height=0.94*window.innerHeight - 180;
+	//var height=0.8*(window.innerHeight-200);
 	var plans=state.Layout.makePlans(label,[""],[""],width,height,border,cellMode);
 	var items=getDataRowList(classes,state,skeys,plans);
 	//console.log("Details => Width/Height:",window.innerWidth,window.innerHeight,plan.cell.width,plan.hdr.height)

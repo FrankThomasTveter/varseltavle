@@ -5,18 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 import CanvasText  from './CanvasTextComponent';
 
 const styles = theme => ({
-    pointer: {
-	cursor:"pointer",
-	border:"0px",
-	overflow: 'hidden',
-	padding: theme.spacing.unit*0,
-	textAlign:"center",
-    },
-    nopointer: {
-	border:'1px solid #EEE',
-	padding: theme.spacing.unit*0,
-	textAlign:"center",
-    },
     divTableCell:{
 	border: '1px solid #EEE',
 	display: 'table-cell',
@@ -36,9 +24,9 @@ function SummaryCell(props) {
     const { classes,state,onclick,index,rowindex,
 	    colkey,rowkey,colvalues,rowval,
 	    elements,plan,key,label } = props;
-    //console.log("Summary height:",plan.height);
-    var style0={height:plan.height+"px",backgroundColor:'#FFF'};
-    var style1={height:plan.height+"px",backgroundColor:'#EEE'};
+    console.log("Summary height:",plan.height);
+    var style0={height:(plan.height)+"px",backgroundColor:'#FFF'};
+    var style1={height:(plan.height)+"px",backgroundColor:'#EEE'};
     if (elements===undefined) {
 	if (rowindex%2===1) {
 	    return <div className={classes.divTableCell} style={style1}/>
@@ -59,7 +47,9 @@ function SummaryCell(props) {
 	};
     };
     var invalid=(minlev < 0); 
-    var bgcolor=state.Colors.getLevelColor(maxlev);
+    var bgcolor=state.Colors.getLevelBgColor(maxlev);
+    var fgcolor=state.Colors.getLevelFgColor(maxlev);
+    //console.log("Sending color:",fgcolor);
     //var stylec={height:plan.height+"px",backgroundColor:bgcolor};
     //console.log("SummaryCell:'"+lab+"' lev=",lev,elements.length,bgcolor,lab);
     //console.log("Found invalid.",invalid,minlev,maxlev,JSON.stringify(elements));
@@ -68,10 +58,10 @@ function SummaryCell(props) {
     var data=JSON.stringify({rowkey:rowkey,rowval:rowval,colkey:colkey,colvalues:colvalues,index:index,step:plan.step}); 
     return (
             <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} key={key}
-	         style={{backgroundColor:bgcolor}} onClick={onclick} height={plan.height} width={plan.width}
+	         style={{color:fgcolor,backgroundColor:bgcolor}} onClick={onclick} height={plan.height} width={plan.width}
 	         data-for='cell' data-tip={data}>
 		<CanvasText state={state} label={lab} plan={plan} key={key} invalid={invalid} index={index}
-					   colkey={colkey} rowkey={rowkey} colvalues={colvalues} rowval={rowval}/>
+					   colkey={colkey} rowkey={rowkey} colvalues={colvalues} rowval={rowval} color={fgcolor}/>
 	    </div>
            );
 }

@@ -54,17 +54,18 @@ function SeriesCell(props) {
     //var cnt=info.cnt;
     var maxlev=info.maxlev;
     //var minlev=info.minlev;
-    var bgcolor=state.Colors.getLevelColor(maxlev);
+    var bgcolor=state.Colors.getLevelBgColor(maxlev);
+    var fgcolor=state.Colors.getLevelFgColor(maxlev);
     //console.log("SeriesCell:",JSON.stringify(elements));
     //console.log("SeriesCell:",lev,cnt,JSON.stringify(range));
     //console.log("Series Plan:",JSON.stringify(plan));
     var data=JSON.stringify({rowkey:rowkey,rowval:rowval,colkey:colkey,colvalues:colvalues,index:index,step:plan.step}); 
     return(
 	    <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} key={key}
-	         style={{backgroundColor:bgcolor}} onClick={onclick} height={plan.height} width={plan.width}
+	         style={{color:fgcolor,backgroundColor:bgcolor}} onClick={onclick} height={plan.height} width={plan.width}
 	         data-for='cell' data-tip={data}>
   	       <CanvasGraph {...other} state={state} range={range} colkey={colkey} colvalues={colvalues} index={index}
-	          onclick={onclick} elements={elements} level={maxlev} plan={plan} bgcolor={bgcolor}/>  
+	          onclick={onclick} elements={elements} level={maxlev} plan={plan} fgcolor={fgcolor} bgcolor={bgcolor}/>  
 	     </div>
     );
 }

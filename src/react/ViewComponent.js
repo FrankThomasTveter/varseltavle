@@ -19,7 +19,7 @@ const styles = theme => ({
 function ViewIconMode (props) {
     const {state} = props;
     var mode=state.Layout.state.viewMode;
-    if (mode === state.Layout.code.view.path) {
+    if (mode === state.Layout.modes.view.path) {
 	return (<ViewIcon/>);
     } else {
 	return (<NoViewIcon/>);
@@ -30,15 +30,13 @@ class View extends Component {
 	const {classes, state}=this.props;
 	var onclick = (event) => state.Layout.toggleView(state);
 	return (
-		<div className={classes.view}>
-		   <Button
-	              className={classes.button}
-                      onClick={onclick}
-	              title={"Show path"}
-		    >
-	  	       {<ViewIconMode state={state}/>}
-                    </Button>
-		</div>
+		<Button
+	           className={classes.button}
+                   onClick={onclick}
+	           title={"Show path"}
+		 >
+	  	    {<ViewIconMode state={state}/>}
+                 </Button>
 	);
     }
 }

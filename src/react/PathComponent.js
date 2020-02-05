@@ -11,9 +11,11 @@ import RestPath from './RestPathComponent';
 
 const styles = theme => ({
     root: {
+	width:'calc(98% - 5px)',
 	display:'flex',
 	flexWrap:'wrap',
 	alignContent:'flex-start',
+ //	border:  '1px solid red',
     },
     paper: {
         padding: theme.spacing.unit * 2,
@@ -29,7 +31,7 @@ const styles = theme => ({
 });
 function Details(props) {
     const { state,classes } = props; // 
-    if (state.Layout.state.viewMode === state.Layout.code.view.path) {
+    if (state.Layout.state.viewMode === state.Layout.modes.view.path) {
 	return (
 		<div className={classes.root}>
 		   <SelectPath state={state} key={"select"}/>

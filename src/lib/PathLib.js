@@ -612,7 +612,7 @@ function Path() {
     this.getColKey=function(state) {
 	var arr=state.Utils.cp(this.other.table);
 	var pri=state.Layout.getPriorityIndex(state,arr);
-	if (state.Layout.getLayoutMode(state) === state.Layout.code.layout.Map) {
+	if (state.Layout.getLayoutMode(state) === state.Layout.modes.layout.Map) {
 	    return "_lon";
 	} else if (pri[this.other.table[0]] < pri[this.other.table[1]]) {
 	    return this.other.table[1];
@@ -623,7 +623,7 @@ function Path() {
     this.getRowKey=function(state) {
 	var arr=state.Utils.cp(this.other.table);
 	var pri=state.Layout.getPriorityIndex(state,arr);
-	if (state.Layout.getLayoutMode(state) === state.Layout.code.layout.Map) {
+	if (state.Layout.getLayoutMode(state) === state.Layout.modes.layout.Map) {
 	    return "_lat";
 	} else if (pri[this.other.table[0]] < pri[this.other.table[1]]) {
 	    return this.other.table[0];

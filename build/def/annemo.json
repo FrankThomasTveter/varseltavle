@@ -30,7 +30,7 @@
 				 "24t" :{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [0,5,10,25] }}},
 	    "Middelvind":{"Type":{"Fiskebank":{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [0,17.2,24.5] },
                               "Fylke":    {"lat":"maxlat","lon":"maxlon", "par":"max", ">": [0,13.9,24.5] }}},
-	    "Ising_paa_skip":{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [0,0.50,1.34] },
+	    "Ising_på_skip":{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [0,0.50,1.34] },
         "Vindkast":{"Region":{"Agder":{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [0,20,25,30] },
                                   "Innlandet"         :{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [0,20,25,30] },
                                   "MoreogRomsdal"     :{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [0,25,30,35] },
@@ -70,18 +70,8 @@
 	}
     },
     "colors":{
-	"level":["lightgreen","yellow","orange","red","pink"],
-	"bg":"rgb(255,255,255)",
-	"bo":"rgb(200,200,200)",
-	"fg":"rgb(0,0,0)",
-	"val":"rgb(0,0,255)",
-	"trash":"rgb(255, 100, 100)",
-	"path":"rgb(240,240,240)",
-	"grp":"rgb(240,200,200)",
-	"eye":"rgb(173, 216, 230)",
-	"table":"rgb(173, 216, 230)",
-	"rest":"rgb(240,240,240)",
-        "hdr":"rgb(173, 216, 230)"
+	"background":["rgb(200,200,255)","rgb(150,150,255)","rgb(50,50,255)","purple","pink"],
+	"foreground":["rgb(  0,  0,  0)","rgb(  0,  0,  0)","rgb(255,255,255)","white","white"]
     },
     "other":[
 	"Phenomenon","date","dtg","Partner","Type","Station","Airport",

@@ -47,7 +47,7 @@ class Archive extends Component {
 	    //console.log("Chip:",item,index,active);
 	    state.Database.selectIndex(state,item,index);
 	};
-	console.log("...archive:",JSON.stringify(item),JSON.stringify(index),active);
+	//console.log("...archive:",JSON.stringify(item),JSON.stringify(index),active);
 	return (
 		<div className={classes.archive}>
 	 	<Chip

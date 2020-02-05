@@ -23,7 +23,7 @@ import FullScreen   from './FullScreenComponent';
 
 const styles = theme => ({
     settings: {
-        marginLeft: 'auto',
+        marginRight: 'auto',
 	color:'red',
     },
     button:{color:'white'},
@@ -58,6 +58,7 @@ class Settings extends Component {
 		   {<SettingsIcon />}
                   </Button>
 	          <Menu
+		   settings={{float:'right'}}
                    id="settings-menu"
 	           anchorEl={this.state.anchor}
                    open={Boolean(this.state.anchor)}

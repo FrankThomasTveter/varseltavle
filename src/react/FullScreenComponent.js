@@ -27,7 +27,6 @@ class Fullscreen extends Component {
 	const {classes, state}=this.props;
 	var onclick = (event) => state.Layout.toggleFullScreen(state);
 	return (
-		<div className={classes.view}>
 		   <Button
                       className={classes.button}
                       onClick={onclick}
@@ -35,7 +34,6 @@ class Fullscreen extends Component {
 		    >
 	  	       {<FullscreenIconMode state={state}/>}
                     </Button>
-		</div>
 	);
     }
 }

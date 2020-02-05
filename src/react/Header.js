@@ -8,13 +8,7 @@ import Location  from    "./LocationComponent";
 import Config    from    "./ConfigComponent";
 
 const styles = theme => ({
-    root: {
-        width: '100%',
-        paddingBottom: '2%',
-    },
-    grow: {
-        flexGrow: 1,
-    },
+    header:{},
     logo: {
         padding:'1%',
         width: 150,
@@ -24,11 +18,13 @@ const styles = theme => ({
     },
 });
 
+
+
 function Header(props) {
     const { classes, state } = props;
     return (
-        <div className={classes.root}>
-            <AppBar position={"fixed"} className={classes.paddingBottom}>
+        <div className={classes.header}>
+            <AppBar position={"fixed"} className={classes.header}>
                 <Toolbar>
                     <img alt={"homepage"} className={classes.logo} src={logoImg}></img>
 	            <Location state={state}/>

@@ -237,7 +237,7 @@ function Navigate() {
 	//var rowkey=state.Path.getRowKey(state);
 	var rank=state.Utils.cp(state.Path.keys.other);
 	//console.log("SelectItem:",colkey,"=",colval,"  ",rowkey,"=",rowval);
-	if (state.Layout.getLayoutMode(state)  === state.Layout.code.layout.Map) {
+	if (state.Layout.getLayoutMode(state)  === state.Layout.modes.layout.Map) {
 	    if (this.selectMapKey(state,colkey,colval,colwhere,colcnt)) {
 		this.rank[colkey]=state.Utils.cp(rank);
 		//this.flip[colkey]=this.getFlip(state);
@@ -295,7 +295,7 @@ function Navigate() {
 	var rank=state.Utils.cp(state.Path.keys.other);
 	//console.log("SelecRow: rowkey=",key," val=",val);
 	//console.log("SelectKey:",key,val,where,cnt);
-	if (state.Layout.getLayoutMode(state)  === state.Layout.code.layout.Map) {
+	if (state.Layout.getLayoutMode(state)  === state.Layout.modes.layout.Map) {
 	    if (this.selectMapKey(state,key,val,where,cnt)) {
 		this.rank[key]=state.Utils.cp(rank);
 	    }

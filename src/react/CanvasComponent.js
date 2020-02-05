@@ -31,7 +31,8 @@ function updateCanvas(item) {
     //console.log("******** Canvas elements:",elen,tot,dw,width)
     for (ee=0;ee<elen;ee++) {
 	var el=elements[ee];
-	var color=state.Colors.getLevelColor(el.maxlev);
+	var bgcolor=state.Colors.getLevelBgColor(el.maxlev);
+	var fgcolor=state.Colors.getLevelFgColor(el.maxlev);
 	if (el.maxlev === undefined ||el.maxlev === undefined) {
 	    minlev=Math.min(minlev,-2);
 	} else {
@@ -40,13 +41,14 @@ function updateCanvas(item) {
 	}
 	var docs=el.docs;
 	var dlen=docs.length;
-	//console.log("Element:",el.maxlev,color,tot,cnt);
+	//console.log("Element:",el.maxlev,bgcolor,tot,cnt);
 	if (dlen>0) {
 	    for (var jj=0;jj<dlen;jj++) {
 		cnt=cnt+1;
 		var d=docs[jj];
 		var lev=state.Threshold.getLevel(state,d);
-		var col=state.Colors.getLevelColor(lev);
+		var bgcol=state.Colors.getLevelBgColor(lev);
+		var fgcol=state.Colors.getLevelFgColor(lev);
 		//console.log("   Doc:",colkey,jj,JSON.stringify(lev),JSON.stringify(d));
 		for (var ii=index;ii<Math.min(index+step,clen);ii++) {
 		    //console.log("   Checking Val:",colkey,rowkey,ii,colvalues[ii],d[colkey]);
@@ -58,9 +60,9 @@ function updateCanvas(item) {
 			};
 			var thr=d._thr;
 			var vals=[];
-			//console.log("Making canvas:",ii,colvalues[ii],color,JSON.stringify(d),
+			//console.log("Making canvas:",ii,colvalues[ii],bgcolor,JSON.stringify(d),
 			//	    " Thr=",JSON.stringify(t),width,height,JSON.stringify(range));
-			//console.log("Canvas:",ii,jj,d.dtg,color,el.maxlev,JSON.stringify(t));
+			//console.log("Canvas:",ii,jj,d.dtg,bgcolor,el.maxlev,JSON.stringify(t));
 			var min=range[0]
 			var max=range[1];
 			var ymin=min;
@@ -80,14 +82,16 @@ function updateCanvas(item) {
 			var xmax=(mm+1)*dw-2;   //width-2*xmin;
 			var zmin=state.Show.scale(ymin,min,max,height,0);
 			var zmax=state.Show.scale(ymax,min,max,height,0);
-			//console.log("Fill:",xmin,xmax,width,zmin,(zmax-zmin),height,color);
+			//console.log("Fill:",xmin,xmax,width,zmin,(zmax-zmin),height,bgcolor);
 			//ctx.fillStyle="cornflowerblue";
-			color=col;
-			if (color !== undefined) {ctx.fillStyle=color;}
+			bgcolor=bgcol;
+			fgcolor=fgcol;
+			if (bgcolor !== undefined) {ctx.fillStyle=bgcolor;}
+			if (fgcolor !== undefined) {ctx.strokeStyle=fgcolor;}
 			ctx.fillRect(xmin,zmin,xmax-xmin,(zmax-zmin));
 			//ctx.beginPath();
 			//ctx.lineWidth=2;
-			//if (color !== undefined) {ctx.strokeStyle=color;}
+			//if (bgcolor !== undefined) {ctx.strokeStyle=bgcolor;}
 			//ctx.strokeStyle="black";
 			//ctx.moveTo(xmin,zmax);
 			//ctx.lineTo(xmax,zmax);
@@ -97,14 +101,15 @@ function updateCanvas(item) {
 			for (var ll=0;ll<lenv;ll++) {
 			    var tyval=vals[ii];
 			    var tzval=state.Show.scale(tyval,min,max,height,0);
-			    var scolor=state.Colors.getLevelColor(ll);
+			    var sbgcolor=state.Colors.getLevelBgColor(ll);
+			    var sfgcolor=state.Colors.getLevelFgColor(ll);
 			    ctx.beginPath();
 			    ctx.lineWidth=5;
-			    if (scolor !== undefined) {ctx.strokeStyle=scolor;}
+			    if (sbgcolor !== undefined) {ctx.strokeStyle=sbgcolor;}
 			    ctx.moveTo(xmin,tzval);
 			    ctx.lineTo(xmax,tzval);
 			    ctx.stroke();
-			    //console.log("Stroke color:",scolor,ll,tzval,cnv.width);
+			    //console.log("Stroke color:",sbgcolor,ll,tzval,cnv.width);
 			}
 		    }
 		}
@@ -117,7 +122,7 @@ function updateCanvas(item) {
 	//console.log("Drew:",JSON.stringify(colvalues),tot,dlen);
     }
     ctx.lineWidth=5;
-    ctx.strokeStyle=state.Colors.getLevelColor(maxlev);
+    ctx.strokeStyle=state.Colors.getLevelBgColor(maxlev);
     ctx.strokeRect(0,0, cnv.width,cnv.height);
     //console.log("Canvas:",cnv.width,cnv.height);
 }

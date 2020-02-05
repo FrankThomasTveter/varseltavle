@@ -27,7 +27,6 @@ class Auto extends Component {
 	const {classes, state}=this.props;
 	var onclick = (event) => state.Auto.toggle(state);
 	return (
-		<div className={classes.view}>
 		   <Button
                       className={classes.button}
                       onClick={onclick}
@@ -35,7 +34,6 @@ class Auto extends Component {
 		    >
 	  	       {<AutoIconMode state={state}/>}
                     </Button>
-		</div>
 	);
     }
 }

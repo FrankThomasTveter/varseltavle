@@ -23,22 +23,23 @@ const styles = theme => ({
 function Adress(props) {
     // const { classes } = props;
     return (
-            <Grid item xs={12} sm={6}>
+
+            <Grid item xs={12} sm={12}>
              <Typography color={"inherit"}>
-               Meteorologisk institutt
-             </Typography>
-             <Typography color={"inherit"}>
-               Henrik Mohns Plass 1
-             </Typography>
-             <Typography color={"inherit"}>
-               0313 Oslo
-             </Typography>
-             <Typography color={"inherit"}>
-               Telefon 22 96 30 00
+               <a href="https://met.no"> met.no </a>
              </Typography>
             </Grid>
     );
 }
+             //<Typography color={"inherit"}>
+             //  Henrik Mohns Plass 1
+             //</Typography>
+             //<Typography color={"inherit"}>
+             //  0313 Oslo
+             //</Typography>
+             //<Typography color={"inherit"}>
+             //  Telefon 22 96 30 00
+             //</Typography>
 
 Adress.propTypes = {
     classes: PropTypes.object.isRequired,

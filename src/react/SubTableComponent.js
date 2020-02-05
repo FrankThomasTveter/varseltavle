@@ -60,19 +60,20 @@ function FirstDataCell (props) {
 }
 //{rowval}
 function DataCell(props) {
-    const {classes,state,val,rowindex,bgcolor}=props;
+    const {classes,state,val,rowindex,fgcolor,bgcolor}=props;
     var rval=val;
     if (isNaN(rval)) {
 	rval=val;
     } else {
 	rval=parseFloat(rval,0).toFixed(2);
     };
-    return <div className={classes.divTableCell} style={{backgroundColor:bgcolor}}>{rval}</div>
+    return <div className={classes.divTableCell} style={{color:fgcolor,backgroundColor:bgcolor}}>{rval}</div>
 }
 function renderDataCell(classes,state,key,sub,rowindex,colindex) {
     var maxlev=sub["level"]||0;
-    var bgcolor=state.Colors.getLevelColor(maxlev);
-    return (<DataCell classes={classes} state={state} key={`${rowindex}-${colindex}`} val={sub[key]} rowindex={rowindex} bgcolor={bgcolor}/>);
+    var bgcolor=state.Colors.getLevelBgColor(maxlev);
+    var fgcolor=state.Colors.getLevelFgColor(maxlev);
+    return (<DataCell classes={classes} state={state} key={`${rowindex}-${colindex}`} val={sub[key]} rowindex={rowindex} fgcolor={fgcolor} bgcolor={bgcolor}/>);
 }
 //{{rowkey:'test1',colkey:'test2',title:title}}
 function dataRow(classes,state,key,subs,rowindex) {

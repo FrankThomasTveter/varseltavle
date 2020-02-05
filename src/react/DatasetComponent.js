@@ -10,25 +10,13 @@ import Progress  from './Progress';
 //console.log("Inside Dataset.")
 
 const styles = theme => ({
-    body: {
-        margin: theme.spacing.getMaxWidth.margin,
-	width: '90%',
-	height: '90%',
-    },
-    table: {
-        textAlign: 'left',
-        padding: theme.spacing.unit * 0,
-	height: '100%',
-	width: '100%',
-	borderStyle: 'solid',
-    },
-    row  :{alignItems: "stretch"},
-    cell : {cursor: "pointer"},
+    dataset:{},
+    content:{},
 });
 //        maxWidth: theme.spacing.getMaxWidth.maxWidth,
 
 function Switcher(props) {
-    const { state, progress } = props;
+    const { state, classes, progress } = props;
     //var skeys=state.Matrix.sortedKeys(state,state.Matrix.keyCnt);
     //var dim        = state.Layout.getDim(state)
     var mode       = state.Layout.getLayoutMode(props.state);
@@ -37,12 +25,12 @@ function Switcher(props) {
 	return (<div style={{width:'100%',margin:'0 auto'}}>
 	          <Progress/>
 	       </div>);
-    } else if (mode === state.Layout.code.layout.Table) {
-	return (<Table state={state}/>);
-    } else if (mode === state.Layout.code.layout.List) {
-	return (<List state={state}/>);
-    } else if (mode === state.Layout.code.layout.Map) {
-	return (<Map state={state}/>);
+    } else if (mode === state.Layout.modes.layout.Table) {
+	return (<Table state={state}   classes={classes}/>);
+    } else if (mode === state.Layout.modes.layout.List) {
+	return (<List  state={state}   classes={classes}/>);
+    } else if (mode === state.Layout.modes.layout.Map) {
+	return (<Map   state={state}   classes={classes}/>);
     }
 };
 
@@ -59,15 +47,15 @@ class Dataset extends Component {
 	this.forceUpdate();
     };
     setProgress(state,active) {
-	this.setState({progress:active});
+	state.React.Dataset.setState({progress:active});
 	//this.forceUpdate();
     };
     render() {
         const { classes, state } = this.props;
         return (
-            <div className={classes.body}>
+            <div className={classes.dataset}>
                 <Path     state={state}/>
-		<Switcher state={state} progress={this.state.progress}/>
+		<Switcher state={state} classes={{content:classes.content}} progress={this.state.progress}/>
             </div>
         );
     }

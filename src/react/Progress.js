@@ -5,22 +5,10 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 //import LinearProgress from '@material-ui/core/LinearProgress';
 
 const styles = theme => ({
-  progress: {
-    margin: theme.spacing.unit * 2,
-  },
-    align:{
-	width: '100%',
+    content: {
+	padding: '10%',
 	textAlign:'center',
     },
-    primary:{
-	color: 'blue',
-    },
-    secondary:{
-	color: 'red',
-    },
-    tertiary:{
-	color: 'black',
-    }
 });
 
 function Progress(props) {
@@ -29,8 +17,8 @@ function Progress(props) {
       return null;
   } else {
       return (
-	  <div className={classes.align}>
-	      <CircularProgress/>
+	  <div className={classes.content}>
+	      <CircularProgress/> 
  	  </div>
      );
   }

@@ -33,7 +33,7 @@ function renderMenuItem(classes,state,item,index) {
     if (item[0]==="" || item[0] === null || item[0]===undefined) {
 	return null;
     } else {
-	console.log("Archive:",JSON.stringify(item),JSON.stringify(index));
+	//console.log("Archive:",JSON.stringify(item),JSON.stringify(index));
 	return (<MenuItem key={item[0]}>
 		<Archive state={state} item={item[0]}  index={item[1]} active={item[2]}/> 
 		</MenuItem>);

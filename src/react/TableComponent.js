@@ -13,9 +13,7 @@ import CanvasText  from './CanvasTextComponent';
 import Tooltip  from './TooltipContainer';
 
 const styles = theme => ({
-    root: {
-	height: '100%',
-    },
+    content:{},
     divHdrLeft : {
 	display: 'inline-block',
 	justifyContent: 'left',
@@ -27,7 +25,7 @@ const styles = theme => ({
 	cursor: "pointer",
     },
     paper: {
-	overflow: 'hidden',
+//	overflow: 'hidden',
 	tableLayout: 'fixed',
 	padding:0,
 	margin:0,
@@ -35,6 +33,7 @@ const styles = theme => ({
     divTable :{
 	display: 'table',
 	width: '100%',
+//	border:  '1px solid red',
     },
     divTableRow:  {
 	backgroundColor:teal_palette.main,
@@ -116,7 +115,7 @@ function DataCell(props) {
 	} else {
 	    return <div className={classes.divTableCell} style={{backgroundColor:'#FFF'}}/>
 	}
-    } else if (mode===state.Layout.code.cell.Sum) {
+    } else if (mode===state.Layout.modes.cell.Sum) {
 	return <SummaryCell {...other} state={state} elements={elements} plan={plan}/>
 	//return null;
     } else {
@@ -247,10 +246,14 @@ function Details(props) {
     //var ncol=colvalues.length + 1;
     //var nrow=rowvalues.length + 1;
     //DOM.style.font
-    var border=2;
-    var width=0.8*window.innerWidth;
-    var height=0.8*(window.innerHeight-200);
+    var border=0;
+    if (cellMode===state.Layout.modes.cell.Sum) {
+	border=1;
+    };
+    var width=0.9*window.innerWidth;
+    var height=0.94*window.innerHeight - 180;
     var plans=state.Layout.makePlans(colkey,rowkey,colvalues,rowvalues,width,height,border);
+    //console.log("Heights:",window.innerHeight,height,plans.hdr.height,plans.cell.height);
     //console.log("Details => Width/Height:",window.innerWidth,window.innerHeight,plan.cell.width,plan.hdr.height)
     //console.log("Colkey:",colkey," colval:",JSON.stringify(colvalues));
     //console.log("Rowkey:",rowkey," rowval:",JSON.stringify(rowvalues));
@@ -291,17 +294,12 @@ class Table extends Component {
     render() {
 	const { classes, state } = this.props;
 	//console.log("##### Rendering Table.");
-	return (<div ref={el=>{this.element(el)}} className={classes.root}  style={{width: '100%', height: '100%'}}>
+	return (<div ref={el=>{this.element(el)}} className={classes.content}>
 		   <Grid container spacing={24}>
 		      <Grid item xs={12} > 
                          { <Paper className={classes.paper}>
 		              <Details state={state} classes={classes} element={this}/>
                            </Paper>}
-                      </Grid>
-		      <Grid item xs={12} > 
-                         <Paper className={classes.paperImage}>
-		            *** Indicated colors do not represent official warning levels ***
-		         </Paper>
                       </Grid>
                    </Grid>
 		   <Tooltip state={state} classes={{button:classes.button}} element={this} type={'cell'}/>

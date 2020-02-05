@@ -48,7 +48,7 @@ function Matrix() {
 	this.values={};
 	this.keyCnt={};
     };
-    this.mapKeyCnt=function(state,where,nrec,keys) {
+    this.makeKeyCnt=function(state,where,nrec,keys) {
 	if (keys !== undefined) {
 	    var plen = keys.length;
 	    for (var ii = 0; ii < plen; ii++) {
@@ -77,15 +77,17 @@ function Matrix() {
     }
 
     // add "undefined" range of keys that are not present in every doc...
-    this.completeValues=function(state,key,dlen){
-	if (this.keyCnt[key] < dlen) {
-	    var val="";
-	    this.values[key].push(val);
+    this.addUndefinedKeyCnt=function(state,docs){
+	var dlen = docs.length;
+	for (var key in this.keyCnt) {
+	    if (this.keyCnt[key] < dlen) {
+		var val="";
+		this.values[key].push(val);
+	    }
 	}
-    }
-
+    };
     // parent path keys are always present (undefined parents can be used)...
-    this.addPathKeyCntValues=function(state) {
+    this.addUndefinedKeyCntValues=function(state) {
 	var plen = state.Path.keys.path.length;
 	for (var ii = 0; ii < plen; ii++) {
 	    var key=state.Path.keys.path[ii];
@@ -103,12 +105,12 @@ function Matrix() {
 	    max !== undefined ) {
 	    var ret;
 	    var dlon=(max-min)/res;
-	    if (Math.abs(state,dlon) < dmin) {
+	    if (Math.abs(dlon) < dmin) {
 		ret=(min+max)/2;
 	    } else {
 		var dbor=dlon/2;
 		var val=( (Number(pos)+0.5) * dlon ) + min - dbor;
-		ret=Math.floor(state,val*1000+0.5)/1000;
+		ret=Math.floor(val*1000+0.5)/1000;
 	    }
 	    return ret.toString();
 	}
@@ -120,13 +122,13 @@ function Matrix() {
 	    min !== undefined &&
 	    max !== undefined ) {
 	    var dlon=(max-min)/res;
-	    if (Math.abs(state,dlon) < dmin) {
-		return Math.floor(state,res/2);
+	    if (Math.abs(dlon) < dmin) {
+		return Math.floor(res/2);
 	    } else {
 		var dbor=dlon/2;
 		var pos=(Number(val) - min + dbor)/dlon;
 		//console.log("ValToPos:",pos,Number(val)-min+dbor,dlon);
-		return Math.max(0,Math.min(res,Math.floor(state,pos)))
+		return Math.max(0,Math.min(res,Math.floor(pos)))
 	    }
 	}
     };
@@ -201,7 +203,7 @@ function Matrix() {
 	    return ''+keylat+' >= '+latmax+' and '+keylat+ ' < '+latmin+'';
 	}
     };
-    this.addMapKeys=function(state,docs) {
+    this.addMapAreaKeys=function(state,docs) {
 	//var maxlat,minlat,maxlon,minlon;
 	var dlen = docs.length;
 	for (var ii = 0; ii < dlen; ii++) {
@@ -215,10 +217,10 @@ function Matrix() {
 	    var ilon=this.posToLon(state,lonpos);
 	    doc._lat=ilat
 	    doc._lon=ilon
-	    //console.log("Trash doc=",ii,JSON.stringify(doc));
+	    //console.log("Trash doc=",doc.lon,lonpos,ilon,doc._lon,JSON.stringify(this.area));
 	}
     };
-    this.mapKeys=function(state,docs) {
+    this.makeKeyCntMap=function(state,docs) {
 	var key;
 	var maxlat,minlat,maxlon,minlon;
 	var dlen = docs.length;
@@ -258,13 +260,16 @@ function Matrix() {
     	    };
 	}
 	this.area={minlat:minlat,maxlat:maxlat,minlon:minlon,maxlon:maxlon};
-	// make lat-lon range
-	this.makeMapRange(state);
-	// add "undefined" range of keys that are not present in every doc...
-	for (key in this.keyCnt) {this.completeValues(state,key,dlen) };
-	this.addPathKeyCntValues(state);
+	return;
     };
-    this.makeMatrixCnt=function(state,cntDocs,matrix) {
+    this.setupMap=function(state,docs) {
+	this.makeMapArea(state,docs);
+	this.makeMapRange(state);
+	this.addUndefinedKeyCnt(state,docs); // add "undefined"
+	this.addPathKeyCntValues(state);
+	this.addMapAreaKeys(state,docs);
+    };
+    this.makeMatrixCntMap=function(state,cntDocs,matrix) {
 	//console.log("MatrixCnt:",JSON.stringify(cntDocs));
 	//var lonmin,lonmax,latmin,latmax;
 	var found=false;
@@ -310,12 +315,11 @@ function Matrix() {
 	    console.log("this.makeMatrix No relevant thresholds found.");
 	    state.Html.setFootnote(state,"No data found.");
 	}
-	if (state.Layout.state.tooltip === 1) { // pre-generate all tooltips
+	if (state.Layout.state.tooltip === 0) { // pre-generate all tooltips
 	    state.Matrix.addAllTooltip(state,matrix);
 	};
     	//console.log ("Matrix:",JSON.stringify(matrix));
 	this.area={minlat:minlat,maxlat:maxlat,minlon:minlon,maxlon:maxlon};
-	this.makeMapRange(state);
     };
     this.makeMatrix=function(state,docs,matrix) {
 	var found=false;
@@ -450,7 +454,7 @@ function Matrix() {
 	} else if (nn === dd) { // make sure at least 1 undef is added...
 	    arr.docs.push(doc);
 	}
-	//if (state.Layout.state.tooltip === 1) {
+	//if (state.Layout.state.tooltip === 0) {
 	    var rank=state.Threshold.getRank(state,doc);
 	    if (arr.tooltip === undefined) {arr.tooltip={};};
 	    var el=this.getTooltipElement(state,arr.tooltip,doc);

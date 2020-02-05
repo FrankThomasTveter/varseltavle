@@ -52,9 +52,9 @@ function drawThresholds(state,elements,colkey,colvalue,range,plan,level,ctx,heig
 			var tzval=state.Show.scale(tyval,min,max,height,0);
 			var scolor=undefined;
 			if (ll === level) {
-			    scolor='black';
+			    scolor=state.Colors.getLevelFgColor(ll);
 			} else {
-			    scolor=state.Colors.getLevelColor(ll);
+			    scolor=state.Colors.getLevelBgColor(ll);
 			};
 			var xmin=offset+cnt*dwidth;
 			var xmax=offset+(cnt+1)*dwidth;
@@ -64,7 +64,7 @@ function drawThresholds(state,elements,colkey,colvalue,range,plan,level,ctx,heig
 			ctx.moveTo(xmin,tzval);
 			ctx.lineTo(xmax,tzval);
 			ctx.stroke();
-			//console.log("Stroke color:",scolor,ll,tzval,cnv.width);
+			//console.log("Stroke color:",sbgcolor,ll,tzval,cnv.width);
 		    }
 		};
 		if (thr.val !== undefined) {
@@ -112,7 +112,7 @@ function drawData(state,elements,colkey,colvalue,range,plan,level,ctx,height,off
 		//console.log("Fill:",xmin,xmax,zmin,(zmax-zmin),height,color);
 		//ctx.fillStyle="cornflowerblue";
                 var lev=state.Threshold.getLevel(state,d);
-                var col=state.Colors.getLevelColor(lev);
+                var col=state.Colors.getLevelFgColor(lev);
 		if (col !== undefined) {
 		    if (thr.level === undefined) { //  || Math.random() > 0.8
 
@@ -125,7 +125,7 @@ function drawData(state,elements,colkey,colvalue,range,plan,level,ctx,height,off
 		    };
 		    var dx=Math.max(1,xmax-xmin);
 		    var dz=zmax-zmin;
-		    ctx.strokeStyle='black';
+		    ctx.strokeStyle=col;
 		    ctx.strokeRect(xmin,zmin,dx,dz);
 		} else {
 		    minlev=Math.min(minlev,-2);
