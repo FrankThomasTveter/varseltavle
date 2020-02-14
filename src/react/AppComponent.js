@@ -35,16 +35,24 @@ const footAndHeaderheight = "100px";
 
 const styles = theme => ({
     root: {
+	position:'fixed',
+	padding:0,
+	margin:0,
+	top:0,
+	left:0,
 	width: '100%',
+	height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundImage: `url(${BackGroundImage})`
+        backgroundImage: `url(${BackGroundImage})`,
+ 	border:  '1px solid green',
     },
     header: {
 	position:'fixed',
 	height: 'calc('+headerheight+' + 2%)',
 	maxHeight: headerheight,
 	width: '100%',
+	paddingRight:'5px',
 //	border:  '1px solid green',
     },
     dataset: {
@@ -57,7 +65,7 @@ const styles = theme => ({
 //	border:  '1px solid green',
         overflowY: 'auto',
 	maxHeight: '100%',
-	maxWidth: '100%',
+	maxWidth: '99%',
     },
     content: {
 //	border:  '1px solid red',
@@ -68,6 +76,7 @@ const styles = theme => ({
 	position:'fixed',
 	height: 'calc('+footheight+' + 3%)',
 	width: '100%',
+	left:0,
 	bottom:0,
     },
 });
@@ -148,7 +157,7 @@ class App extends Component {
         const { classes } = this.props;
 	const state       = this.state;
         return (
-             <BrowserRouter>
+             <BrowserRouter  className={classes.root}>
                 <div className={classes.root}>
 		<Switch>
                    <Route exact={true} path={this.path[1]} render={() => (
@@ -171,6 +180,10 @@ class App extends Component {
         );
     }
 }
+
+
+
+
 
 //                            <div className={classes.content}>
 //                            </div>

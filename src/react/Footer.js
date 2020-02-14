@@ -42,7 +42,7 @@ function Footer(props) {
 	       <Grid item xs={6}>
 	          <LevelBar state={state}/>
 	       </Grid>
-	       <Grid item xs={5} style={{position: 'absolute', right: 0}}>
+	       <Grid item xs={5} style={{position: 'absolute', right: 5}}>
 	          <Status state={state}/>
 	       </Grid>
 	    </Grid>

@@ -27,7 +27,7 @@ const styles = theme => ({
 	height: '100%',
 	padding:0,
 	margin:0,
-	border: '5px solid red'
+//	border: '5px solid red'
     },
     dataset: {
 	overflow: 'hidden',
