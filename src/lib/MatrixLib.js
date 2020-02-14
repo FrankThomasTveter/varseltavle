@@ -1,6 +1,7 @@
 //console.log("Loading MatrixLib.js");
 
 function Matrix() {
+    this.bdeb=false;
     this.cnt=0;
     this.keyCnt={};
     this.levCnt={};
@@ -97,37 +98,38 @@ function Matrix() {
 	    }
 	}
     };
+    this.roundup=function(val) {
+	return Math.ceil(val*1000)/1000;
+    }
+    this.rounddown=function(val) {
+	return Math.floor(val*1000)/1000;
+    }
     this.posToVal=function(state,pos,min,max) {
-	var dmin=0.01;
 	var res=this.resolution-1;
 	if (pos !== undefined &&
 	    min !== undefined &&
 	    max !== undefined ) {
 	    var ret;
 	    var dlon=(max-min)/res;
-	    if (Math.abs(dlon) < dmin) {
-		ret=(min+max)/2;
-	    } else {
-		var dbor=dlon/2;
-		var val=( (Number(pos)+0.5) * dlon ) + min - dbor;
-		ret=Math.floor(val*1000+0.5)/1000;
-	    }
-	    return ret.toString();
+	    var dbor=dlon/2;
+	    var val=( (Number(pos)) * dlon ) + min;
+	    if (this.bdeb) {console.log("PosToVal ",pos,min,max,val);};
+	    return val;
 	}
     };
     this.valToPos=function(state,val,min,max) {
-	var dmin=0.01;
 	var res=this.resolution-1;
 	if (val !== undefined &&
 	    min !== undefined &&
 	    max !== undefined ) {
 	    var dlon=(max-min)/res;
-	    if (Math.abs(dlon) < dmin) {
+	    if (max==min) {
+		console.log("ValToPos#",Number(val)-min,dlon,res/2);
 		return Math.floor(res/2);
 	    } else {
 		var dbor=dlon/2;
 		var pos=(Number(val) - min + dbor)/dlon;
-		//console.log("ValToPos:",pos,Number(val)-min+dbor,dlon);
+		if(this.bdeb){console.log("ValToPos:",pos,Number(val)-min+dbor,dlon);};
 		return Math.max(0,Math.min(res,Math.floor(pos)))
 	    }
 	}
@@ -153,51 +155,57 @@ function Matrix() {
 	return this.posToVal(state,pos,min,max)
     };
     this.makeMapRange=function(state){
-	this.values["_lat"]=[];
+	const distinct=(value, index, self) => {
+	    return self.indexOf(value) === index;
+	};
+	var vals=[];
 	var ii;
+	if (this.bdeb) {console.log("makeMapRange:",JSON.stringify(this.area));};
 	for (ii=0;ii<this.resolution;ii++) {
 	    var lat=this.posToLat(state,this.resolution-ii-1);
-	    //console.log("Values _lat:",ii,lat)
-	    this.values["_lat"].push(lat);
+	    if (this.bdeb) {console.log("Values _lat:",this.resolution,ii,lat)};
+	    vals.push(lat);
 	}
-	this.values["_lon"]=[];
+	this.values["_lat"]=vals.filter(distinct);
+	vals=[];
 	for (ii=0;ii<this.resolution;ii++) {
 	    var lon=this.posToLon(state,ii);
-	    //console.log("Values _lon:",ii,lon)
-	    this.values["_lon"].push(lon);
+	    if (this.bdeb) {console.log("Values _lon:",this.resolution,ii,lon)};
+	    vals.push(lon);
 	}
+	this.values["_lon"]=vals.filter(distinct);
     };
-    this.getLonWhere=function(state,keylon,arr,poslon) {
-	var lon=arr[poslon];
-	var min=Number(arr[0]);
-	var max=Number(arr[arr.length-1]);
+    this.getLonRange=function(state,lon) {
+	var min=parseFloat(this.area.minlon);//Number(arr[0]);
+	var max=parseFloat(this.area.maxlon);//Number(arr[arr.length-1]);
 	var pos=this.valToPos(state,lon,min,max);
-	var lonmin=this.posToVal(state,pos-0.5,min,max);
-	var lonmax=this.posToVal(state,pos+0.5,min,max);
-	if (lonmin < lonmax) {
+	var lonmin=this.rounddown(this.posToVal(state,pos-0.506,min,max));
+	var lonmax=this.roundup(this.posToVal(state,pos+0.494,min,max));
+	return {min:lonmin,max:lonmax};
+    }
+    this.getLonWhere=function(state,keylon,lon) {
+	var range=this.getLonRange(state,lon);
+	var lonmin=range.min;
+	var lonmax=range.max;
+	if (parseFloat(lonmin) < parseFloat(lonmax)) {
 	    return ''+keylon+' >= '+lonmin+' and '+keylon+ ' < '+lonmax+'';
 	} else {
 	    return ''+keylon+' >= '+lonmax+' and '+keylon+ ' < '+lonmin+'';
 	}
     };
-    this.getLatWhere=function(state,keylat,arr,poslat) {
-	var lat=arr[poslat];
-	var min=Number(arr[0]);
-	var max=Number(arr[arr.length-1]);
+    this.getLatRange=function(state,lat) {
+	var min=parseFloat(this.area.minlat);//Number(arr[0]);
+	var max=parseFloat(this.area.maxlat);//Number(arr[arr.length-1]);
 	var pos=this.valToPos(state,lat,min,max);
-	var latmin=this.posToVal(state,pos-0.5,min,max);
-	var latmax=this.posToVal(state,pos+0.5,min,max);
-
-	var res=this.resolution-1;
-	var dlon=(max-min)/res;
-	var dbor=dlon/2;
-	//var val=( (Number(pos)+0.5) * dlon ) + min - dbor;
-	//var ret=Math.floor(state,val*1000+0.5)/1000;
-	var xpos=(Number(lat) - min + dbor)/dlon;
-
-	console.log("GetLatWhere:",lat,poslat,pos,xpos,min,max," lat=",lat,latmin,latmax," d=",dbor,dlon);
-
-	if (latmin < latmax) {
+	var latmin=this.rounddown(this.posToVal(state,pos-0.506,min,max));
+	var latmax=this.roundup(this.posToVal(state,pos+0.494,min,max));
+	return {min:latmin,max:latmax};
+    }
+    this.getLatWhere=function(state,keylat,lat) {
+	var range=this.getLatRange(state,lat);
+	var latmin=range.min;
+	var latmax=range.max;
+	if (parseFloat(latmin) < parseFloat(latmax)) {
 	    return ''+keylat+' >= '+latmin+' and '+keylat+ ' < '+latmax+'';
 	} else {
 	    return ''+keylat+' >= '+latmax+' and '+keylat+ ' < '+latmin+'';
@@ -217,9 +225,30 @@ function Matrix() {
 	    var ilon=this.posToLon(state,lonpos);
 	    doc._lat=ilat
 	    doc._lon=ilon
-	    //console.log("Trash doc=",doc.lon,lonpos,ilon,doc._lon,JSON.stringify(this.area));
+	    this.updateKeyCnt(state,"_lat");
+	    this.updateKeyCnt(state,"_lon");
+	    //console.log("AddMapAreaKeys=",doc.lon,lonpos,ilon,doc._lon,JSON.stringify(this.area));
 	}
     };
+    this.setArea=function(iminlat,imaxlat,iminlon,imaxlon) {
+	var eps=0.1;
+	var minlat=parseFloat(iminlat);
+	var maxlat=parseFloat(imaxlat);
+	var minlon=parseFloat(iminlon);
+	var maxlon=parseFloat(imaxlon);
+	var epslon=maxlon-minlon;
+	var epslat=maxlat-minlat;
+	if (epslon < eps) {
+	    maxlon=maxlon+eps/2;
+	    minlon=minlon-eps/2;
+	};
+	if (epslat < eps) {
+	    maxlat=maxlat+eps/2;
+	    minlat=minlat-eps/2;
+	};
+	this.area={minlat:minlat,maxlat:maxlat,minlon:minlon,maxlon:maxlon};
+	console.log("setArea:",JSON.stringify(this.area));
+    }
     this.makeKeyCntMap=function(state,docs) {
 	var key;
 	var maxlat,minlat,maxlon,minlon;
@@ -259,7 +288,7 @@ function Matrix() {
 		}
     	    };
 	}
-	this.area={minlat:minlat,maxlat:maxlat,minlon:minlon,maxlon:maxlon};
+	this.setArea(minlat,maxlat,minlon,maxlon);
 	return;
     };
     this.setupMap=function(state,docs) {
@@ -276,6 +305,7 @@ function Matrix() {
 	var colkey=state.Path.getColKey(state);
 	var rowkey=state.Path.getRowKey(state);
 	this.levCnt={};
+	if (this.bdeb) {console.log("Keys:",JSON.stringify(colkey),JSON.stringify(rowkey),);};
 	//var pos=[];
 	var dlen=cntDocs.length;
 	for (var ii = 0; ii < dlen; ii++) {
@@ -310,6 +340,7 @@ function Matrix() {
 		//arr.docs=[];
     		//console.log ("Array:",JSON.stringify(arr));
 	    }
+	    // 	this.setArea(minlat,maxlat,minlon,maxlon);
 	}
 	if (! found) {
 	    console.log("this.makeMatrix No relevant thresholds found.");
@@ -319,8 +350,19 @@ function Matrix() {
 	    state.Matrix.addAllTooltip(state,matrix);
 	};
     	//console.log ("Matrix:",JSON.stringify(matrix));
-	this.area={minlat:minlat,maxlat:maxlat,minlon:minlon,maxlon:maxlon};
     };
+    this.setMapArea=function(state,docs) {
+	var dlen=docs.length;
+	for (var ii = 0; ii < dlen; ii++) {
+    	    var doc=docs[ii];
+	    var minlon=this.getDocVal(state,doc,"minlon");
+	    var maxlon=this.getDocVal(state,doc,"maxlon");
+	    var minlat=this.getDocVal(state,doc,"minlat");
+	    var maxlat=this.getDocVal(state,doc,"maxlat");
+	    this.setArea(minlat,maxlat,minlon,maxlon);
+	    if (this.bdeb) {console.log("setMapArea:",JSON.stringify(this.area),JSON.stringify(this.doc));};
+	}
+    }
     this.makeMatrix=function(state,docs,matrix) {
 	var found=false;
 	var colkey=state.Path.getColKey(state);
@@ -371,6 +413,21 @@ function Matrix() {
 	    return matrix[colval][rowval];
 	}
 	return;
+    };
+    this.printElements=function(matrix) {
+	// loop over colvalues
+	//console.log("Matrix:",JSON.stringify(matrix));
+	var colvalues=Object.keys(matrix);
+	//console.log("Matrix keys:",JSON.stringify(colvalues));
+	//for (var colval of colvalues) {
+	//   console.log(">",colval);
+	//    if (colval === undefined) {
+	//	console.log(colval,": ***");
+	//    } else {
+	//	//var rowvalues=Object.keys(matrix[colval]);
+	//	//console.log(colval,":",rowvalues);
+	//    };
+	//};
     };
     this.getMatrixElements=function(icolvalues,irowval,matrix,iindex,istep) {
 	var colvalues= (icolvalues === undefined ? undefined : icolvalues.slice());
@@ -609,7 +666,9 @@ function Matrix() {
 	    if (this.values[key] !== undefined) {
 		//console.log("Key:",key,"Values:",JSON.stringify(this.values[key]),jj,
 	    	//	    " sort:",JSON.stringify(state.Database.keyCnt));
-		if (state.Database.keyCnt[key].order  === state.Database.casc) {
+		if (state.Database.keyCnt[key]===undefined) {
+		    console.log("**** Undefined keycnt:",key);
+		} else if (state.Database.keyCnt[key].order  === state.Database.casc) {
     		    this.values[key]=this.values[key].sort(state.Utils.ascending);
 		} else if (state.Database.keyCnt[key].order  === state.Database.nasc) {
     		    this.values[key]=this.values[key].sort(state.Utils.descendingN);
@@ -757,7 +816,7 @@ function Matrix() {
 	return ttset;
     };
     this.addTooltip=function(state,data) {
-	console.log("Updated Matrix with tooltip.",data.rowkey,data.colkey);
+	if (this.bdeb) {console.log("Updated Matrix with tooltip.",data.rowkey,data.colkey);};
 	var rowval=data.rowval;
 	var colvalues=data.colvalues;
 	var step=data.step;

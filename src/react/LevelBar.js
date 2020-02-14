@@ -5,10 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 
 import LevelColor from './LevelColor';
 
-import UndoIcon from '@material-ui/icons/Undo';
-import RedoIcon from '@material-ui/icons/Redo';
-import HomeIcon from '@material-ui/icons/Home';
-
 const styles = theme => ({
     divTable :{
 	display: 'table',
@@ -30,11 +26,12 @@ const styles = theme => ({
 	display: 'table-cell',
 	padding: '0px',
 	cursor: 'pointer',
+	width: '25%',
 //	border:  '1px solid blue',
     },
 });
-function renderItem(classes,state,bg,fg,level) {
-    var plans=state.Layout.makePlans();
+function renderItem(classes,state,bg,fg,level,cnt) {
+    //var plans=state.Layout.makePlans();
     //console.log("Showing palette:",bg,fg,JSON.stringify(plans.hd2));
     return (<LevelColor key={level} state={state} bg={bg} fg={fg} level={level} classes={{divTableCell:classes.divTableCell}}/>);
 //  style={{color:fg,backgroundColor:bg,textAlign:'center'}} onClick={onclick} 
@@ -60,7 +57,8 @@ class LevelBar extends Component {
 	//} else {
 	    //console.log("No colors...");
 	}
-	var mapFunction= (val,index)=>renderItem(classes,state,bgcolors[index],fgcolors[index],index);
+	var cnt=bgcolors.length;
+	var mapFunction= (val,index)=>renderItem(classes,state,bgcolors[index],fgcolors[index],index,cnt);
 	//console.log("Rendering LevelBar...");
 	return (   <div className={classes.divTable}>
 		      <div className={classes.divTableBody}>

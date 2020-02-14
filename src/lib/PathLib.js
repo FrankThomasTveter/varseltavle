@@ -10,9 +10,9 @@ function Path() {
     this.trash=[];         // remaining valid keys
     this.valid=[];         // list of valid keys
     this.ignore=["max","min","minlat","minlon","maxlat","maxlon","cnt","level"]; // only visible in 1D and 0D tables
-    this.select={val:{}};  // current selection criteria
+    this.select={val:{},range:{}};  // current selection criteria
     this.where={};         // current cache for where expressions
-    this.home={path:[],val:{}};  // initial home for data...
+    this.home={path:[],val:{},range:{}};  // initial home for data...
     this.tooltip={keys:[],   // keys that will be displayed (in addition to row/col-keys)
 		  select:[], // extra level of keys to distinguish reports
 		  sort:[],   // which keys should be sorted?
@@ -32,16 +32,20 @@ function Path() {
     this.init=function(state){
 	state.Utils.init("Path",this);
     };
-    this.cleanSelect=function(state) {
-	var pkeys=state.Path.keys.path;
-	var keys=Object.keys(state.Path.select.val);
+    this.cleanKeys=function(pkeys,val) {
+	var keys=Object.keys(val);
 	var lenk=keys.length;
 	for (var ii=0;ii<lenk;ii++) {
 	    var key=keys[ii];
 	    if (pkeys.indexOf(key) === -1) {
-		state.Path.select.val[key]=undefined;
+		val[key]=undefined;
 	    }
 	}
+    }
+    this.cleanSelect=function(state) {
+	var pkeys=state.Path.keys.path;
+	this.cleanKeys(pkeys,state.Path.select.val);
+	this.cleanKeys(pkeys,state.Path.select.range);
     };
     this.goHome=function(state) {
 	var buff=state.Utils.cp(state.Path.keys.path);
@@ -50,6 +54,7 @@ function Path() {
 	state.Utils.remArray(state.Path.keys.other,state.Path.home.path);
 	state.Utils.prepArray(state.Path.keys.other,buff);
 	state.Path.select.val=state.Utils.cp(state.Path.home.val);
+	state.Path.select.range=state.Utils.cp(state.Path.home.range);
 	state.Path.keys.path=state.Utils.cp(state.Path.home.path);
 	//console.log(">>>>>> Path.goHome: ",JSON.stringify(state.Path.home),JSON.stringify(state.Path.keys.path));
 	state.Utils.pushUrl(state);
@@ -61,6 +66,7 @@ function Path() {
 	state.Path.cleanSelect(state);
 	this.home.path=state.Utils.cp(state.Path.keys.path);
 	this.home.val=state.Utils.cp(state.Path.select.val);
+	this.home.range=state.Utils.cp(state.Path.select.range);
 	state.Utils.pushUrl(state);
 	console.log("Setting home.");
     };
@@ -226,6 +232,7 @@ function Path() {
 		    state.Utils.missing(this.ignore,key)) {
 		    pathSet[key]="trash";
 		    this.select.val[key]=undefined;
+		    this.select.range[key]=undefined;
 		    this.where[key]="";
 		    this.trash.push(key);
 		}
@@ -241,6 +248,7 @@ function Path() {
 	    this.other.table=[]
 	    this.other.rest=[]
 	    this.select.val={}; // no values are set so far
+	    this.select.range={}; // no values are set so far
 	    this.where={}
 	    //console.log("Copy default trash keys.",JSON.stringify(state.Default.current.trash));
 	    // copy default trash keys (that are used) to trash...

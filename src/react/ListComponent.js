@@ -91,18 +91,18 @@ function getDataRowList(classes,state,skeys,plans) {
     if (matrix!==undefined) {
 	var colvalues=Object.keys(matrix);
 	var clen=colvalues.length;
-        for (var kk=0;kk<clen;kk++) {
+        for (let kk=0;kk<clen;kk++) {
 	    var colval=colvalues[kk];
 	    var list=matrix[colval];
 	    if (list !== undefined) {
 		var rowvalues=Object.keys(list);
 		var rlen=rowvalues.length;
-		for (var ll=0;ll<rlen;ll++) {
+		for (let ll=0;ll<rlen;ll++) {
 		    var rowval=rowvalues[ll];
 		    var element=state.Matrix.getMatrixElement(colval,rowval,matrix);
 		    //console.log("We have a matrix with range:",JSON.stringify(range));
 		    if (element !== undefined && element.docs !== undefined) {
-			var lev=element.maxlev;
+			let lev=element.maxlev;
 			var mapFunction=(doc,index) =>renderDoc(classes,state,skeys,plans.cell,doc,lev,index);
 			items.push(element.docs.map(mapFunction));
 		    };

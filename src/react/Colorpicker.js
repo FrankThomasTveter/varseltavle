@@ -69,7 +69,7 @@ class Disclaimer extends Component {
 	const { classes, state } = this.props;
 	this.onClose = () => {this.setState({ anchor: null });};
 	this.onClick = (event) => {this.setState({ anchor: event.currentTarget });};
-	const handleColorChange = ({ hex }) => {state.Colors.setLevelBgColor(this.state.level,hex);state.Show.show(state,false);}
+	const handleColorChange = ({ hex }) => {state.Colors.setLevelBgColor(state,this.state.level,hex);state.Show.show(state,false);}
 	var bgcolors=[];
 	var fgcolors=[];
 	if (state.Colors.colors !== undefined) {

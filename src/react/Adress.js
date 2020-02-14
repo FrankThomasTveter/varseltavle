@@ -15,10 +15,14 @@ const styles = theme => ({
     },
 
     text: {
-        maxWidth: theme.spacing.getMaxWidth.maxWidth,
-        margin: theme.spacing.getMaxWidth.margin,
+	maxWidth: "100%",
+	margin: "1%",
     },
 });
+
+//text        maxWidth: theme.spacing.getMaxWidth.maxWidth,
+//text        margin: theme.spacing.getMaxWidth.margin,
+
 
 function Adress(props) {
     // const { classes } = props;

@@ -44,5 +44,10 @@
     "layoutMode": 0
   },
   "other": ["Region","Method","dtg","Partner","Type","Airport","date","Model","Variable","Aerodome","ILS_direction","Issued","Phenomenon"],
-  "trash": ["cnt","lat","lon","max","maxlat","maxlon","min","minlat","minlon","epoch","level","value"]
+    "trash": ["cnt","lat","lon",
+	      "max","maxlat","maxlon",
+	      "min","minlat","minlon",
+	      "epoch","level","value",
+	      "Unit","a1600","a400",
+	      "f90","f95","f98"]
 }

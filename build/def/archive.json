@@ -91,7 +91,9 @@
     "trash":["cnt","lat","lon",
 	     "max","maxlat","maxlon",
 	     "min","minlat","minlon",
-	     "epoch","level","value"
+	     "epoch","level","value",
+	     "Unit","a1600","a400",
+	     "f90","f95","f98"
 	    ],
     "priority":["dtg","date","Type","Model","Method","Partner","Duration","Phenomenon","Airport","Region","Issued"],
     "select":{"val":{},"where":{},"cnt":{}},

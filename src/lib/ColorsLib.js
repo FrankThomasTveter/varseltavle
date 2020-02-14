@@ -5,11 +5,13 @@ function Colors() {
     this.init=function(state){
 	state.Utils.init("Colors",this);
     };
-    this.setLevelBgColor=function(level,color) {
+    this.setLevelBgColor=function(state,level,color) {
 	this.colors.background[level]=color;
+	state.Utils.pushUrl(state);
     };
-    this.setLevelFgColor=function(level,color) {
+    this.setLevelFgColor=function(state,level,color) {
 	this.colors.foreground[level]=color;
+	state.Utils.pushUrl(state);
     };
     this.getLevelBgColor=function(level) {
 	if (level !== undefined && level >= 0 && this.colors !== undefined) {

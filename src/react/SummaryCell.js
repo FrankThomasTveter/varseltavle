@@ -24,7 +24,7 @@ function SummaryCell(props) {
     const { classes,state,onclick,index,rowindex,
 	    colkey,rowkey,colvalues,rowval,
 	    elements,plan,key,label } = props;
-    console.log("Summary height:",plan.height);
+    //console.log("Summary height:",plan.height);
     var style0={height:(plan.height)+"px",backgroundColor:'#FFF'};
     var style1={height:(plan.height)+"px",backgroundColor:'#EEE'};
     if (elements===undefined) {

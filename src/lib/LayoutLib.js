@@ -102,8 +102,6 @@ function Layout() {
 	var mode=this.state.layoutMode;
 	if (mode  === this.modes.layout.List && state.Matrix.cnt > state.Matrix.popSeries) {
 	    mode=this.modes.layout.Table;
-	} else if (mode  === this.modes.layout.Map && state.Matrix.cnt > state.Matrix.popSeries) {
-	    mode=this.modes.layout.Table;
 	}
 	return mode;
     };

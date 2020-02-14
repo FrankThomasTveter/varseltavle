@@ -65,11 +65,11 @@ class CellTooltip extends Component {
 	state.React.Tooltip=this;
     };
     rebuild() {
-	console.log("Rebuilding tooltip.");
+	//console.log("Rebuilding tooltip.");
 	ReactTooltip.rebuild();
     };
     update() {
-	console.log("Rebuilding tooltip.");
+	//console.log("Rebuilding tooltip.");
 	this.forceUpdate();
 	ReactTooltip.rebuild();
     };

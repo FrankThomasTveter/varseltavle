@@ -21,7 +21,10 @@ function Switcher(props) {
     //var dim        = state.Layout.getDim(state)
     var mode       = state.Layout.getLayoutMode(props.state);
     //console.log(">>>>>> Switcher Dim:",dim," mode:",mode);
-    if (progress) { // processing
+    if (mode === state.Layout.modes.layout.Map) {
+	console.log("Showing map...");
+	return (<Map   state={state}   classes={classes}/>);
+    } else if (progress) { // processing
 	return (<div style={{width:'100%',margin:'0 auto'}}>
 	          <Progress/>
 	       </div>);
@@ -29,8 +32,6 @@ function Switcher(props) {
 	return (<Table state={state}   classes={classes}/>);
     } else if (mode === state.Layout.modes.layout.List) {
 	return (<List  state={state}   classes={classes}/>);
-    } else if (mode === state.Layout.modes.layout.Map) {
-	return (<Map   state={state}   classes={classes}/>);
     }
 };
 
@@ -39,16 +40,23 @@ class Dataset extends Component {
         super(props);
         const {state} = props;
         state.React.Dataset=this;
-	this.state={progress:false};
+	this.state={progress:false,mode:0};
     };
     showMatrix(state,matrix) {
 	state.React.matrix=matrix;
-	//console.log("Datacomponent matrix:",JSON.stringify(state.React.matrix));
 	this.forceUpdate();
+	//console.log("Datacomponent matrix:",JSON.stringify(state.React.matrix));
     };
     setProgress(state,active) {
-	state.React.Dataset.setState({progress:active});
-	//this.forceUpdate();
+	var mode       = state.Layout.getLayoutMode(state);
+	//console.log(">>>>>> Switcher Dim:",dim," mode:",mode);
+	//console.log("Setting progress:",active,mode);
+	if (mode === state.Layout.modes.layout.Map && mode==this.state.mode) {
+	    this.state.progress=active;
+	} else {
+	    state.React.Dataset.setState({progress:active,mode:mode});
+	    //this.forceUpdate();
+	}
     };
     render() {
         const { classes, state } = this.props;

@@ -94,7 +94,8 @@
 	     "max","maxlat","maxlon",
 	     "min","minlat","minlon",
 	     "epoch","level","value",
-	     "Unit","a1600","a400","f90"
+	     "Unit","a1600","a400",
+	     "f90","f95","f98"
 	    ],
     "priority":["dtg","date","Unit","Type","Model","Method","Partner","Duration","Phenomenon","Airport","Region","Issued"],
     "select":{"val":{},"where":{},"cnt":{}},

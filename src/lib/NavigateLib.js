@@ -231,59 +231,61 @@ function Navigate() {
 	    state.Show.show(state,reload);
 	}	
     };
+    this.selectItemRange=function(state,colkey,rowkey,colrange,rowrange,colwhere,rowwhere,colcnt,rowcnt) {
+	var rank=state.Utils.cp(state.Path.keys.other);
+	if (this.setKeyRange(state,colkey,colrange,colwhere,colcnt)) {
+	    this.rank[colkey]=state.Utils.cp(rank);
+	    //this.flip[colkey]=this.getFlip(state);
+	    if (this.setKeyRange(state,rowkey,rowrange,rowwhere,rowcnt)) {
+		this.rank[rowkey]=state.Utils.cp(rank);
+		//this.last.flip[rowkey]=this.getFlip(state);
+	    }
+	    //this.trash[colkey]=state.Path.checkTableKeys(state);
+	    //console.log("state.Path.checkTableKeys Done.",colkey,JSON.stringify(this.trash[colkey]));
+	};
+	//console.log("Path:",JSON.stringify(state.Path))
+	state.Html.setFootnote(state,"Extracting data.");
+	state.Html.setProgress(state, true);
+	state.Navigate.store(state);
+	state.Show.show(state);	
+	
+    };
     this.selectItem=function(state,colkey,rowkey,colval,rowval,colwhere,rowwhere,colcnt,rowcnt) {
 	//console.log("Selectitem:",colkey,rowkey,colval,rowval,colwhere,rowwhere,colcnt,rowcnt);
 	//var colkey=state.Path.getColKey(state);
 	//var rowkey=state.Path.getRowKey(state);
 	var rank=state.Utils.cp(state.Path.keys.other);
 	//console.log("SelectItem:",colkey,"=",colval,"  ",rowkey,"=",rowval);
-	if (state.Layout.getLayoutMode(state)  === state.Layout.modes.layout.Map) {
-	    if (this.selectMapKey(state,colkey,colval,colwhere,colcnt)) {
-		this.rank[colkey]=state.Utils.cp(rank);
-		//this.flip[colkey]=this.getFlip(state);
-		if (this.selectMapKey(state,rowkey,rowval,rowwhere,rowcnt)) {
-		    this.rank[rowkey]=state.Utils.cp(rank);
-		    //this.last.flip[rowkey]=this.getFlip(state);
-		}
-		//this.trash[colkey]=state.Path.checkTableKeys(state);
-		//console.log("state.Path.checkTableKeys Done.",colkey,JSON.stringify(this.trash[colkey]));
-	    };
-	    //console.log("Path:",JSON.stringify(state.Path))
+	var changed=false;
+	if (state.Auto.selectTableKey(state,colkey,colval,colwhere,colcnt)) {
+	    //console.log("Selected:",colkey,colval,JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other));
+	    this.rank[colkey]=state.Utils.cp(rank);
+	    changed=true;
+	} else {
+	    console.log("Unable to select:",colkey);
+	};
+	if (state.Auto.selectTableKey(state,rowkey,rowval,rowwhere,rowcnt)) {
+	    //console.log("Selected:",rowkey,rowval,JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other));
+	    this.rank[rowkey]=state.Utils.cp(rank);
+	    changed=true;
+	} else {
+	    console.log("Unable to select:",rowkey);
+	}
+	if (changed) {
+	    //this.trash[colkey]=state.Path.checkTableKeys(state);
+	    //console.log("state.Path.checkTableKeys Done.",colkey,JSON.stringify(this.trash[colkey]));
 	    state.Html.setFootnote(state,"Extracting data.");
 	    state.Html.setProgress(state, true);
 	    state.Navigate.store(state);
-	    state.Show.show(state);	
-	} else {
-	    var changed=false;
-	    if (state.Auto.selectTableKey(state,colkey,colval,colwhere,colcnt)) {
-		//console.log("Selected:",colkey,colval,JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other));
-		this.rank[colkey]=state.Utils.cp(rank);
-		changed=true;
-	    } else {
-		console.log("Unable to select:",colkey);
-	    };
-	    if (state.Auto.selectTableKey(state,rowkey,rowval,rowwhere,rowcnt)) {
-		//console.log("Selected:",rowkey,rowval,JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other));
-		this.rank[rowkey]=state.Utils.cp(rank);
-		changed=true;
-	    } else {
-		console.log("Unable to select:",rowkey);
-	    }
-	    if (changed) {
-		//this.trash[colkey]=state.Path.checkTableKeys(state);
-		//console.log("state.Path.checkTableKeys Done.",colkey,JSON.stringify(this.trash[colkey]));
-		state.Html.setFootnote(state,"Extracting data.");
-		state.Html.setProgress(state, true);
-		state.Navigate.store(state);
-		state.Show.show(state);
-	    }
-	    //console.log("Selectitem Done:",rowwhere,colwhere);
-	};
+	    state.Show.show(state);
+	}
+	//console.log("Selectitem Done:",rowwhere,colwhere);
     };
-    this.selectMapKey=function(state,key,val,where,cnt) { // keep abscissa
+    this.setKeyRange=function(state,key,range,where,cnt) { // keep abscissa
 	//console.log("Table.Selecting:",key,"=",val,", where=",where);
-	state.Path.select.val[key]=[val];
+	state.Path.select.range[key]=[range.min,range.max];
 	state.Path.where[key]=where;
+	//console.log("setKeyRange:",key,JSON.stringify(state.Path.select.range[key]));
 	if (state.Utils.missing(state.Path.keys.path,key)) {
 	    //console.log("Adding to path:",key);
 	    state.Utils.pushKey(state.Path.keys.path,key);
@@ -291,19 +293,21 @@ function Navigate() {
 	};
 	return true;
     };
+    this.selectKeyRange=function(state,key,range,where,cnt) {
+	var rank=state.Utils.cp(state.Path.keys.other);
+	if (this.setKeyRange(state,key,range,where,cnt)) {
+	    this.rank[key]=state.Utils.cp(rank);
+	}
+	state.Html.setFootnote(state,"Extracting data.");
+	state.Html.setProgress(state, true);
+	state.Navigate.store(state);
+	state.Show.show(state);
+    };
     this.selectKey=function(state,key,val,where,cnt) {
 	var rank=state.Utils.cp(state.Path.keys.other);
 	//console.log("SelecRow: rowkey=",key," val=",val);
 	//console.log("SelectKey:",key,val,where,cnt);
-	if (state.Layout.getLayoutMode(state)  === state.Layout.modes.layout.Map) {
-	    if (this.selectMapKey(state,key,val,where,cnt)) {
-		this.rank[key]=state.Utils.cp(rank);
-	    }
-	    state.Html.setFootnote(state,"Extracting data.");
-	    state.Html.setProgress(state, true);
-	    state.Navigate.store(state);
-	    state.Show.show(state);
-	} else if (state.Auto.selectTableKey(state,key,val,where,cnt)) {
+	if (state.Auto.selectTableKey(state,key,val,where,cnt)) {
 	    this.rank[key]=rank;
 	    //this.trash[key]=state.Path.checkTableKeys(state);
 	    //console.log("state.Path.checkTableKeys Done.",rowkey,JSON.stringify(this.trash[key]));

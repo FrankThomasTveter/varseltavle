@@ -27,8 +27,8 @@ function renderRestPath(classes,state,item,index) {
 	var lab=item;
 	onclick=() => state.Navigate.onClickPath(state,'path',key);
 	title="'"+state.Path.where[key]+"'";
-	return (<span>
-		<SelectValueMenu state={state} classes={{}} key={`rest-${key}`} keyitem={item} keyindex={index} label={lab} remove={remove} onclick={onclick} title={title}/>
+	return (<span  key={`rest-${key}`}>
+		<SelectValueMenu state={state} classes={{}} keyitem={item} keyindex={index} label={lab} remove={remove} onclick={onclick} title={title}/>
 		</span>);
     }
     //    return <RestKey state={state} key={`rest-${key}`} index={index} onclick={onclick} title={title} value={key}/>;
@@ -36,10 +36,15 @@ function renderRestPath(classes,state,item,index) {
 class RestPath extends Component {
     state={anchor:null};
     render() {
-       const { classes, state } = this.props;
-       var items=state.Path.other.rest;
-       var mapFunction= (item,index)=>renderRestPath(classes,state,item,index);
-	return items.map(mapFunction);
+	const { classes, state } = this.props;
+	var items=state.Path.other.rest;
+	//console.log("RestPathComponent items:",JSON.stringify(items));
+	var mapFunction= (item,index)=>renderRestPath(classes,state,item,index);
+	if (items.length > 0) {
+	    return items.map(mapFunction);
+	} else {
+	    return null;
+	}
     }
 };
 

@@ -18,7 +18,7 @@ const styles = theme => ({
 class RestValue extends Component {
     render() {
 	const { classes, state, keyvalue, target, onclose } = this.props; // state, key, index, onclick, title, 
-	var where=state.Database.getWhereDetail(target,keyvalue);
+	var where=state.Database.getWhereValue(target,keyvalue);
 	var onclick=() => {state.Navigate.onClickRestValue(state,keyvalue,target,where);onclose();};
 	return <Chip
         label={keyvalue}

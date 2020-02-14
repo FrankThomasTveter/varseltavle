@@ -80,7 +80,7 @@ function renderDataCell(classes,state,key,click,sub,rowindex,colindex) {
     var fgcolor=state.Colors.getLevelFgColor(maxlev);
     var rowkey=key;
     var rowval=sub[key];
-    var rowwhere=state.Database.getWhereDetail(rowkey,rowval);
+    var rowwhere=state.Database.getWhereValue(rowkey,rowval);
     var onclick=(click.indexOf(rowkey)===-1?undefined: () => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1)});
     return (<DataCell classes={classes} state={state} key={`${rowindex}-${colindex}`} val={sub[key]} rowindex={rowindex} fgcolor={fgcolor} bgcolor={bgcolor} onclick={onclick}/>);
 }

@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import Popper from '@material-ui/core/Popper';
 
 //import { CompactPicker as Picker } from 'react-color';
@@ -12,7 +11,6 @@ const styles = theme => ({
         marginRight: 'auto',
 	color:'red',
     },
-    button:{color:'white'},
     paper: {
 	border: '1px solid',
 	padding: '10px',
@@ -75,7 +73,7 @@ class LevelColor extends Component {
         const { state,classes,bg,fg,level } = this.props;
 	//console.log("Rendering LevelColor...");
 	this.onClick = (event) => {this.open(event)};
-	const handleColorChange = ({ hex }) => {console.log("Color:",hex,level);state.Colors.setLevelBgColor(level,hex);state.Show.show(state,false);}
+	const handleColorChange = ({ hex }) => {console.log("Color:",hex,level);state.Colors.setLevelBgColor(state,level,hex);state.Show.show(state,false);}
 	var style={color:fg,backgroundColor:bg,textAlign:'center'};
 	this.node=<div className={classes.divTableCell} style={style} onClick={this.onClick} ref={this.div}>
 		    <div>

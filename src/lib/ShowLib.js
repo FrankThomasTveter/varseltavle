@@ -39,11 +39,12 @@ function Show() {
 			//console.log("Showing Config");
 			this.showConfig(state);
 			//console.log("Showing matrix");
-			this.showMatrix(state,matrix);
+			this.showTable(state,matrix);
 			//console.log("Pushing URL");
 			state.Utils.pushUrl(state);
 			state.Html.setFootnote(state);
 			state.Html.setProgress(state, false);
+			//console.log("Delayed showAll is done...");
 		    }.bind(this),0.1);
 		}.bind(this));
 	    }.bind(this),0.1);
@@ -70,8 +71,8 @@ function Show() {
 	} else {
 	    console.log("No react-location available.");
 	}
-	if (state.React.Disclaimer !== undefined) {
-	    state.React.Disclaimer.showDisclaimer(state); // forceUpdate()
+	if (state.React.LevelBar !== undefined) {
+	    state.React.LevelBar.showLevelBar(state); // forceUpdate()
 	} else {
 	    console.log("No react-disclaimer available.");
 	}
@@ -89,6 +90,11 @@ function Show() {
 	}
     };
     this.showTable=function(state,matrix) {
+	//console.log("Showing table...");
+	if (matrix !== undefined) {
+	    //console.log("Defining matrix...");
+	    state.React.matrix=matrix;
+	};
 	//console.log("ShowTable:",state.Layout.state.layoutMode,state.Layout.modes.layout.Map);
 	if (state.Layout.state.layoutMode === state.Layout.modes.layout.Map) {
 	    if (state.React.Map !== undefined) {
@@ -99,6 +105,7 @@ function Show() {
 		state.React.Table.showTable(state);
 	    }
 	}
+	//console.log("Showing table done...");
     };
     this.showTooltip=function(state) {
 	if (state.React.Tooltip !== undefined) {

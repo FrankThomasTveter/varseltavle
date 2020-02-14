@@ -128,7 +128,8 @@ function renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,ro
     if (index%plan.step === 0) {
 	// get elements and range
 	//console.log("Processing:",val,colvalues[index],plan.step);
-	var elements=state.Matrix.getMatrixElements(colvalues,rowval,state.React.matrix,index,plan.step);
+	var matrix=state.React.matrix;
+	var elements=state.Matrix.getMatrixElements(colvalues,rowval,matrix,index,plan.step);
 	//console.log("Elements:",rowval,index,' =>',JSON.stringify(elements));
 	// get count and colwhere
         var cnt = Math.min(colvalues.length,index+plan.step)-index;
@@ -145,7 +146,7 @@ function renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,ro
 }
 //{{rowkey:'test1',colkey:'test2'}}
 function dataRow(classes,state,colkey,rowkey,colvalues,mode,plans,rowval,rowindex) {
-    var rowwhere=state.Database.getWhereDetail(rowkey,rowval);
+    var rowwhere=state.Database.getWhereValue(rowkey,rowval);
     var onclick=() => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1);}
     var range=[undefined,undefined];
     if (state.React.matrix!==undefined) {
@@ -270,14 +271,21 @@ class Table extends Component {
 	super(props);
 	const {state} = props;
 	state.React.Table=this;
+	this._ismounted=false;
     };
     showTable() {
-	console.log("Rebuilding table.");
-	this.forceUpdate();
+	//console.log("Rebuilding table.",this._ismounted);
+	if (this._ismounted) {
+	    this.forceUpdate();
+	};
     };
-    componentDidMount() {
+    componentDidMount() { 
+	this._ismounted = true;
         window.addEventListener("resize", this.updateWindowDimensions);
-    } 
+    }
+    componentWillUnmount() {
+	this._ismounted = false;
+    }
     updateWindowDimensions = () => {
         this.width= window.innerWidth;
 	this.height=window.innerHeight;

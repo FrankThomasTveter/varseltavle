@@ -3,6 +3,8 @@
 const alasql = window.alasql;
 
 function Database() {
+    this.bdeb=false;
+    this.processing=false;
     var ret;
     this.files=["1.json"];                  // json data file
     this.loaded="";
@@ -373,7 +375,9 @@ function Database() {
     this.dbextract=function(state,showFunc) { // extract data from db and show
 	// extract data from db and insert into data-array
 	// var parent={};//{test:{$exists:false}};
+	if (this.processing) {return};
 	var where = this.getWhere(state);
+	console.log("dbextract Where:",where)
 	var cntDocs0=this.getDocsCnt(state,where);
 	var nrec= (cntDocs0.length===0?0:cntDocs0[0].cnt);
 	var m={};
@@ -390,9 +394,19 @@ function Database() {
 	    state.Matrix.sortMatrixValues(state);
 	    //console.log("Count:",JSON.stringify(docs));
 	    // add "undefined" range of keys that are not present in every doc...
-	    var cntDocs=state.Database.getDocsCnt(state,where,state.Path.other.table);
+	    var colkey=state.Path.getColKey(state);
+	    var rowkey=state.Path.getRowKey(state);
+	    var areaDocs=state.Database.getDocsCnt(state,where);
+	    state.Matrix.setMapArea(state,areaDocs);
+	    state.Matrix.addMapAreaKeys(state,alasql.tables.alarm.data); // add lat_ and lon_ to database...
+	    var cntDocs=state.Database.getDocsCnt(state,where,[colkey,rowkey]);
+	    if (this.bdeb) {console.log("dbextract cntDocs:",JSON.stringify(cntDocs));}
 	    state.Matrix.makeMatrixCntMap(state,cntDocs,m);
 	    state.Matrix.makeMapRange(state);
+	    if (this.bdeb) {console.log("dbextract maprange:",JSON.stringify(state.Matrix.values["_lon"]),JSON.stringify(state.Matrix.values["_lat"]));};
+	    if (this.bdeb) {console.log("dbextract matrix:",JSON.stringify(m));};
+	    //var docs=this.getDocs(state,where); // get all docs
+	    //console.log("Docs:",JSON.stringify(alasql.tables.alarm.data));
 	} else {                              // maintain map data and keyCnt...
 	    //console.log("Database where:",where);
 	    var docs=this.getDocs(state,where); // get all docs
@@ -409,6 +423,7 @@ function Database() {
 	    state.Matrix.makeMatrix(state,docs,m);
 	    //console.log ("Matrix:",JSON.stringify(m));
 	}
+	this.processing=false;
 	showFunc(state,m);
     };
     this.dbindex=function(state,ks) { // make indexes on all keys
@@ -451,7 +466,7 @@ function Database() {
     this.getWhereDynamic=function(state,key,val) {
 	var ret,parse;
 	if (state.Database.values[key] === undefined) {
-	    ret=state.Database.getWhereDetail(key,val);
+	    ret=state.Database.getWhereNull(key);
 	} else {
 	    var keytrg=this.getKeytrg(state,key,val);
 	    //console.log("parseWhere:",key,JSON.stringify(val),keytrg);
@@ -470,37 +485,55 @@ function Database() {
 		} else {
 		    ret=key + "='"+parse+"'";
 		};
-	    } else{
-		ret=state.Database.getWhereDetail(key,val);
-	    };
+	    } else if (keytrg !== undefined) {
+		ret=state.Database.getWhereValue(key,val);
+	    } else {
+		ret=state.Database.getWhereNull(key);
+	    }
 	};
 	//console.log("GetWhere:",key,val,ret);
 	return ret;
     };
-    this.getWhereDetail=function(key,val) {
-	if (val  === undefined ||
-	    val  === null ||
-	    val  === "") {
-	    return key +' is NULL';
+    this.getWhereRange=function(key,range) {
+	if (range  !== undefined ||
+	    range  !== null ||
+	    range  !== "") {
+	    //console.log("getWhereRange:",key,JSON.stringify(range),range[0],range[2]);
+	    return key +' >= '+range[0]+' AND ' + key + ' < '+range[1]+'';
 	} else {
-	    return key + '="'+val+'"'
+	    return;
 	};
     };
-    this.getWhere=function(state,keys,vals) {
+    this.getWhereValue=function(key,val) {
+	if (val  !== undefined ||
+	    val  !== null ||
+	    val  !== "") {
+	    return key + '="'+val+'"'
+	} else {
+	    return;
+	};
+    };
+    this.getWhereNull=function(key) {
+	return key + ' is NULL';
+    };
+    this.getWhere=function(state,keys,vals,ranges) {
 	var where="";
 	//console.log("Path:",JSON.stringify(state.Path.keys));
 	if (keys === undefined) {
 	    keys=state.Path.keys.path;
 	    vals=state.Path.select.val;
+	    ranges=state.Path.select.range;
+	    //console.log("getWhere ranges:",JSON.stringify(ranges));
 	};
 	if (vals === undefined) {vals=[];};
+	if (ranges === undefined) {ranges=[];};
 	if (keys !== undefined) {
 	    var plen = keys.length;
 	    for (var ii = 0; ii < plen; ii++) {
 		var key=keys[ii];
-		var whereKey=state.Database.parseWhere(state,key,vals[key])
+		var whereKey=state.Database.parseWhere(state,key,vals[key],ranges[key])
 		//console.log("Wherekey:",ii,key,JSON.stringify(vals),
-		//	    JSON.stringify(vals[key]),"'"+whereKey+"'");
+		//	    JSON.stringify(vals[key]),JSON.stringify(ranges[key]),"'"+whereKey+"'");
 		if (whereKey  === undefined ||
 		    whereKey  === null ||
 		    whereKey  === "" ) {
@@ -534,7 +567,7 @@ function Database() {
 	var where="";
         for (var kk=index;kk<Math.min(clen,index+step);kk++) {
 	    if (where !== "") {where=where + " or ";}
-	    where=where + this.getWhereDetail(key,values[kk]);
+	    where=where + this.getWhereValue(key,values[kk]);
         };               
 	return where;
     };
@@ -546,13 +579,13 @@ function Database() {
 	    keys.forEach(function(item,index) {this.setWhere(state,item,vals[item]);}.bind(this));
 	}
     };
-    this.setWhere=function(state,key,vals) {
+    this.setWhere=function(state,key,vals,range) {
 	//console.log("Setting where:",key,JSON.stringify(vals));
-	var where=this.parseWhere(state,key,vals);
+	var where=this.parseWhere(state,key,vals,range);
 	//console.log("Setting where:",key,JSON.stringify(vals),"'"+where+"'");
 	state.Path.where[key]=where;
     };
-    this.parseWhere=function(state,key,vals) {
+    this.parseWhere=function(state,key,vals,range) {
 	var where="";
 	if (vals === undefined) {vals=[];};
 	var lenv=vals.length
@@ -562,6 +595,10 @@ function Database() {
 	    where = where + state.Database.getWhereDynamic(state,key,val);
 	    //console.log("From getWhereDynamic:",key,":",val,":",where);
 	};
+	if (range !== undefined) {
+	    if (where !== "") { where=where + " OR ";};
+	    where = where + state.Database.getWhereRange(key,range);
+	}
 	return where;
     };
     this.getGroup=function(keys) {
@@ -634,11 +671,11 @@ function Database() {
 	} else {
 	    var cols = this.getCols(keys);
 	    var group = this.getGroup(keys);
-	    sql="select "+cols+body+
-    		where+group;
-	    //console.log("SQL:",sql,":",body,":",where);
+	    sql="select "+cols+body+where+group;
+	    //console.log("SQL:",sql);
+	    //console.log("Body:",body,":",where,",group:",group,",keys:",JSON.stringify(keys));
 	    dd=this.query(sql);
-	    //console.log("Cnt:",JSON.stringify(dd),JSON.stringify(keys));
+	    //console.log("Cnt:",JSON.stringify(dd),",keys:",JSON.stringify(keys));
 	}
 	return (dd===undefined?[]:dd);
     };
