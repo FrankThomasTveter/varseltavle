@@ -11,8 +11,8 @@ function random(scaleFactor: number): number {
     : -scaleFactor * Math.random();
 }
 
-const MARKER_COLOR = '#ff0000';
-const MARKER_LIGHT = '#ffcccc';
+//const MARKER_COLOR = '#ff0000';
+//const MARKER_LIGHT = '#ffcccc';
 const MARKER_COMPANION_COLOR = '#ff7777';
 
 export default function markerRenderer(marker: Marker): THREE.Object3D {
@@ -22,9 +22,9 @@ export default function markerRenderer(marker: Marker): THREE.Object3D {
   //console.log("Marker:",JSON.stringify(marker.size));
   const material = new THREE.MeshBasicMaterial({
     color: new THREE.Color(marker.bgcolor),
-//    color: new THREE.Color(MARKER_COLOR),
   });
 
+//  const main = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), material);
   const mesh = new THREE.Mesh(geometry, material);
   mesh.children = [];
 
@@ -34,7 +34,7 @@ export default function markerRenderer(marker: Marker): THREE.Object3D {
 
   // add companion markers based on size
   const companions: THREE.Mesh[] = [];
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const companionGeometry = new THREE.SphereGeometry(
       Math.min((size * Math.random())/2, 1),
       10,
@@ -72,7 +72,7 @@ export default function markerRenderer(marker: Marker): THREE.Object3D {
             (): void => {
               const [x, y, z] = from.position;
               const companionMaterial = companion.material as THREE.MeshBasicMaterial; //
-              const intensityChange = random(0.05);
+              //const intensityChange = random(0.05);
               //if (
                 //light.intensity + intensityChange > 0 &&
                 //light.intensity + intensityChange < 1.5

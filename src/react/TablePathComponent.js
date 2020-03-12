@@ -9,7 +9,7 @@ const styles = theme => ({
         marginLeft: 'auto',
     },
     tabchip: {
-        margin: theme.spacing.unit,
+        margin: theme.spacing(1),
 	cursor: "pointer",
         color:"red",
         borderColor:"blue",

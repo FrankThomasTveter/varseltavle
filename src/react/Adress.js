@@ -8,9 +8,9 @@ import Grid from "@material-ui/core/Grid/Grid";
 const styles = theme => ({
     root: {
         backgroundColor: theme.palette.primary.main,
-        marginTop: theme.spacing.unit * 8,
+        marginTop: theme.spacing(8),
         bottom: 0,
-        padding: `${theme.spacing.unit * 6}px 0`,
+        padding: theme.spacing(6),
         color: '#FFF'
     },
 

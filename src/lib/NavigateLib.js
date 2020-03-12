@@ -57,6 +57,7 @@ function Navigate() {
 	    //console.log("Setting snapshot:",this.snapshotToString(state,snapshot));
 	    state.Path.setSnapshot(state,snapshot);
 	    this.refreshHistory(state);
+	    state.Path.setMapTitle(state,"");
 	    state.Show.show(state);
 	};
     };
@@ -68,6 +69,7 @@ function Navigate() {
 	    //console.log("Setting snapshot:",this.snapshotToString(state,snapshot));
 	    state.Path.setSnapshot(state,snapshot);
 	    this.refreshHistory(state);
+	    state.Path.setMapTitle(state,"");
 	    state.Show.show(state);
 	}
     };
@@ -91,6 +93,7 @@ function Navigate() {
 	state.Html.setFootnote(state,"Extracting data.");
 	state.Html.setProgress(state, true);
 	state.Navigate.store(state);
+	state.Path.setMapTitle(state,"");
 	state.Show.show(state,reload);
     };
     this.onClickRestValue=function(state,val,key,where) {
@@ -99,6 +102,7 @@ function Navigate() {
 	    state.Html.setFootnote(state,"Extracting data.");
 	    state.Html.setProgress(state, true);
 	    state.Navigate.store(state);
+	    state.Path.setMapTitle(state,"");
 	    state.Show.show(state);
 	};
 	console.log("onClickRestValue done:",val,key,JSON.stringify(state.Path.keys));
@@ -110,8 +114,11 @@ function Navigate() {
 	if (ttyp  === "path") { // path -> table
 	    tid=state.Path.keys.path.indexOf(tkey);
 	    if (tid !== -1) {
+		var range=state.Path.getRange(state,tkey);
 		src=state.Path.keys.path.splice(tid, 1);                 // remove from path
-		state.Utils.pushKey(state.Path.keys.other,src,2);
+		if (range === undefined) { // remove if this is a range (lat/lon)
+		    state.Utils.pushKey(state.Path.keys.other,src,2);
+		};
 		//state.Utils.spliceArray(state.Path.keys.other,0,0,src); // first position (table)
 		state.Path.cleanSelect(state);
 		state.Navigate.store(state);
@@ -171,6 +178,7 @@ function Navigate() {
 	state.Html.setFootnote(state,"Extracting data.");
 	state.Html.setProgress(state, true);
 	//console.log("Showing:",JSON.stringify(state.Path.other));
+	state.Path.setMapTitle(state,"");
 	state.Show.show(state,reload);
     };
     this.onClickAddOther=function(state,ttyp,tkey,active) { // add key to other
@@ -213,6 +221,7 @@ function Navigate() {
 	//console.log("Keys:",reload,JSON.stringify(state.Path.keys));
 	//console.log("Trash:",reload,JSON.stringify(state.Path.trash));
 	//console.log("Other:",JSON.stringify(state.Path.other));
+	state.Path.setMapTitle(state,"");
 	state.Show.show(state,reload);
     };
     this.switchTableKey=function(state,key) {
@@ -228,6 +237,7 @@ function Navigate() {
 	    state.Navigate.store(state);
 	    var reload=(src[0]!==colkey && src[0]!==rowkey);
 	    //console.log("Switched:",JSON.stringify(src[0]),colkey,rowkey,reload);
+	    state.Path.setMapTitle(state,"");
 	    state.Show.show(state,reload);
 	}	
     };
@@ -247,8 +257,8 @@ function Navigate() {
 	state.Html.setFootnote(state,"Extracting data.");
 	state.Html.setProgress(state, true);
 	state.Navigate.store(state);
-	state.Show.show(state);	
-	
+	state.Path.setMapTitle(state,"");
+	state.Show.show(state);		
     };
     this.selectItem=function(state,colkey,rowkey,colval,rowval,colwhere,rowwhere,colcnt,rowcnt) {
 	//console.log("Selectitem:",colkey,rowkey,colval,rowval,colwhere,rowwhere,colcnt,rowcnt);
@@ -277,6 +287,7 @@ function Navigate() {
 	    state.Html.setFootnote(state,"Extracting data.");
 	    state.Html.setProgress(state, true);
 	    state.Navigate.store(state);
+	    state.Path.setMapTitle(state,"");
 	    state.Show.show(state);
 	}
 	//console.log("Selectitem Done:",rowwhere,colwhere);
@@ -301,12 +312,13 @@ function Navigate() {
 	state.Html.setFootnote(state,"Extracting data.");
 	state.Html.setProgress(state, true);
 	state.Navigate.store(state);
+	state.Path.setMapTitle(state,"");
 	state.Show.show(state);
     };
     this.selectKey=function(state,key,val,where,cnt) {
 	var rank=state.Utils.cp(state.Path.keys.other);
-	//console.log("SelecRow: rowkey=",key," val=",val);
-	//console.log("SelectKey:",key,val,where,cnt);
+	console.log("SelecRow: rowkey=",key," val=",val);
+	console.log("SelectKey:",key,val,where,cnt);
 	if (state.Auto.selectTableKey(state,key,val,where,cnt)) {
 	    this.rank[key]=rank;
 	    //this.trash[key]=state.Path.checkTableKeys(state);
@@ -314,6 +326,7 @@ function Navigate() {
 	    state.Html.setFootnote(state,"Extracting data.");
 	    state.Html.setProgress(state, true);
 	    state.Navigate.store(state);
+	    state.Path.setMapTitle(state,"");
 	    state.Show.show(state);
 	} else {
 	    console.log("Unable to select:",key);

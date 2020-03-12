@@ -13,10 +13,10 @@ const styles = theme => ({
     },
     pointer: {
 	cursor:"pointer",
-	padding: theme.spacing.unit*0,
+	padding: theme.spacing(0),
     },
     nopointer: {
-	padding: theme.spacing.unit*0,
+	padding: theme.spacing(0),
     },
     div :{},
 });

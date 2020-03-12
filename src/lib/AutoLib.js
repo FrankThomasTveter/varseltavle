@@ -27,7 +27,9 @@ function Auto() {
 	    if(this.debug){console.log("Autopath or not?:",lenk,colkey,rowkey,sid,state.Auto.complete);};
 	    if (lenk===0 || colkey===undefined || rowkey===undefined || ! state.Auto.complete ) { // nothing to consider
 		ret = state.Path.tableKeyToPath(state,key,keyval,keywhere,keycnt);
-	    } else {
+	    } else if (key !== colkey && key !== rowkey) { // plain select...
+		ret = state.Path.tableKeyToPath(state,key,keyval,keywhere,keycnt);
+	    } else { // auto-select
 		state.Path.moveOther2Table(state,key);   // move target key to front of array
 		state.Path.duplicateTableKey(state,key); // make duplicate
 		state.Path.exportAllKeys(state);

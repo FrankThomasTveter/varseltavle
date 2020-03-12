@@ -10,6 +10,9 @@ function Layout() {
     this.fonts=["12px Fixed","18px Fixed","24px Fixed","36px Fixed","48px Fixed"
 	       ];
     //
+    this.lfonts=["24px Fixed","36px Fixed","48px Fixed","72px Fixed","96px Fixed"
+	       ];
+    //
     this.state={viewMode:0,       // should we show trash contents?
 		cellMode:0,       // sum, series, item
 		layoutMode:0,     // table, list, map
@@ -50,7 +53,7 @@ function Layout() {
 	state.Show.showConfig(state);
     };
     this.toggleMode=function(state,layoutMode,cellMode) {
-	console.log("Mode:",layoutMode,cellMode);
+	//console.log("Mode:",layoutMode,cellMode);
 	//var reload=(layoutMode !== state.Layout.state.layoutMode);
 	var reload=((state.Layout.state.layoutMode===state.Layout.modes.layout.Map &&
 		    layoutMode!==state.Layout.modes.layout.Map) ||
@@ -309,7 +312,7 @@ function Layout() {
 	if (fontname !== undefined) {
 	    this.getTextWidth.ctx.font = fontsize + ' ' + fontname;
 	} else {
-	    this.getTextWidth.ctx.font = this.fonts[this.state.cfont];
+	    this.getTextWidth.ctx.font = this.getFont();
 	}
 	return this.getTextWidth.ctx.measureText(txt).width;
     };
@@ -321,7 +324,7 @@ function Layout() {
 	if (fontname !== undefined) {
 	    this.getTextHeight.ctx.font = fontsize + ' ' + fontname;
 	} else {
-	    this.getTextHeight.ctx.font = this.fonts[this.state.cfont];
+	    this.getTextHeight.ctx.font = this.getFont();
 	}
 	return this.getTextHeight.ctx.measureText('M').width;
     };
@@ -367,18 +370,49 @@ function Layout() {
 	}
 	return title;
     };
+    this.getFont=function(){
+	return this.fonts[this.state.cfont];
+    };
+    this.getLargeFont=function(){
+	return this.lfonts[this.state.cfont];
+    };
+    this.makePlan=function(label,iwidth,iheight){
+	// get height/width ratio
+	var plan={};
+	var hh=0;
+	var ww=0;
+	var dh=this.getTextHeight();
+	var dw=this.getTextWidth(label);
+	if (dh/dw > iheight/iwidth) {
+	    hh=Math.floor(iheight/3);
+	    ww=Math.floor(hh*dw/dh);
+	} else {
+	    ww=Math.floor(iwidth/3);
+	    hh=Math.floor(ww*dh/dw);
+	}
+	plan.font=hh + 'px Fixed';
+	plan.xoffset=(iwidth-ww)/2;
+	plan.yoffset=(iheight-hh)/2;
+	plan.height=iheight;
+	plan.width=iwidth;
+	plan.rotate=false;
+	plan.step=1;
+	plan.border=0;
+	//console.log("Plan:",JSON.stringify(plan));
+	return plan;
+    }
     this.makePlans=function(colkey,rowkey,colvalues,rowvalues,iwidth,iheight,border) {
 	var descender=this.getDescender();
 	if (border===null) {border=0;}
 	border=border+descender+1;
 	// text boundaries
 	var mheight=this.getTextHeight() + 2 * (descender+1);       //props.theme.spacing.unit;
-	var plans={cell:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.fonts[this.state.cfont]}, 
-		   hdr:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.fonts[this.state.cfont]},
-		   hd1:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.fonts[this.state.cfont]},
-		   hd2:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.fonts[this.state.cfont]},
-		   row:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.fonts[this.state.cfont]},
-		   col:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.fonts[this.state.cfont]}};
+	var plans={cell:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()}, 
+		   hdr:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()},
+		   hd1:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()},
+		   hd2:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()},
+		   row:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()},
+		   col:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()}};
 	if (colkey!==undefined) {
 	    if (iwidth <= 0) { return plans;};
 	    var wh=this.maxWidth(rowvalues,border);
@@ -420,21 +454,21 @@ function Layout() {
 		//console.log("Plan (rot+step):",JSON.stringify(plans),stp,cw,hh,hx);
 	    }
 	    // calculate cell height
-	    var height=iheight-hh;
+	    var height=iheight-hh-((lenr+1)*border);
 	    if (mheight*lenr < height) { // 
 		ch=Math.min(mheight*10,height/lenr) - border;
 	    } else {
 		ch=mheight - border;
 	    }
 	    hw=hwidth;
-	    //console.log("Cells:",hh,ch,height,lenr,mheight);
+	    //console.log("Cells:",hh,ch,iheight,height,lenr,mheight);
 	    var dw=(hw-zwidth1-zwidth2)/2;
-	    this.setPlan(plans.cell,{width:cw,height:ch,step:stp,font:this.fonts[this.state.cfont]});
-	    this.setPlan(plans.hdr, {width:hw,height:hh,font:this.fonts[this.state.cfont]});
-	    this.setPlan(plans.hd1, {width:zwidth1+dw,height:hh,align:"right",font:this.fonts[this.state.cfont]});
-	    this.setPlan(plans.hd2, {width:zwidth2+dw,height:hh,font:this.fonts[this.state.cfont]});
-	    this.setPlan(plans.col, {width:cw,height:hh,xoffset:hx,step:stp,rotate:rot,font:this.fonts[this.state.cfont]});
-	    this.setPlan(plans.row, {width:hw,height:ch,font:this.fonts[this.state.cfont]});
+	    this.setPlan(plans.cell,{width:cw,height:ch,step:stp,font:this.getFont()});
+	    this.setPlan(plans.hdr, {width:hw,height:hh,font:this.getFont()});
+	    this.setPlan(plans.hd1, {width:zwidth1+dw,height:hh,align:"right",font:this.getFont()});
+	    this.setPlan(plans.hd2, {width:zwidth2+dw,height:hh,font:this.getFont()});
+	    this.setPlan(plans.col, {width:cw,height:hh,xoffset:hx,step:stp,rotate:rot,font:this.getFont()});
+	    this.setPlan(plans.row, {width:hw,height:ch,font:this.getFont()});
 	    //console.log("Plan (finally):",JSON.stringify(plans),mheight,mwidth,height,width,lenr);
 	}
 	return plans;

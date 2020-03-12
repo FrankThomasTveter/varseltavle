@@ -21,7 +21,7 @@ function Show() {
 	    };
 	}.bind(this),0.1);
     };
-    this.showAll=function(state,reload) { // show data on screen
+    this.showAll=function(state,reload,force) { // show data on screen
 	//var documentLog = document.getElementById("log");
 	//console.log("Showing data.");
 	if (reload  === undefined || reload) {
@@ -38,8 +38,10 @@ function Show() {
 			this.showPath(state);
 			//console.log("Showing Config");
 			this.showConfig(state);
-			//console.log("Showing matrix");
-			this.showTable(state,matrix);
+
+			//console.log("Showing Table/Map");
+
+			this.showDataset(state,matrix,force);
 			//console.log("Pushing URL");
 			state.Utils.pushUrl(state);
 			state.Html.setFootnote(state);
@@ -53,7 +55,7 @@ function Show() {
 	    state.Path.exportAllKeys(state);
 	    this.showPath(state);
 	    this.showConfig(state);
-	    this.showTable(state);
+	    this.showDataset(state,undefined,force);
 	    this.showTooltip(state);
 	    state.Html.setFootnote(state);
 	    state.Html.setProgress(state, false);
@@ -84,21 +86,30 @@ function Show() {
 	    console.log("No react-config available.");
 	}
     };
+    this.showSettings=function(state) {
+	if (state.React.Settings !== undefined) {
+	    state.React.Settings.show(state); // forceUpdate()
+	} else {
+	    console.log("No react-config available.");
+	}
+    };
     this.showMatrix=function(state,matrix) {
 	if (state.React.Dataset !== undefined) {
 	    state.React.Dataset.showMatrix(state,matrix);
 	}
     };
-    this.showTable=function(state,matrix) {
+    this.showDataset=function(state,matrix,force) {
 	//console.log("Showing table...");
 	if (matrix !== undefined) {
 	    //console.log("Defining matrix...");
 	    state.React.matrix=matrix;
 	};
+
 	//console.log("ShowTable:",state.Layout.state.layoutMode,state.Layout.modes.layout.Map);
+
 	if (state.Layout.state.layoutMode === state.Layout.modes.layout.Map) {
 	    if (state.React.Map !== undefined) {
-		state.React.Map.showMap(state);
+		state.React.Map.showMap(state,force);
 	    }
 	} else {
 	    if (state.React.Table !== undefined) {

@@ -35,7 +35,7 @@ function Footer(props) {
     const { classes, state } = props;
     return (
 	    <div className={classes.footer}>
-            <Grid container spacing={24} className={classes.text}>
+            <Grid container spacing={10} className={classes.text}>
 	       <Grid item xs={3}>
  	          <Adress />
 	       </Grid>

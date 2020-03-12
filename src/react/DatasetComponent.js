@@ -22,7 +22,7 @@ function Switcher(props) {
     var mode       = state.Layout.getLayoutMode(props.state);
     //console.log(">>>>>> Switcher Dim:",dim," mode:",mode);
     if (mode === state.Layout.modes.layout.Map) {
-	console.log("Showing map...");
+	//console.log("Showing map...");
 	return (<Map   state={state}   classes={classes}/>);
     } else if (progress) { // processing
 	return (<div style={{width:'100%',margin:'0 auto'}}>
@@ -51,8 +51,9 @@ class Dataset extends Component {
 	var mode       = state.Layout.getLayoutMode(state);
 	//console.log(">>>>>> Switcher Dim:",dim," mode:",mode);
 	//console.log("Setting progress:",active,mode);
-	if (mode === state.Layout.modes.layout.Map && mode==this.state.mode) {
-	    this.state.progress=active;
+	if (mode === state.Layout.modes.layout.Map && mode===this.state.mode) {
+	    this.setState({progress:active});
+	    //this.state.progress=active;
 	} else {
 	    state.React.Dataset.setState({progress:active,mode:mode});
 	    //this.forceUpdate();

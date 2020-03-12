@@ -30,6 +30,10 @@ const styles = theme => ({
 	padding:0,
 	margin:0,
     },
+    divEmpty :{
+	width: '100%',
+	height: '100%',
+    },
     divTable :{
 	display: 'table',
 	width: '100%',
@@ -74,7 +78,7 @@ const styles = theme => ({
     },
     paperImage: {
         textAlign: 'center',
-        padding: theme.spacing.unit * 2,
+        padding: theme.spacing(2),
     }
 });
 
@@ -252,20 +256,27 @@ function Details(props) {
 	border=1;
     };
     var width=0.9*window.innerWidth;
-    var height=0.94*window.innerHeight - 180;
+    var height=0.94*window.innerHeight - 100;
     var plans=state.Layout.makePlans(colkey,rowkey,colvalues,rowvalues,width,height,border);
     //console.log("Heights:",window.innerHeight,height,plans.hdr.height,plans.cell.height);
     //console.log("Details => Width/Height:",window.innerWidth,window.innerHeight,plan.cell.width,plan.hdr.height)
     //console.log("Colkey:",colkey," colval:",JSON.stringify(colvalues));
     //console.log("Rowkey:",rowkey," rowval:",JSON.stringify(rowvalues));
-
-    return (<div className={classes.divTable}>
-	       <div className={classes.divTableBody}>
+    if (state.React.matrix === undefined) {
+	var label="Processing..."
+	var plan=state.Layout.makePlan(label,width,height);
+	return (<div className={classes.divEmpty}>
+		   <CanvasText state={state} label={label} plan={plan}/>
+		</div>);
+    } else {
+	return (<div className={classes.divTable}>
+		 <div className={classes.divTableBody}>
 	          <HdrRow classes={classes} state={state} plans={plans} colkey={colkey} colvalues={colvalues} rowkey={rowkey} rowvalues={rowvalues}/>
 	          <DataRows classes={classes} state={state} plans={plans} colkey={colkey} colvalues={colvalues} rowkey={rowkey} rowvalues={rowvalues} mode={cellMode}/>
-	       </div>
-            </div>);
- }
+		 </div>
+		</div>);
+    }
+}
 class Table extends Component {
     constructor(props) {
 	super(props);
@@ -303,7 +314,7 @@ class Table extends Component {
 	const { classes, state } = this.props;
 	//console.log("##### Rendering Table.");
 	return (<div ref={el=>{this.element(el)}} className={classes.content}>
-		   <Grid container spacing={24}>
+		   <Grid container spacing={10}>
 		      <Grid item xs={12} > 
                          { <Paper className={classes.paper}>
 		              <Details state={state} classes={classes} element={this}/>

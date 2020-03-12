@@ -18,16 +18,16 @@ import ReactDOM from 'react-dom';
 const styles = theme => ({
     cell : {
 	cursor: "pointer",
-	padding: theme.spacing.unit*0,
-	width:theme.spacing.unit*0,
+	padding: theme.spacing(0),
+	width: theme.spacing(0),
 	borderStyle: 'solid',
     },
     rotate : {
 	cursor: "pointer",
-	padding: theme.spacing.unit*0,
-	width:theme.spacing.unit*0,
+	padding: theme.spacing(0),
+	width:theme.spacing(0),
 	borderStyle: 'solid',
-	width:"20px",
+	width: "20px",
 //	textAlign:"right",
     },
 });

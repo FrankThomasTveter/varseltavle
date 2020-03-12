@@ -9,13 +9,13 @@ const styles = theme => ({
         marginRight: 'auto',
     },
     selchip: {
-        margin: theme.spacing.unit,
+        margin: theme.spacing(1),
 	cursor: "pointer",
         color:"blue",
         borderColor:"blue",
     },
     othchip: {
-        margin: theme.spacing.unit,
+        margin: theme.spacing(1),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",

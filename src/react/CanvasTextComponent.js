@@ -10,10 +10,10 @@ const styles = theme => ({
     },
     pointer: {
 	cursor:"pointer",
-	padding: theme.spacing.unit*0,
+	padding: theme.spacing(0),
     },
     nopointer: {
-	padding: theme.spacing.unit*0,
+	padding: theme.spacing(0),
     },
 });
 function drawMarker(ctx,height,offset,width) {
@@ -54,14 +54,17 @@ function updateCanvas(item) {
     };
     if (plan.rotate !== undefined && plan.rotate) {
 	ctx.textAlign = "left"; //left right center
-	ctx.translate(item.width-plan.border-plan.xoffset,item.height-plan.border);
+	ctx.translate(item.width-plan.border-plan.xoffset,item.height-plan.border-plan.yoffset);
 	ctx.rotate(-Math.PI/2);
 	ctx.fillText(label, 0, 0); // labelXposition
     } else if (plan.align === "right") {
 	ctx.textAlign = "right"; //left right center
-	ctx.fillText(label, plan.width-plan.border+plan.xoffset, item.height-plan.border); // labelXposition
+	ctx.fillText(label, plan.width-plan.border+plan.xoffset, item.height-plan.border-plan.yoffset); // labelXposition
+    } else if (plan.align === "center") {
+	ctx.textAlign = "center"; //left right center
+	ctx.fillText(label, plan.width-plan.border+plan.xoffset, item.height-plan.border-plan.yoffset); // labelXposition
     } else {
-	ctx.fillText(label, plan.border+plan.xoffset, item.height-plan.border); // labelXposition
+	ctx.fillText(label, plan.border+plan.xoffset, item.height-plan.border-plan.yoffset); // labelXposition
     };
     ctx.restore();
     //ctx.rect(0,0,item.width,item.height);

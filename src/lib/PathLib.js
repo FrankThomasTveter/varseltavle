@@ -13,6 +13,7 @@ function Path() {
     this.select={val:{},range:{}};  // current selection criteria
     this.where={};         // current cache for where expressions
     this.home={path:[],val:{},range:{}};  // initial home for data...
+    this.film={ index:null, reel:[], play:false, label:"", title:"" } ;// reel={label:"",path:[],val:{},range:{}} 
     this.tooltip={keys:[],   // keys that will be displayed (in addition to row/col-keys)
 		  select:[], // extra level of keys to distinguish reports
 		  sort:[],   // which keys should be sorted?
@@ -68,7 +69,7 @@ function Path() {
 	this.home.val=state.Utils.cp(state.Path.select.val);
 	this.home.range=state.Utils.cp(state.Path.select.range);
 	state.Utils.pushUrl(state);
-	console.log("Setting home.");
+	//console.log("Setting home.");
     };
     this.getSnapshot=function(state) { // store state
 	return {keys:state.Utils.cp(state.Path.keys),
@@ -78,6 +79,136 @@ function Path() {
     };
     this.setSnapshot=function(state,snapshot) { // store state
 	state.Utils.restore(state.Path,snapshot);
+    };
+    this.addFilm=function(state,snapshot) {
+	var film=state.Path.film;
+	var reel=film.reel;
+	if (snapshot === undefined) {
+	    snapshot=this.getSnapshot(state);
+	};
+	snapshot.label=film.label;
+	reel.push(snapshot);
+	state.Utils.pushUrl(state);
+	return reel.length-1;
+    };
+    this.setFilm=function(state,label,pos,snapshot) {
+	var film=state.Path.film;
+	var reel=film.reel;
+	if (snapshot === undefined) {
+	    snapshot=this.getSnapshot(state);
+	};
+	snapshot.label=label;
+	reel[pos]=snapshot;
+	state.Utils.pushUrl(state);
+	return pos;
+    };
+    this.moveFilm=function(state,pos) {
+	var film=state.Path.film;
+	var reel=film.reel;
+	var len=reel.length;
+	if (pos !== undefined && pos>0 && pos < len) {
+	    var snapshot=reel[pos];
+	    reel[pos]=reel[pos-1];
+	    reel[pos-1]=snapshot;
+	}
+	state.Utils.pushUrl(state);
+    }
+    this.removeFilm=function(state,pos) {
+	var label="";
+	var film=state.Path.film;
+	var reel=film.reel;
+	if (pos === undefined) { pos=0;};
+	if (reel.length > 0 && pos < reel.length) {
+	    var trash=reel.splice(pos, 1);
+	    label=trash[0].label;
+	    //console.log("Snapshot:",JSON.stringify(trash),label);
+	    if (reel.length <= 0) {
+		film.index=null;
+	    } else {
+		film.index=Math.min(film.index,reel.length);
+	    }
+	} else {
+	    film.index=null;
+	}
+	if (label===undefined) {label="";};
+	film.label=label;
+	console.log("Removing :",pos,label,reel.length);
+	state.Utils.pushUrl(state);
+	return label;
+    };
+    this.toggleFilm=function(state) {
+	var film=state.Path.film;
+	film.play = ! film.play;
+	state.Utils.pushUrl(state);
+	return film.play;
+    };
+    this.getFilmPlay=function(state) {
+	var film=state.Path.film;
+	return film.play;
+    };
+    this.nextFilm=function(state,pos) {
+	var film=state.Path.film;
+	var reel=film.reel;
+	var len=reel.length;
+	if (pos !== undefined && pos < len) {
+	    // FT signing off...
+	    // console.log("Next film",film.play,pos,film.index,len);
+	    var snapshot=reel[pos];
+	    this.setSnapshot(state,snapshot);
+	    this.setLabel(state,snapshot.label);
+	    this.setMapTitle(state,snapshot.label);
+	    state.Show.show(state);
+	    return snapshot.label;
+	} else if (pos === undefined && film.play) {
+	    if (film.index === undefined || film.index===null) {
+		film.index=0;
+	    } else { 
+		film.index= (film.index+1)%len;
+	    };
+	    console.log("Next index film",film.index,len);
+	    return this.nextFilm(state,film.index);
+	}
+    };
+    this.setMapTitle=function(state,label) {
+	var film=state.Path.film;
+	console.log("Setting map title:",label);
+	state.Utils.pushUrl(state);
+	film.title=label;
+    };
+    this.getMapTitle=function(state) {
+	var film=state.Path.film;
+	return film.title;
+    };
+    this.setLabel=function(state,label) {
+	var film=state.Path.film;
+	state.Utils.pushUrl(state);
+	film.label=label;
+    };
+    this.getLabel=function(state) {
+	var film=state.Path.film;
+	return film.label;
+    };
+    this.setFilmLabel=function(state,pos,label) {
+	var film=state.Path.film;
+	var reel=film.reel;
+	var snapshot=reel[pos];
+	snapshot.label=label;
+	state.Utils.pushUrl(state);
+    };
+    this.getFilmLabel=function(state,pos) {
+	var film=state.Path.film;
+	var reel=film.reel;
+	var snapshot=reel[pos];
+	return snapshot.label;
+    };
+    this.getFilmCnt=function(state) {
+	var film=state.Path.film;
+	var reel=film.reel;
+	return reel.length;
+    };
+    this.getReels=function(state) {
+	var film=state.Path.film;
+	return film.reel;
     };
     this.toggleSelect=function(state,key,val) {
 	var vals=state.Path.select.val[key];
@@ -104,13 +235,19 @@ function Path() {
 	keys.forEach(
 	    function(key,index) {
 		var vals=state.Path.select.val[key];
+		var range=state.Path.select.range[key];
 		//console.log("   select:",key,JSON.stringify(vals));
-		if (vals === undefined) {vals=[];};
-		var lenv=vals.length
-		for (var ii=0;ii<lenv;ii++) {
-		    var val=vals[ii]
+		if (range !== undefined) {
 		    if (title !== "") { title=title + " | ";};
-		    title=title+state.Database.getTitleDynamic(state,key,val);
+		    title=title+key+"<"+range[0]+","+range[1]+">";
+		} else { 
+		    if (vals === undefined) {vals=[];};
+		    var lenv=vals.length
+		    for (var ii=0;ii<lenv;ii++) {
+			var val=vals[ii]
+			if (title !== "") { title=title + " | ";};
+			title=title+state.Database.getTitleDynamic(state,key,val);
+		    }
 		}
 	    }
 	);
@@ -190,18 +327,23 @@ function Path() {
 	    this.keys.other=this.keys.other.filter(this.Unique);
 	    this.trash=this.trash.filter(this.Unique);
 	    //console.log("setup:",JSON.stringify(setup));
-	    //console.log("Remove invalid keys from path.");
+	    //console.log("Remove invalid keys from path.",JSON.stringify(this.keys));
 	    // remove invalid keys from path
 	    var plen = this.keys.path.length;
 	    for (ii = 0; ii < plen; ii++) {
 		key=this.keys.path[ii];
 		if (state.Database.keyCnt[key]  === undefined) {
-		    this.keys.path.splice(ii, 1);
-		    ii=ii-1;
-		    plen=plen-1;
+		    if (this.select !== undefined &&
+			this.select.range[key] !== undefined) {
+			//console.log("**** Keeping:",key);
+		    } else {
+			this.keys.path.splice(ii, 1);
+			ii=ii-1;
+			plen=plen-1;
+		    };
 		}
 	    }
-	    //console.log("Remove invalid keys from other.");
+	    //console.log("Remove invalid keys from other.",JSON.stringify(this.keys));
 	    // remove invalid keys from other
 	    olen = this.keys.other.length;
 	    for (ii = 0; ii < olen; ii++) {
@@ -212,7 +354,7 @@ function Path() {
 		    olen=olen-1;
 		}
 	    }
-	    //console.log("Remove invalid keys from trash.");
+	    //console.log("Remove invalid keys from trash.",JSON.stringify(this.keys));
 	    // remove invalid keys from trash
 	    olen = this.trash.length;
 	    for (ii = 0; ii < olen; ii++) {
@@ -223,7 +365,7 @@ function Path() {
 		    olen=olen-1;
 		}
 	    }
-	    //console.log("Update trash with keys.");
+	    //console.log("Update trash with keys.",JSON.stringify(this.keys));
 	    // we already have a path, update trash with new keys
 	    for (key in state.Database.keyCnt) {
 		if (this.keys.path.indexOf(key)  === -1 && 
@@ -237,6 +379,7 @@ function Path() {
 		    this.trash.push(key);
 		}
 	    }
+	    //console.log("Update trash with keys.",JSON.stringify(this.keys));
 	} else {
 	    // new path...
 	    //console.log("New path");
@@ -265,7 +408,7 @@ function Path() {
 		}
 		//console.log("Pathset:",JSON.stringify(pathSet),JSON.stringify(state.Default.current.trash));
 	    };
-	    //console.log("Copy default other keys.");
+	    //console.log("Copy default other keys.",JSON.stringify(this.keys));
 	    //console.log("makePath A:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));
 	    // console.log("Added trash:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));
 	    // copy default other keys (that are used) to other...
@@ -282,7 +425,7 @@ function Path() {
 		}
 	    }
 	    //console.log("makePath B:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));
-	    //console.log("Add missing keys.");
+	    //console.log("Add missing keys.",JSON.stringify(this.keys));
 	    // add missing keys to path
 	    for (key in state.Database.keyCnt) {
 		if (state.Utils.missing(this.ignore,key)) {
@@ -312,7 +455,7 @@ function Path() {
 	    //     }
 	    // });
 	    //console.log("makePath C:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));
-	    //console.log("Push other keys to table and rest.");
+	    //console.log("Push other keys to table and rest.",JSON.stringify(this.keys));
 	    var glen = this.keys.other.length;
 	    for (ii = 0; ii < glen; ii++) {
 		key=this.keys.other[ii];
@@ -336,6 +479,15 @@ function Path() {
 	//console.log("After Valid:",JSON.stringify(state.Path.valid),JSON.stringify(state.Path.keys));
 	//console.log("Completed makepath.");
     };
+    this.getRange=function(state,key) {
+	return state.Path.select.range[key];
+    }
+    this.setRange=function(state,key,range) {
+	state.Path.select.range[key]=range;
+    }
+    this.setRangeValue=function(state,range,index,value) {
+	range[index]=value;
+    }
     this.getIndex=function(state,trg) {
 	return this.keys.path.indexOf(trg);
     };
@@ -405,7 +557,7 @@ function Path() {
 	    //console.log("Selectkey:",JSON.stringify(setup),JSON.stringify(src));
 	    return true;
 	} else {
-	    console.log("Missing '",key,"' in path:",JSON.stringify(state.Path.keys));
+	    console.log("Missing '",key,"' in other:",JSON.stringify(state.Path.keys));
 	    return false;
 	}
     };
@@ -694,6 +846,27 @@ function Path() {
     //values[key]=values[key].filter(this.Unique);
     this.Unique=function(value, index, self) { 
 	return self.indexOf(value)  === index;
+    }
+    this.getClickableTooltipKeys=function(state,data) {
+	var colkey=data.colkey;
+	var rowkey=data.rowkey;
+	var click=[rowkey,colkey];
+	state.Utils.cpArray(click,state.Path.tooltip.click);
+	return click;
+    }
+    this.getTooltipKeys=function(state,data,tooltip) {
+	var colkey=data.colkey;
+	var rowkey=data.rowkey;
+	var colvalues=data.colvalues;
+	var rowval=data.rowval;
+	var keys=[];
+	if (colvalues===undefined) {keys.push(colkey);}
+	if (rowval===undefined) {keys.push(rowkey);}
+	state.Utils.cpArray(keys,state.Path.tooltip.keys);
+	state.Utils.remArray(keys,state.Path.keys.path);
+	//state.Utils.remArray(keys,state.Path.other.table);
+	keys=state.Utils.keepHash(keys,tooltip);
+	return keys;
     }
 };
 export default Path;

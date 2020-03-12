@@ -265,6 +265,10 @@ function Utils() {
 	    if (urlPath ===undefined) {urlPath={};}
 	    urlPath.order=this.cp(state.Path.order);
 	};
+	if (state.Default.hasChanged(state,["Path","film"])) {
+	    if (urlPath ===undefined) {urlPath={};}
+	    urlPath.film=this.cp(state.Path.film);
+	};
 	//console.log("URL Keys:",JSON.stringify(urlPath.keys));
 	var urlLayout=undefined;
 	if (state.Default.hasChanged(state,["Layout","priority"])) {

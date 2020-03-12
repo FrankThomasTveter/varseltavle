@@ -2,55 +2,54 @@ import React, {Component, useState, useEffect, useRef} from "react";
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 
-import {teal_palette} from '../mui/metMuiThemes';
+import ReactGlobe from '../globe/ReactGlobe';
 
-import ReactGlobe from 'react-globe';
-
-import defmarkers from './markers';
+import Tooltip from './Tooltip'
+import MapInfo from './MapInfo'
 import markerRenderer from './markerRenderer';
 
 import './styles.css';
 
-const markerEvent=new Event("UpdateMarkersEvent");
-
-const event2=new CustomEvent("UpdateMarkersEvent",{data:1});
 const footAndHeaderheight = "100px";
-
-function getTooltipContent(marker) {
-    //console.log("Marker colwhere:",marker.colwhere," rowwhere:",marker.rowwhere,JSON.stringify(marker.element));
-  return `${marker.colwhere} ${marker.rowwhere})`;
-}
 
 const styles = theme => ({
     content: {},
     root: {
-	height: '100%',
+//	height: '100%',
 	padding:0,
 	margin:0,
-//	border: '5px solid red'
+	border: '0px solid red'
     },
     dataset: {
 	overflow: 'hidden',
-	height: '100%',
+//	height: '100%',
     },
     map: {
 	overflow: 'hidden',
-	height: '100%',
+//	height: '100%',
     },
 });
 
 
 function MapGlobe(props) {
-    const {classes,onClickMarker,onDefocus,data} = props;
+    const {classes,onClickMarker,update} = props;
     // Use State to keep the values
     const [markers, setMarkers] = useState([]);
     let animations=[];
-    let focus=[0,0];
-    let dist=2;
     const[sequence, setSequence] = useState();
     const id=useRef(null)
+    function getTooltipContent(marker) {
+	//console.log("Path:",JSON.stringify(marker.state.Path.keys));
+	//console.log("Marker colwhere:",marker.colwhere," rowwhere:",marker.rowwhere);
+	var state=marker.state;
+	if (state.Layout.state.tooltip===2) {
+	    return null;
+	} else {
+	    return <Tooltip state={marker.state} data={marker} update={update}/>;
+	}
+    }
     function updateLoop(props) {
-	if (props.data.cnt != 0) {
+	if (props.data.cnt !== 0) {
 	    setMarkers(props.data.markers);
 	    props.data.cnt=0;
 	    setSequence("default");
@@ -60,59 +59,29 @@ function MapGlobe(props) {
 	},500);
     };
     switch(sequence) {
-	case 'default':
-	animations=props.data.animations;
-	//dist=props.data.dist;
-	//focus=props.data.focus;
-	break;
+	default:
+	animations=props.data.animations;	
     }
     useEffect( ()=>{updateLoop(props);
 		    return () => id.current && clearTimeout(id.current) } );
-  //  useEffect( ()=>{setMarkers(props.data.markers);} );
-    //useEffect( ()=>{console.log("Setting Globe markers...",props.data.cnt);setMarkers(props.data.markers);} ,[props.data.cnt] );
-    //  <button onClick={() => {if (markers.length > 0) {setMarkers([]);} else {setMarkers(props.data.markers);};console.log("Button setting markers.");}}
-//<div className={classes.map}>
-//      <button onClick={() => {setMarkers(props.data.markers);console.log("Button setting markers.",props.data.markers.length);}}
-//      >
-//        set marker
-//      </button>
-//	</div>)
-//	        animations={animations}
-//	        focus={focus}
-//	        focusOptions={{distanceRadiusScale:dist,animationDuration:10000,easingFunction: ['Cubic','InOut']}}
     return (<ReactGlobe className={classes.map}
-	    	animations={animations}
+	        animations={animations}
                 markers={markers}
                 onClickMarker={onClickMarker}
+                getTooltipContent={getTooltipContent}
                 markerOptions={{renderer: markerRenderer,
-                                getTooltipContent:getTooltipContent,  
-                               }}
+				//activeScale:1.01,
+				enterAnimationDuration:0.0,
+				exitAnimationDuration:0.0,
+				offsetRadiusScale:0.01,
+				//radiusScaleRange:[1,1],
+				enableGlow:true,
+			       }}
 	        cameraOptions={{autoRotateSpeed:0}}
 	/>)
 }
 
-//                focus={[65,15]} 
-//                zoom={2} 
-//                initialCoordinates={[65,20]}
-//                onClickMarker={onClickMarker}
-//                markerOptions={{renderer: markerRenderer,
-//                                getTooltipContent:getTooltipContent,  
-//                               }}
-//        markerOptions={{
-//          enableGlow: false,
-//          getTooltipContent: marker => marker.tooltip,
-//          radiusScaleRange: [0.02, 0.05],
-//        }}
-//                focusOptions={{
-//                   animationDuration: 500, 
-//                    distanceRadiusScale: 1.75,
-//                    easingFunction: ['Cubic', 'In'],
-//	            enableAutoRotate:false,
-//		    enableClouds:false,
-//                }}
-
-
-
+//, rotateSpeed:0.1
 
 class EarthMap extends Component {
     constructor(props) {
@@ -122,8 +91,15 @@ class EarthMap extends Component {
 	this._ismounted = false;
 	this.elem=null;
 	this.data={cnt:99,markers:[],animations:[],focus:[0,0],dist:2};
+	this.update=this.update.bind(this);
+	this.cnt=0;
     };	
+    update() {
+	//console.log("Force update EarthMap...");
+	this.forceUpdate();
+    };
     componentDidMount() { 
+	this.data={cnt:99,markers:[],animations:[],focus:[0,0],dist:2};
 	this._ismounted = true;
         window.addEventListener("resize", this.updateWindowDimensions);
     };
@@ -133,31 +109,33 @@ class EarthMap extends Component {
     onClickMarker(marker, markerObject, event) {
 	//console.log("Clicked marker...",marker.id)
 	var state=marker.state;
-	var colkey=marker.colkey;
+	var colkey=marker.colrangekey;
 	var colrange=marker.colrange;
 	var colwhere=marker.colwhere;
-	var rowkey=marker.rowkey;
+	var rowkey=marker.rowrangekey;
 	var rowrange=marker.rowrange;
 	var rowwhere=marker.rowwhere;
 	var cnt=marker.cnt;
+	//console.log("Clicked marker...",marker.id);
 	state.Navigate.selectItemRange(state,colkey,rowkey,colrange,rowrange,colwhere,rowwhere,cnt,1);
     };
-    onDefocus(previousCoordinates, event){
-    };
-    showMap(state) {
+    showMap(state,force) {
 	// dont re-render the globe... - only change the markers
-	console.log("Rendering markers...");
+	//console.log("Rendering markers...",force);
 	this.getMarkers(state);//this.data.markers=this.getMarkers(state);
+	if (force !== undefined && force) {
+	    this.update();
+	}
     };
     getMarkers(state) {
 	// get marker data
-	console.log("Setting map markers...");
+	//console.log("Setting map markers...");
 	//var ll=this.markers.length;
 	//for (var ii=0; ii < ll; ii++) {
 	//    this.markers.splice(ii,1);
 	//};
 	//this.data.markers.splice(0,this.data.markers.length);
-	var tcnt=0;
+	var tcnt=this.cnt;
 	var markers=[];//   {id:1,coordinates:[60,10],city:"X",value:0} --state.Matrix.getMarkers(state)
 	var matrix=state.React.matrix;
 	var first=true;
@@ -206,6 +184,8 @@ class EarthMap extends Component {
 			sum.y2=sum.y2+pos.y*pos.y;
 			sum.z2=sum.z2+pos.z*pos.z;
 			var fact=4;
+			//console.log("mapComponent:",colkey,colval,rowkey,rowval);
+			//console.log("Colors:",tcnt,lev,bgcolor);
 			var size={width : (colrange.max-colrange.min)*clat*fact,
 				  depth : (rowrange.max-rowrange.min)*fact,
 				  height: 1};
@@ -218,12 +198,19 @@ class EarthMap extends Component {
 				  bgcolor:bgcolor,
 				  fgcolor:fgcolor,
 				  state:state,
-				  colkey:"lon",
+				  colkey:"_lon",
+				  colvalues:[colval],
+				  step:1,
+				  index:0,
+				  colrangekey:"lon",
 				  colrange:colrange,
 				  colwhere:colwhere,
-				  rowkey:"lat",
+				  rowkey:"_lat",
+				  rowval:rowval,
+				  rowrangekey:"lat",
 				  rowrange:rowrange,
 				  rowwhere:rowwhere,
+				  map:true,
 				  cnt:cnt
 				 };
 			if (first) {
@@ -256,9 +243,9 @@ class EarthMap extends Component {
 		cen.z=0;
 	    }
 	    ll=Math.sqrt(cen.x*cen.x+cen.y*cen.y);
-	    var clat=Math.acos(ll) * 180/Math.PI;
-	    var clon=Math.atan2(cen.y,cen.x) * 180/Math.PI;
-	    console.log("Center:",clon,clat,dist);
+	    clat=Math.acos(ll) * 180/Math.PI;
+	    clon=Math.atan2(cen.y,cen.x) * 180/Math.PI;
+	    //console.log("Center:",clon,clat,dist);
 	    this.data.dist=dist;
 	    this.data.focus=[clat,clon];
 	    this.data.animations=[{
@@ -268,19 +255,28 @@ class EarthMap extends Component {
 		easingFunction: ['Linear','None'],
 	    }];
 	}
-	console.log("Markers:",this.data.markers.length);
+	//console.log("Markers:",this.data.markers.length);
+	this.cnt=tcnt;
+	if (this.cnt > 1000000) {this.cnt=0;};
 	this.data.markers=markers;
 	this.data.cnt=this.data.cnt+1;
     };
     render() {
-	const { classes, state, markers } = this.props;
-	console.log("Rendering map...");
+	const { classes,state  } = this.props;//, state
+	//console.log("Rendering map...");
 	//this.setMarkers(state);
-	const data={cnt:this.cnt,markers:this.markers};
-	const assign= (elem) => {this.elem = elem;console.log("Element...");};
+	var height='calc(95% - '+footAndHeaderheight+')';
 	return (<div className={classes.root}
-	         style={{position:'fixed', marginLeft:'0%',width: '90%', height: 'calc(95% - '+footAndHeaderheight+')',overflow:'hidden'}} >
-		   <MapGlobe onClickMarker={this.onClickMarker} onDefocus={this.onDefocus} data={this.data} classes={{map:classes.map}}/>
+	        style={{position:'fixed',
+			marginLeft:'0%',
+			width: '90%',
+			height: height,
+			overflow:'hidden'}} >
+		<MapInfo state={state}/>
+		<MapGlobe onClickMarker={this.onClickMarker}
+		          data={this.data}
+		          update={this.update}
+		          classes={{map:classes.map}}/>
 	      </div>
 	     );
     }

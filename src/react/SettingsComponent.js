@@ -6,7 +6,6 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 
 import SettingsIcon from '@material-ui/icons/Settings';
-import HomeIcon from '@material-ui/icons/Home';
 import FontIcon from '@material-ui/icons/TextFields';
 
 import Reload       from './ReloadComponent';
@@ -17,6 +16,8 @@ import SelectMenu   from './SelectMenuComponent';
 import KeyMenu      from './KeyMenuComponent';
 import OrderMenu    from './OrderMenuComponent';
 import PriorityMenu from './PriorityMenuComponent';
+import HomeMenu     from './HomeMenuComponent';
+import FilmMenu     from './FilmMenuComponent';
 import FileMenu     from './FileMenuComponent';
 import ArchiveMenu  from './ArchiveMenuComponent';
 import FullScreen   from './FullScreenComponent';
@@ -28,12 +29,6 @@ const styles = theme => ({
     },
     button:{color:'white'},
 });
-function Home(props) {
-    const {state,classes}=props;
-    var onclick=() => {state.Path.setHome(state);};
-    var title="Set home";
-    return <Button className={classes.button} onClick={onclick} title={title}><HomeIcon/></Button>;
-};
 function Font(props) {
     const {state,classes}=props;
     var onclick=() => {state.Layout.changeFont(state);};
@@ -41,6 +36,15 @@ function Font(props) {
     return <Button className={classes.button} onClick={onclick} title={title}><FontIcon/></Button>;
 };
 class Settings extends Component {
+    constructor(props) {
+        super(props);
+        const {state} = props;
+        state.React.Settings=this;
+    };
+    show(state) {
+	//console.log("Called Config.show...");
+	this.forceUpdate();
+    };
     state = {anchor: null,};
     render() {
         const { state,classes } = this.props;
@@ -89,7 +93,10 @@ class Settings extends Component {
 		       <PriorityMenu state={state} classes={{button:classes.button}}/>
 		    </MenuItem>
 		    <MenuItem key="home" onClose={this.onClose}>
-		       <Home state={state} classes={{button:classes.button}}/>
+		       <HomeMenu state={state} classes={{button:classes.button}}/>
+		    </MenuItem>
+		    <MenuItem key="film" onClose={this.onClose}>
+		       <FilmMenu state={state} classes={{button:classes.button}}/>
 		    </MenuItem>
 		    <MenuItem key="font" onClose={this.onClose}>
 		       <Font state={state} classes={{button:classes.button}}/>

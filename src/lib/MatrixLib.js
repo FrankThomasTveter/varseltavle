@@ -8,9 +8,10 @@ function Matrix() {
     this.values={};
     this.limit=100;     // displayed data
     this.resolution=20; // map resolution
+    this.eps=0.5;       // marker resolution
     this.area={};
-    this.popSingle=1000;//0000;
-    this.popSeries=5000;//0000;
+    this.popSingle=2000;//0000;
+    this.popSeries=2000;//0000;
     this.init=function(state){
 	var par="Matrix";
 	state.Utils.init(par,this);
@@ -105,25 +106,24 @@ function Matrix() {
 	return Math.floor(val*1000)/1000;
     }
     this.posToVal=function(state,pos,min,max) {
-	var res=this.resolution-1;
+	var res=this.getRes(min,max);//this.resolution-1
 	if (pos !== undefined &&
 	    min !== undefined &&
 	    max !== undefined ) {
-	    var ret;
-	    var dlon=(max-min)/res;
-	    var dbor=dlon/2;
+	    var dlon=Math.max(this.eps,(max-min)/res);
+	    //var dbor=dlon/2;
 	    var val=( (Number(pos)) * dlon ) + min;
 	    if (this.bdeb) {console.log("PosToVal ",pos,min,max,val);};
 	    return val;
 	}
     };
     this.valToPos=function(state,val,min,max) {
-	var res=this.resolution-1;
+	var res=this.getRes(min,max);//this.resolution-1
 	if (val !== undefined &&
 	    min !== undefined &&
 	    max !== undefined ) {
-	    var dlon=(max-min)/res;
-	    if (max==min) {
+	    var dlon=Math.max(this.eps,(max-min)/res);;
+	    if (max===min) {
 		console.log("ValToPos#",Number(val)-min,dlon,res/2);
 		return Math.floor(res/2);
 	    } else {
@@ -154,6 +154,18 @@ function Matrix() {
 	var max=this.area.maxlat;
 	return this.posToVal(state,pos,min,max)
     };
+    this.getRes=function (min,max) {
+	var dlat=Math.max(this.eps,(max-min)/this.resolution);
+	var res=Math.max(1,Math.floor(0.5+((max-min)/dlat)))
+	res=this.resolution;
+	return res;
+    }
+    this.getResolution=function () {
+	var a=this.area;
+	var res={lat:this.getRes(a.minlat,a.maxlat)+1,lon:this.getRes(a.minlon,a.maxlon)+1};
+	//console.log("Resolution:",JSON.stringify(res));
+	return res;
+    };
     this.makeMapRange=function(state){
 	const distinct=(value, index, self) => {
 	    return self.indexOf(value) === index;
@@ -161,16 +173,17 @@ function Matrix() {
 	var vals=[];
 	var ii;
 	if (this.bdeb) {console.log("makeMapRange:",JSON.stringify(this.area));};
-	for (ii=0;ii<this.resolution;ii++) {
-	    var lat=this.posToLat(state,this.resolution-ii-1);
-	    if (this.bdeb) {console.log("Values _lat:",this.resolution,ii,lat)};
+	var res=this.getResolution(state,this.resolution);
+	for (ii=0;ii<res.lat;ii++) {
+	    var lat=this.posToLat(state,res.lat-ii-1);
+	    if (this.bdeb) {console.log("Values _lat:",res.lat,ii,lat)};
 	    vals.push(lat);
 	}
 	this.values["_lat"]=vals.filter(distinct);
 	vals=[];
-	for (ii=0;ii<this.resolution;ii++) {
+	for (ii=0;ii<res.lon;ii++) {
 	    var lon=this.posToLon(state,ii);
-	    if (this.bdeb) {console.log("Values _lon:",this.resolution,ii,lon)};
+	    if (this.bdeb) {console.log("Values _lon:",res.lon,ii,lon)};
 	    vals.push(lon);
 	}
 	this.values["_lon"]=vals.filter(distinct);
@@ -231,23 +244,22 @@ function Matrix() {
 	}
     };
     this.setArea=function(iminlat,imaxlat,iminlon,imaxlon) {
-	var eps=0.1;
 	var minlat=parseFloat(iminlat);
 	var maxlat=parseFloat(imaxlat);
 	var minlon=parseFloat(iminlon);
 	var maxlon=parseFloat(imaxlon);
 	var epslon=maxlon-minlon;
 	var epslat=maxlat-minlat;
-	if (epslon < eps) {
-	    maxlon=maxlon+eps/2;
-	    minlon=minlon-eps/2;
+	if (epslon < this.eps) {
+	    maxlon=maxlon+this.eps/2;
+	    minlon=minlon-this.eps/2;
 	};
-	if (epslat < eps) {
-	    maxlat=maxlat+eps/2;
-	    minlat=minlat-eps/2;
+	if (epslat < this.eps) {
+	    maxlat=maxlat+this.eps/2;
+	    minlat=minlat-this.eps/2;
 	};
 	this.area={minlat:minlat,maxlat:maxlat,minlon:minlon,maxlon:maxlon};
-	console.log("setArea:",JSON.stringify(this.area));
+	//console.log("setArea:",JSON.stringify(this.area));
     }
     this.makeKeyCntMap=function(state,docs) {
 	var key;
@@ -316,10 +328,10 @@ function Matrix() {
 	    var maxlev=this.getDocVal(state,doc,"maxlev");
 	    var maxrank=this.getDocVal(state,doc,"maxrank");
 	    var minlev=this.getDocVal(state,doc,"minlev");
-	    var minlon=this.getDocVal(state,doc,"minlon");
-	    var maxlon=this.getDocVal(state,doc,"maxlon");
-	    var minlat=this.getDocVal(state,doc,"minlat");
-	    var maxlat=this.getDocVal(state,doc,"maxlat");
+	    //var minlon=this.getDocVal(state,doc,"minlon");
+	    //var maxlon=this.getDocVal(state,doc,"maxlon");
+	    //var minlat=this.getDocVal(state,doc,"minlat");
+	    //var maxlat=this.getDocVal(state,doc,"maxlat");
 	    //if (lonmin === undefined || minlon < lonmin) {
 	//	lonmin=minlon
 	    //};
@@ -349,7 +361,7 @@ function Matrix() {
 	if (state.Layout.state.tooltip === 0) { // pre-generate all tooltips
 	    state.Matrix.addAllTooltip(state,matrix);
 	};
-    	//console.log ("Matrix:",JSON.stringify(matrix));
+	//console.log ("makeMatrixCnt:",JSON.stringify(matrix),colkey,rowkey);
     };
     this.setMapArea=function(state,docs) {
 	var dlen=docs.length;
@@ -390,6 +402,8 @@ function Matrix() {
 	    console.log("this.makeMatrix No relevant thresholds found.");
 	    state.Html.setFootnote(state,"No data with valid threshold was found.");
 	}
+	//console.log ("makeMatrix tooltip-keys:",JSON.stringify(state.Path.tooltip));
+	//console.log ("makeMatrix:",JSON.stringify(matrix),colkey,rowkey);
     };
     this.updateLevCnt=function(state,val,lev) {
 	if (this.levCnt[val]  === undefined) { this.levCnt[val]={};};
@@ -408,16 +422,21 @@ function Matrix() {
 	return m
     };
     this.getMatrixElement=function(colval,rowval,matrix) {
-	//console.log("getMatrixElement:",colval,"|",rowval,"|",JSON.stringify(matrix));
-	if (matrix[colval] !== undefined && matrix[colval][rowval] !== undefined ) {
+	if (matrix[colval] === undefined) {
+	    //console.log("getMatrixElement NO COL-ELEMENT:",colval,"|",JSON.stringify(Object.keys(matrix)));
+	    return;
+	} else if ( matrix[colval][rowval] === undefined ) {
+	    //console.log("getMatrixElement NO ROW-ELEMENT:",rowval,"|",JSON.stringify(Object.keys(matrix[colval])));
+	    return;
+	} else {
+	    //console.log("getMatrixElement Found:",colval,",",rowval,"|",JSON.stringify(matrix[colval][rowval]));
 	    return matrix[colval][rowval];
 	}
-	return;
     };
     this.printElements=function(matrix) {
 	// loop over colvalues
 	//console.log("Matrix:",JSON.stringify(matrix));
-	var colvalues=Object.keys(matrix);
+	//var colvalues=Object.keys(matrix);
 	//console.log("Matrix keys:",JSON.stringify(colvalues));
 	//for (var colval of colvalues) {
 	//   console.log(">",colval);
@@ -736,6 +755,7 @@ function Matrix() {
 	if (elements === undefined) {
 	    console.log("No elements found.");
 	} else {
+	    //console.log("getInfo element:",JSON.stringify(elements));
 	    var elen=elements.length;
 	    for (var ee=0;ee<elen;ee++) {
 		cnt=cnt+elements[ee].cnt;
@@ -749,7 +769,7 @@ function Matrix() {
 		this.mergeTooltipElement(state,elements[ee].tooltip,tooltip,state.Path.tooltip.select.length);
 	    }
 	    docs=this.getTooltipDocs(state,tooltip);
-	    //console.log("Tooltip docs:",JSON.stringify(docs));
+	    //console.log("Tooltip docs:",JSON.stringify(tooltip),JSON.stringify(docs));
 	}
 	return {cnt:cnt,
 		minlev:minlev,
@@ -817,19 +837,25 @@ function Matrix() {
     };
     this.addTooltip=function(state,data) {
 	if (this.bdeb) {console.log("Updated Matrix with tooltip.",data.rowkey,data.colkey);};
-	var rowval=data.rowval;
-	var colvalues=data.colvalues;
-	var step=data.step;
-	var index=data.index;
-	// get elements
-	var elements=this.getMatrixElements(colvalues,rowval,state.React.matrix,index,step)||[];
-	var lene=elements.length;
-	for (var ee=0; ee<lene; ee++) {
-	    // check if elements have tooltip set
-	    if (elements[ee].tooltip===undefined) {
-		this.addElementTooltip(state,elements[ee]);
-	    }
-	};
+	if (data.map === undefined) {
+	    // get elements
+	    var elements=this.getMatrixElements(data.colvalues,data.rowval,state.React.matrix,data.index,data.step)||[];
+	    var lene=elements.length;
+	    for (var ee=0; ee<lene; ee++) {
+		// check if elements have tooltip set
+		if (elements[ee].tooltip===undefined) {
+		    this.addElementTooltip(state,elements[ee]);
+		}
+	    };
+	} else {
+	    //console.log("### Updated Matrix with tooltip.",data.rowkey,data.colkey,"Elements:",lene);
+	    //console.log("addTooltip docs:",JSON.stringify(state.Database.getDocs(state,"")));
+	    var element=this.getMatrixElement(data.colvalues[0],data.rowval,state.React.matrix)
+	    //console.log("addTooltip element:",JSON.stringify([data.colvalues[0],data.rowval]));
+	    this.addElementTooltip(state,element);
+	    //console.log("...added tooltip.",JSON.stringify(element));
+	    
+	}
     };
     this.makeCntTooltip=function(state,docs) {
 	// called when matrix is made if tooltip mode is toggled
@@ -856,17 +882,20 @@ function Matrix() {
 	var where = state.Database.getWhere(state);
 	var colkey= state.Path.getColKey(state);
 	var rowkey= state.Path.getRowKey(state);
+	var del="'";
+	if (colkey.substring(0,1)==="_" && rowkey.substring(0,1)==="_") {del="";}; // numerical value
 	if (rowkey !== undefined && rowkey !== "") {
 	    var rowval=el.rowval;
-	    where=state.Database.addWhere(where,rowkey+"='" + rowval+"'");
+	    where=state.Database.addWhere(where,rowkey+"="+del +rowval+del);
 	};
 	if (colkey !== undefined && colkey !== "") {
 	    var colval=el.colval;
-	    where=state.Database.addWhere(where,colkey+"='" + colval+"'");
+	    where=state.Database.addWhere(where,colkey+"="+del+ colval+del);
 	};
 	return where;
     };
     this.addAllTooltip=function(state,matrix) {
+	//console.log(">>> Adding all tooltips..."); // 
 	// loop over all elements and add tooltips
 	var colvalues=Object.keys(matrix);
 	var lenc=colvalues.length;
@@ -883,25 +912,32 @@ function Matrix() {
 	}
     };
     this.addElementTooltip=function(state,el) {
+	//var colkey= state.Path.getColKey(state);
+	//var rowkey= state.Path.getRowKey(state);
+	//console.log(">>> Adding ElementTooltip:",JSON.stringify(el),colkey,rowkey); // 
 	// called when info-button is pressed - to add tooltip to element...
 	var where = this.getElementWhere(state,el);
 	var docs=[];
 	if (el.cnt>0) {docs=state.Database.getDocs(state,where);};
+	//console.log("addElementTooltip:",where,el.cnt,docs.length);
 	el.tooltip=this.makeCntTooltip(state,docs);
-	//console.log("Added tooltip for element:",docs.length,where); // JSON.stringify(el);
+	//console.log(">>> Added tooltip for element:",docs.length,where,JSON.stringify(el)); // 
     };
-    this.getTooltip=function(state,data) {
-	var rowval=data.rowval;
-	var colvalues=data.colvalues;
-	var step=data.step;
-	var index=data.index;
-	// // get elements
-	var elements=this.getMatrixElements(colvalues,rowval,state.React.matrix,index,step);
-
-	//console.log("Elements:",JSON.stringify(elements));
-
+    this.getTooltipInfo=function(state,data) {
+	// get elements
+	var elements=[];
+	if (data.map === undefined) {
+	    elements=this.getMatrixElements(data.colvalues,data.rowval,state.React.matrix,data.index,data.step);
+	} else {
+	    //console.log("getTooltipInfo data:",JSON.stringify(Object.keys(data)));
+	    var element=this.getMatrixElement(data.colvalues[0],data.rowval,state.React.matrix)
+	    if (element !== undefined && element !== null) {
+		elements=[element];
+	    }
+	}
+	//console.log("getTooltipInfo elements:",JSON.stringify(elements));
 	var info=this.getInfo(state,elements);
-	return info.tooltip;
+	return info;
     };
 };
 export default Matrix;

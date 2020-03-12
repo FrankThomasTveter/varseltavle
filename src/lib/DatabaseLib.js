@@ -21,7 +21,9 @@ function Database() {
     this.cdes=1; // key is sorted descending
     this.nasc=2; // key is sorted ascending
     this.ndes=3; // key is sorted descending
-    this.delay=600000;  // server-polling period in ms
+    this.delay=10*1000;  // polling period in ms (film + server-polling loop)
+    this.step=60;        // server-polling step
+    this.stepCnt=0;      // current step count
     this.ready=true;     // can we poll server or is another poll running
     this.log="";
     this.mod="";
@@ -31,6 +33,10 @@ function Database() {
 		 Min:2,
 		 Max:3
 		};
+    this.db=null;
+    this.newDb=function() {
+	this.db=new alasql.Database();
+    };
     this.init=function(state,response,callbacks){
         state.Colors.init(state);
         state.Path.init(state);
@@ -42,7 +48,12 @@ function Database() {
     this.updateLoop=function(state) {
 	//console.log("Updating database...");
 	this.setTime(state);
-	this.load(state);
+	if (this.stepCnt%this.step===0) {
+	    this.load(state);
+	} else {
+	    state.Path.nextFilm(state);
+	};
+	this.stepCnt=(this.stepCnt+1)%this.step;
 	setTimeout(function() {
 	    state.Database.updateLoop(state)
 	},state.Database.delay); //state.Database.delay
@@ -51,10 +62,10 @@ function Database() {
 	console.log("Database load number:",++this.cnt);
 	if (state.Database.index === 0) {
 	    state.Database.loadRegister(state,"",
-					[state.Database.processRegister,
-					 state.Database.loadData,
-					 state.Database.processData
-					]);
+					       [state.Database.processRegister,
+						state.Database.loadData,
+						state.Database.processData
+					       ]);
 	};
     };
     this.loadRegister=function(state, response, callbacks ) {
@@ -80,6 +91,7 @@ function Database() {
 	    state.File.load(state,path,callbacks);
 	} else {
 	    //console.log("Setting footer...");
+	    state.Path.nextFilm(state);
 	    state.Html.setFootnote(state);
 	}
     };
@@ -197,6 +209,7 @@ function Database() {
 	    //console.log("Setting time.");
 	    this.epoch0=this.getTime(state,json.epoch);     // data file time
 	    this.setTime(state);     // data file time
+	    this.newDb();
 	    // make database for raw data
 	    this.makeTable(state);
 	    // reset key counts and range
@@ -377,6 +390,7 @@ function Database() {
 	// var parent={};//{test:{$exists:false}};
 	if (this.processing) {return};
 	var where = this.getWhere(state);
+	//console.log("dbextract Path:",JSON.stringify(state.Path.keys));
 	console.log("dbextract Where:",where)
 	var cntDocs0=this.getDocsCnt(state,where);
 	var nrec= (cntDocs0.length===0?0:cntDocs0[0].cnt);
@@ -398,7 +412,7 @@ function Database() {
 	    var rowkey=state.Path.getRowKey(state);
 	    var areaDocs=state.Database.getDocsCnt(state,where);
 	    state.Matrix.setMapArea(state,areaDocs);
-	    state.Matrix.addMapAreaKeys(state,alasql.tables.alarm.data); // add lat_ and lon_ to database...
+	    state.Matrix.addMapAreaKeys(state,this.db.tables.alarm.data); // add lat_ and lon_ to database...
 	    var cntDocs=state.Database.getDocsCnt(state,where,[colkey,rowkey]);
 	    if (this.bdeb) {console.log("dbextract cntDocs:",JSON.stringify(cntDocs));}
 	    state.Matrix.makeMatrixCntMap(state,cntDocs,m);
@@ -406,7 +420,7 @@ function Database() {
 	    if (this.bdeb) {console.log("dbextract maprange:",JSON.stringify(state.Matrix.values["_lon"]),JSON.stringify(state.Matrix.values["_lat"]));};
 	    if (this.bdeb) {console.log("dbextract matrix:",JSON.stringify(m));};
 	    //var docs=this.getDocs(state,where); // get all docs
-	    //console.log("Docs:",JSON.stringify(alasql.tables.alarm.data));
+	    //console.log("Docs:",JSON.stringify(this.db.tables.alarm.data));
 	} else {                              // maintain map data and keyCnt...
 	    //console.log("Database where:",where);
 	    var docs=this.getDocs(state,where); // get all docs
@@ -680,14 +694,17 @@ function Database() {
 	return (dd===undefined?[]:dd);
     };
     this.getDocs=function(state,where) {
-	var dd=this.query("select * FROM alarm"+where);
+	var query="select * FROM alarm"+where;
+	//query="select * FROM alarm WHERE (_lat=69.00631578947369) AND (_lon=17.206315789473685)";
+	var dd=this.query(query);
+	//console.log("getDocs q:",query,JSON.stringify(dd));
 	return (dd===undefined?[]:dd);
     };
     this.makeTable=function(state) {
 	this.query('DROP TABLE IF EXISTS alarm; CREATE TABLE alarm;');
     };
     this.dataToDb=function(state,data) {
-	alasql.tables.alarm.data = data;
+	this.db.tables.alarm.data = data;
     };
     this.getKeyCnt=function(state,key,where){
 	var sql="select "+key+",count(*) AS cnt FROM alarm"+
@@ -740,7 +757,7 @@ function Database() {
     }
     this.query=function(sql) {
 	try {
-	    return alasql(sql);
+	    return this.db.exec(sql);
 	} catch (e) {
 	    alert(sql + ":" + e);
 	};

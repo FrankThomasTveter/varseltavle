@@ -18,12 +18,12 @@ const styles = theme => ({
  //	border:  '1px solid red',
     },
     paper: {
-        padding: theme.spacing.unit * 2,
+        padding: theme.spacing(2),
         textAlign: 'left',
     },
     paperImage: {
         textAlign: 'center',
-        padding: theme.spacing.unit * 2,
+        padding: theme.spacing(2),
     },
     button : {
 	color: 'white',
@@ -57,7 +57,7 @@ class PathComponent extends Component {
         const { classes, state } = this.props;
         return (
             <div className={classes.root}>
-                <Grid container spacing={24}>
+                <Grid container spacing={10}>
                     <Grid item xs={12}>
 		       <Details classes={classes} state={state}/>
                     </Grid>

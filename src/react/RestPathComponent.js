@@ -38,7 +38,7 @@ class RestPath extends Component {
     render() {
 	const { classes, state } = this.props;
 	var items=state.Path.other.rest;
-	//console.log("RestPathComponent items:",JSON.stringify(items));
+	//console.log("RestPathComponent items:",JSON.stringify(items),JSON.stringify(state.Path.keys));
 	var mapFunction= (item,index)=>renderRestPath(classes,state,item,index);
 	if (items.length > 0) {
 	    return items.map(mapFunction);

@@ -10,13 +10,13 @@ const styles = theme => ({
         marginRight: 'auto',
     },
     selectchip: {
-        margin: theme.spacing.unit,
+        margin: theme.spacing(1),
 	cursor: "pointer",
         color:"red",
         borderColor:"green",
     },
     restchip: {
-        margin: theme.spacing.unit,
+        margin: theme.spacing(1),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",

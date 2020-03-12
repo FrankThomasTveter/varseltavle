@@ -9,7 +9,6 @@ import Mode         from './ModeComponent';
 
 import UndoIcon from '@material-ui/icons/Undo';
 import RedoIcon from '@material-ui/icons/Redo';
-import HomeIcon from '@material-ui/icons/Home';
 
 const styles = theme => ({
     horisontal: {
@@ -40,12 +39,6 @@ function Redo(props) {
     var title="Redo";
     return <Button classes={{root:classes.button,disabled:classes.buttonDisabled}} disabled={disredo} onClick={onclick} title={title}><RedoIcon/></Button>;
 };
-function Home(props) {
-    const {state,classes}=props;
-    var onclick=() => state.Path.goHome(state);
-    var title="Home";
-    return <Button className={classes.button} onClick={onclick} title={title}><HomeIcon/></Button>;
-};
 class Config extends Component {
     constructor(props) {
         super(props);
@@ -62,7 +55,6 @@ class Config extends Component {
 	return (<div className={classes.horisontal}>
 		   <Undo state={state} classes={classes}/>
                    <Redo state={state} classes={classes}/>
-                   <Home state={state} classes={classes}/>
 		   <Mode state={state} classes={{button:classes.button}}x/>
                    <Settings state={state} classes={{button:classes.button}}/>
 		</div>);

@@ -44,7 +44,7 @@ class LevelColor extends Component {
 //	}
 	this.setState({ anchor: event.currentTarget })
 	const clickOff = function (evt){ 
-	    console.log("Got clickoff event...");
+	    //console.log("Got clickoff event...");
 	    var node=this.popper.current;
 	    if ( ! this ) {
 		//console.log("This is undefined...");
@@ -66,14 +66,14 @@ class LevelColor extends Component {
     };
     close() {
 	// ... hide the menu element ...
-	console.log("Closing...");
+	//console.log("Closing...");
 	this.setState({ anchor: null });
     };
     render() {
         const { state,classes,bg,fg,level } = this.props;
 	//console.log("Rendering LevelColor...");
-	this.onClick = (event) => {this.open(event)};
-	const handleColorChange = ({ hex }) => {console.log("Color:",hex,level);state.Colors.setLevelBgColor(state,level,hex);state.Show.show(state,false);}
+	this.onClick = (event) => {this.open(event)};//console.log("Color:",hex,level);
+	const handleColorChange = ({ hex }) => {state.Colors.setLevelBgColor(state,level,hex);state.Show.showAll(state,false,true);}
 	var style={color:fg,backgroundColor:bg,textAlign:'center'};
 	this.node=<div className={classes.divTableCell} style={style} onClick={this.onClick} ref={this.div}>
 		    <div>
@@ -93,9 +93,6 @@ class LevelColor extends Component {
 	    return this.node;
     }
 }
-
-
-
 
 LevelColor.propTypes = {
     classes: PropTypes.object.isRequired,

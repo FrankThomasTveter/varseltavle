@@ -18,8 +18,12 @@ const styles = theme => ({
         marginRight: 'auto',
     },
     button:{
-	color:'white'
+	color:'white',
+	"&$buttonDisabled": {
+            color: theme.palette.primary.main,
+	}
     },
+    buttonDisabled: {},
 });
 //   className={classes.select}  -> horisontal layout
 function renderMenuItem(classes,state,keyitem,keyindex) {
@@ -38,16 +42,33 @@ class SelectMenu extends Component {
 	//items=items.sort(state.Utils.ascending);
 	var mapFunction= (item,index)=>renderMenuItem(classes,state,item,index);
 	//console.log("Select.rendering",items.length,JSON.stringify(anchor),Boolean(anchor));
-	return (
-		<div className={classes.tableSelect}>
+	var disabled=(items.length===0);
+	//className={classes.button}
+	if (disabled) {
+	    return (
 		   <Button
-                      className={classes.button}
+                      classes={{root:classes.button,disabled:classes.buttonDisabled}} 
                       aria-owns={this.state.anchor ? 'selects-menu' : undefined}
                       aria-haspopup="true"
                       onClick={this.onClick}
 	              title={"Selected order"}
+		      disabled={disabled} 
 		    >
-	  	       {<SelectIcon state={state}/>}
+	  	       <SelectIcon state={state}/>
+                     </Button>
+	    );
+	} else {
+	    return (
+		<div className={classes.tableSelect}>
+		   <Button
+                       classes={{root:classes.button,disabled:classes.buttonDisabled}} 
+                      aria-owns={this.state.anchor ? 'selects-menu' : undefined}
+                      aria-haspopup="true"
+                      onClick={this.onClick}
+	              title={"Selected order"}
+		      disabled={disabled} 
+		    >
+	  	       <SelectIcon state={state}/>
                      </Button>
 		     <Menu
 	                className={classes.tableSelect}
@@ -59,7 +80,8 @@ class SelectMenu extends Component {
 		        {items.map(mapFunction)}
 	             </Menu>
 		</div>
-	);
+	    );
+	};
     }
 }
 
