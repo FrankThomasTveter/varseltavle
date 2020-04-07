@@ -29,10 +29,11 @@ class ReelAdd extends Component {
     constructor(props) {
 	super(props);
 	const {state} = props;
+	state.React.ReelAdd=this;
 	this.state={anchor:null, label:""};
 	//state.Path.getLabel(state)
 	this.onClick  = event => {this.setState({ anchor: event.currentTarget });};
-	this.onAdd    = () => {state.Path.addFilm(state,state.Path.getSnapshot(state)); this.setState({label:""});state.Show.showSettings(state);};
+	this.onAdd    = () => {state.Path.addFilm(state,state.Path.getSnapshort(state)); this.setState({label:""});state.Show.showSettings(state);};
 	this.onRemove = (index) => {this.setState({label:state.Path.removeFilm(state,index)});};
 	this.handleChange=(event) => {
 	    //console.log("handleChange:",event.target.value);
@@ -43,10 +44,13 @@ class ReelAdd extends Component {
 	this.onClick=this.onClick.bind(this);
 	this.onAdd=this.onAdd.bind(this);
     };
-    
+    showLabel(state) {
+	var label=state.Path.getLabel(state);
+	this.setState({label:label});
+    }
     render() {
         const { classes, state } = this.props;
-	//var label=state.Path.getLabel(state);
+	//this.state.label=label;
 	//var items=state.Path.getReels(state);
 	const input=<input type={"search"} value={this.state.label} onChange={this.handleChange} />;
 	return (<div>

@@ -15,7 +15,7 @@ function Html() {
 	    if (msg  === undefined) {
 		msg=state.Utils.getStatusString(state);
 	    };
-	    //console.log("setlog:",msg,state.Matrix.cnt);
+	    //console.log("setFootnote:",msg);
 	    state.React.Status.setFootnote(state,msg);
 	}
     };
@@ -29,14 +29,13 @@ function Html() {
     this.progressInfo=function(state,e) {
 	if (state.React !== undefined && state.React.Status !== undefined) {
 	    if (e.loaded  === e.total) {
-		state.React.Status.setFootnote(state,"");
+		state.React.Status.setFootnote(state);
 	    } else {
 		e.preventDefault();
 		//console.log("Complete:",e.loaded,e.total,JSON.stringify(e));
 		//var percentComplete = e.loaded / e.total * 100;
 		//state.React.Status.setFootnote(state,percentComplete.toFixed(2)+"kb");
-		state.React.Status.setFootnote(state,state.Utils.numberWithCommas(
-		    Math.round(e.loaded/1000))+" Kb");
+		state.React.Status.setFootnote(state,state.Utils.getLoadString(state,e.loaded));
 	    }
 	}
     };
@@ -47,7 +46,7 @@ function Html() {
     };
     this.errorInfo=function(state,e) {
 	if (state.React !== undefined && state.React.Status !== undefined) {
-	    state.React.Status.setFootnote(state,"Error");
+	    //state.React.Status.setFootnote(state,"Error");
 	}
     };
     this.abortInfo=function(state,e) {

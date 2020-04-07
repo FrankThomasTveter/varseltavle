@@ -245,7 +245,7 @@ export default class Globe {
     }
 
     destroy() {
-	console.log("Destroying Globe...");
+	//console.log("Destroying Globe...");
 	cancelAnimationFrame(this.animationFrameId);
 	this.tooltip.destroy();
 	this.tooltip=null;

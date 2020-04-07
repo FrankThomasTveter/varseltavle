@@ -258,6 +258,7 @@ function Details(props) {
     var width=0.9*window.innerWidth;
     var height=0.94*window.innerHeight - 100;
     var plans=state.Layout.makePlans(colkey,rowkey,colvalues,rowvalues,width,height,border);
+    //console.log("Table Plans:",JSON.stringify(plans));
     //console.log("Heights:",window.innerHeight,height,plans.hdr.height,plans.cell.height);
     //console.log("Details => Width/Height:",window.innerWidth,window.innerHeight,plan.cell.width,plan.hdr.height)
     //console.log("Colkey:",colkey," colval:",JSON.stringify(colvalues));

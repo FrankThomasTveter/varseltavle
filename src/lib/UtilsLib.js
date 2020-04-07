@@ -43,7 +43,7 @@ function Utils() {
 	if (par in url) {
 	    //console.log(par,url);
 	    var code=decodeURIComponent(url[par]);
-	    //console.log("Processing url:",code);
+	    //console.log("Processing url:",par,code);
 	    try {
 		var newsetup=JSON.parse(code);
 		for (var ss in newsetup) {
@@ -56,12 +56,14 @@ function Utils() {
 	    }
 	    //console.log("new setup:",JSON.stringify(setup));
 	} else {
-	    //console.log("No '"+par+"' in URL.");
+	    //console.log("No '"+par+"' in URL.",JSON.stringify(url));
 	}
 
     };
-    this.clean=function(arr) {
-	for (var ii=0;ii<arr.length;ii++) {
+    this.clean=function(arr,max) {
+	if (max === undefined) {max=0;};
+	//console.log("Arr:",JSON.stringify(arr),max);
+	for (var ii=max;ii<arr.length;ii++) {
 	    if (arr[ii]===null || arr[ii]==="") {
 		arr.splice(ii, 1);
 	    }
@@ -188,8 +190,13 @@ function Utils() {
 	return temp;
     }.bind(this);
     this.getStatusString=function(state) {
-	return this.numberWithCommas(state.Database.cnt)+ " in database, "+
-	    this.numberWithCommas(state.Matrix.cnt)+" in table.";
+	return this.numberWithCommas(state.Database.cnt)+ " in database, "
+	    + this.numberWithCommas(state.Matrix.cnt)+" in table"
+	    + " ["+state.Database.loaded + "]";
+    };
+    this.getLoadString=function(state,loaded) {
+	return state.Utils.numberWithCommas(Math.round(loaded/1000))+" Kb"
+	    + " ["+state.Database.loaded + "]";
     };
     this.toString=function(setup) {
 	var s="->";
@@ -197,6 +204,17 @@ function Utils() {
 	    s = s + "|"+ kk + ":" + setup[kk];
 	};
 	return s;
+    };
+    this.basename=function(path) {
+	var ic=path.indexOf(":");
+	var is=path.indexOf("/");
+	var ii=Math.max(ic,is);
+	console.log("Basename:",path,"->",path.substring(ii+1));
+	if (ii >= 0) {
+	    return path.substring(ii+1);
+	} else {
+	    return path;
+	};
     };
     this.numberWithCommas=function(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -268,6 +286,7 @@ function Utils() {
 	if (state.Default.hasChanged(state,["Path","film"])) {
 	    if (urlPath ===undefined) {urlPath={};}
 	    urlPath.film=this.cp(state.Path.film);
+	    //console.log("Film:",JSON.stringify(urlPath.film));
 	};
 	//console.log("URL Keys:",JSON.stringify(urlPath.keys));
 	var urlLayout=undefined;

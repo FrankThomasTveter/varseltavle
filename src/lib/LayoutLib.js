@@ -27,7 +27,7 @@ function Layout() {
 		     },
 		layout:{Table:0,
 			List:1,
-			Map:2,
+			Map:2
 		       }
 	       };
     this.toggleTooltip=function(state) {
@@ -53,12 +53,22 @@ function Layout() {
 	state.Show.showConfig(state);
     };
     this.toggleMode=function(state,layoutMode,cellMode) {
-	//console.log("Mode:",layoutMode,cellMode);
+	//console.log("ToggleMode:",layoutMode,cellMode);
 	//var reload=(layoutMode !== state.Layout.state.layoutMode);
-	var reload=((state.Layout.state.layoutMode===state.Layout.modes.layout.Map &&
-		    layoutMode!==state.Layout.modes.layout.Map) ||
-		    (state.Layout.state.layoutMode!==state.Layout.modes.layout.Map &&
-		    layoutMode===state.Layout.modes.layout.Map));
+	var newismap = layoutMode===state.Layout.modes.layout.Map;
+	var oldismap = state.Layout.state.layoutMode===state.Layout.modes.layout.Map;
+	var newiscus=(layoutMode!==state.Layout.modes.layout.Table &&
+			 layoutMode!==state.Layout.modes.layout.List &&
+			 layoutMode!==state.Layout.modes.layout.Map);
+	var oldiscus=(state.Layout.state.layoutMode!==state.Layout.modes.layout.Table &&
+			 state.Layout.state.layoutMode!==state.Layout.modes.layout.List &&
+			 state.Layout.state.layoutMode!==state.Layout.modes.layout.Map);
+	var changed= state.Layout.state.layoutMode!==layoutMode;
+	var reload=(   ( newismap && ! oldismap)
+		    || ( oldismap && ! newismap)
+		    || ( oldiscus && (! newiscus || changed))
+		       || ( newiscus && (! oldiscus || changed)));
+	//console.log("Reload:",reload,newismap,oldismap,newiscus,oldiscus,changed);
 	state.Layout.state.layoutMode=layoutMode;
 	state.Layout.state.cellMode=cellMode;
 	//state.Show.showConfig(state);
@@ -404,7 +414,8 @@ function Layout() {
     this.makePlans=function(colkey,rowkey,colvalues,rowvalues,iwidth,iheight,border) {
 	var descender=this.getDescender();
 	if (border===null) {border=0;}
-	border=border+descender+1;
+	iheight=iheight-15;
+	border=border+1; // descender
 	// text boundaries
 	var mheight=this.getTextHeight() + 2 * (descender+1);       //props.theme.spacing.unit;
 	var plans={cell:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()}, 
@@ -413,8 +424,29 @@ function Layout() {
 		   hd2:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()},
 		   row:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()},
 		   col:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()}};
-	if (colkey!==undefined) {
-	    if (iwidth <= 0) { return plans;};
+	if (iwidth <= 0) { return plans;};
+	var hdrHeight, hdrWidth, cellHeight, cellWidth, hdr1Width, hdr2Width, hx, rot, stp,lenr,lenc, cheight;
+	lenc=colvalues.length;
+	lenr=rowvalues.length;
+	//console.log("Height:",iheight,lenr,border);
+	if (colkey.substr(0,1) === "_") {
+	    rot=false;
+	    stp=1
+	    hdrHeight=0;
+	    hdrWidth=0;
+	    hdr1Width=0;
+	    hdr2Width=0;
+	    hx=(cellWidth)/2;
+	    var height=iheight-((lenr+1)*(border+5))-15;
+	    var width=iwidth;
+	    var cheight=iheight-hdrHeight;
+	    cellHeight=cheight/lenr - 2*border-5;
+	    //console.log("CellHeight:",cellHeight,height,lenr,border);
+	    cellWidth=width/lenc - 2*border;
+	    //console.log("Keys:",colkey, rowkey, lenc, lenr, cellWidth, cellHeight, iwidth,iheight,border);
+	    //console.log("Keys col:",colkey, JSON.stringify(colvalues), lenc, iwidth, cellWidth);
+	    //console.log("Keys row:",rowkey, JSON.stringify(rowvalues), lenr, iheight, cellHeight);
+	} else if (colkey!==undefined) {
 	    var wh=this.maxWidth(rowvalues,border);
 	    var ww=this.maxWidth(colvalues,border);
 	    var zwidth1 =(colkey===""?0:this.getTextWidth(colkey) + 2 * border);   //props.theme.spacing.unit;
@@ -423,54 +455,55 @@ function Layout() {
 	    // var zheight=getTextHeight() + 2 * border;  //props.theme.spacing.unit;
 	    // table boundaries
 	    var hwidth=Math.max(wh.max,zwidth1+zwidth2) + mheight;
-	    var width=iwidth-hwidth;
+	    width=iwidth-hwidth;
 	    // calculate cell width...
 	    var mwidth=ww.max;
 	    //var swidth=ww.sum;
-	    var lenc=colvalues.length;
-	    var lenr=rowvalues.length;
-	    var hh, hw, ch, cw, hx, rot, stp;
 	    //console.log("HdrW:",mwidth," HdrH=",mheight," cnt=",lenc," totW=",width);
 	    if (mwidth*lenc < width) { // horisontal
 		rot=false;
 		stp=1
-		cw=width/lenc;
-		hh=mheight;
-		hx=(cw-mwidth)/2;
+		cellWidth=width/lenc;
+		hdrHeight=mheight;
+		hx=(cellWidth-mwidth)/2;
 		//console.log("Plan (normal):",JSON.stringify(plans));
 	    } else if (mheight*lenc < width) { // rotate
 		rot=true;
 		stp=1
-		cw=width/lenc;
-		hh=mwidth;
-		hx=(cw-mheight)/2;
-		//console.log("Plan (rot):",JSON.stringify(plans),lenc,cw*lenc);
+		cellWidth=width/lenc;
+		hdrHeight=mwidth;
+		hx=(cellWidth-mheight)/2;
+		//console.log("Plan (rot):",JSON.stringify(plans),lenc,cellWidth*lenc);
 	    } else { // rotate and use steps
 		rot=true;
 		stp=Math.ceil(lenc*mheight/width);
-		cw=stp*width/lenc;
-		hh=mwidth;
-		hx=(cw-mheight)/2;
-		//console.log("Plan (rot+step):",JSON.stringify(plans),stp,cw,hh,hx);
+		cellWidth=stp*width/lenc;
+		hdrHeight=mwidth;
+		hx=(cellWidth-mheight)/2;
+		//console.log("Plan (rot+step):",JSON.stringify(plans),stp,cellWidth,hdrHeight,hx);
 	    }
 	    // calculate cell height
-	    var height=iheight-hh-((lenr+1)*border);
-	    if (mheight*lenr < height) { // 
-		ch=Math.min(mheight*10,height/lenr) - border;
+	    var cheight=iheight-hdrHeight-2*border;
+	    //height=iheight-hdrHeight-((lenr+1)*border)-15;
+	    console.log("Height:",iheight,cheight,mheight*lenr);
+	    if (mheight*lenr < cheight) { // 
+		cellHeight=Math.min(mheight*10,cheight/lenr)-2*border-3;
 	    } else {
-		ch=mheight - border;
+		cellHeight=mheight - 2*border-3;
 	    }
-	    hw=hwidth;
-	    //console.log("Cells:",hh,ch,iheight,height,lenr,mheight);
-	    var dw=(hw-zwidth1-zwidth2)/2;
-	    this.setPlan(plans.cell,{width:cw,height:ch,step:stp,font:this.getFont()});
-	    this.setPlan(plans.hdr, {width:hw,height:hh,font:this.getFont()});
-	    this.setPlan(plans.hd1, {width:zwidth1+dw,height:hh,align:"right",font:this.getFont()});
-	    this.setPlan(plans.hd2, {width:zwidth2+dw,height:hh,font:this.getFont()});
-	    this.setPlan(plans.col, {width:cw,height:hh,xoffset:hx,step:stp,rotate:rot,font:this.getFont()});
-	    this.setPlan(plans.row, {width:hw,height:ch,font:this.getFont()});
-	    //console.log("Plan (finally):",JSON.stringify(plans),mheight,mwidth,height,width,lenr);
+	    hdrWidth=hwidth;
+	    //console.log("Cells:",hdrHeight,cellHeight,iheight,lenr,mheight);
+	    var dw=(hdrWidth-zwidth1-zwidth2)/2;
+	    hdr1Width=zwidth1+dw;
+	    hdr2Width=zwidth2+dw;
 	}
+	this.setPlan(plans.cell,{width:cellWidth, height:cellHeight, step:stp, font:this.getFont()});
+	this.setPlan(plans.hdr, {width:hdrWidth,  height:hdrHeight,  font:this.getFont()});
+	this.setPlan(plans.hd1, {width:hdr1Width, height:hdrHeight,  align:"right", font:this.getFont()});
+	this.setPlan(plans.hd2, {width:hdr2Width, height:hdrHeight,  font:this.getFont()});
+	this.setPlan(plans.col, {width:cellWidth, height:hdrHeight,  xoffset:hx, step:stp,rotate:rot, font:this.getFont()});
+	this.setPlan(plans.row, {width:hdrWidth,  height:cellHeight, font:this.getFont()});
+	//console.log("Plan (finally):",JSON.stringify(plans),mheight,mwidth,height,width,lenr);
 	return plans;
     }
 };

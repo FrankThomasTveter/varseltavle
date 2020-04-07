@@ -98,6 +98,11 @@ function Show() {
 	    state.React.Dataset.showMatrix(state,matrix);
 	}
     };
+    this.showFilm=function(state) {
+	if (state.React.ReelAdd !== undefined) {
+	    state.React.ReelAdd.showLabel(state);
+	}
+    };
     this.showDataset=function(state,matrix,force) {
 	//console.log("Showing table...");
 	if (matrix !== undefined) {

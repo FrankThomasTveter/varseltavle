@@ -33,7 +33,7 @@ class Status extends Component {
     // set dataset age
     setAge(state,age) {
 	//console.log("Age...",state.Database.mod,age);
-	this.setState({msg:age});
+	//this.setState({msg:age});
     };
     setFootnote(state,msg) {
 	//console.log("Setlog...",this.state.msg," -> ",msg);

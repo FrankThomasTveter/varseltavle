@@ -183,7 +183,7 @@ class List extends Component {
 	const { classes, state } = this.props;
 	//console.log("##### Rendering List.");
 	return (<div ref={el=>{this.element(el)}} className={classes.root}  style={{width: '100%', height: '100%'}}>
-		 <Grid container spacing={24}>
+		 <Grid container spacing={12}>
 		  <Grid item xs={12} > 
                    { <Paper className={classes.paper}>
 		       <Details state={state} classes={classes} element={this}/>

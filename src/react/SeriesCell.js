@@ -39,7 +39,7 @@ const styles = theme => ({
 function SeriesCell(props) {
     const { classes,state,onclick,index,rowindex,
 	    colwhere,rowwhere,colkey,rowkey,colvalues,rowval,
-	    elements,range,plan,key,...other } = props;
+	    elements,range,plan,key,layout,...other } = props;
 
     var style0={height:plan.height+"px",backgroundColor:'#FFF'};
     var style1={height:plan.height+"px",backgroundColor:'#EEE'};
@@ -59,7 +59,7 @@ function SeriesCell(props) {
     //console.log("SeriesCell:",JSON.stringify(elements));
     //console.log("SeriesCell:",lev,cnt,JSON.stringify(range));
     //console.log("Series Plan:",JSON.stringify(plan));
-    var data=JSON.stringify({rowkey:rowkey,rowval:rowval,colkey:colkey,colvalues:colvalues,index:index,step:plan.step}); 
+    var data=JSON.stringify({rowkey:rowkey,rowval:rowval,colkey:colkey,colvalues:colvalues,index:index,step:plan.step,layout:layout}); 
     return(
 	    <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} key={key}
 	         style={{color:fgcolor,backgroundColor:bgcolor}} onClick={onclick} height={plan.height} width={plan.width}

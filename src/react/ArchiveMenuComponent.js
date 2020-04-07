@@ -5,30 +5,27 @@ import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 //import ArchiveIcon from '@material-ui/icons/VpnArchive';
-import ArchiveIcon from '@material-ui/icons/Unarchive';
+import ArchiveIcon from '@material-ui/icons/Storage';
 import Archive     from './ArchiveComponent';
+import Upload from './UploadDbComponent';
+import DownloadIcon from '@material-ui/icons/CloudDownload';
 
 const styles = theme => ({
     settings:{},
     config: {
         marginLeft: 'auto',
     },
-    othchip: {
-        margin: theme.spacing(1),
-	cursor: "pointer",
-        color:"blue",
-        borderColor:"blue",
-    },
-    trashchip: {
-        margin: theme.spacing(1),
-	cursor: "pointer",
-        color:"gray",
-        borderColor:"gray",
-  },
     button:{
 	color:'white'
     },
 });
+
+function Download(props) {
+    const {state,classes}=props;
+    var onclick=() => {state.Database.saveDb(state);};
+    var title="Download database";
+    return <Button className={classes.button} onClick={onclick} title={title}><DownloadIcon/></Button>;
+};
 function renderMenuItem(classes,state,item,index) {
     if (item[0]==="" || item[0] === null || item[0]===undefined) {
 	return null;
@@ -72,6 +69,11 @@ class ArchiveMenu extends Component {
                         open={Boolean(this.state.anchor)}
                         onClose={this.onClose}
 		     >
+
+		        <MenuItem key="upload"  className={classes.file} onClose={this.onClose}>
+		           <Upload state={state}/>
+		           <Download state={state} classes={{button:classes.button}}/>
+		        </MenuItem>
 		        {items.map(mapFunction)}
 	             </Menu>
 		</div>

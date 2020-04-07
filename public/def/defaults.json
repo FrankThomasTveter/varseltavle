@@ -57,6 +57,7 @@
 	                            "Kristiansund" :{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [-1.80,1.52,1.67,1.80] },
 	                            "Måløy"        :{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [-1.70,1.36,1.48,1.58] },
 	                            "Narvik"       :{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [-2.20,2.18,2.40,2.66] },
+	                            "Ny Ålesund"   :{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [-1.30,1.04,1.15,1.23] },
 	                            "Ny-Ålesund"   :{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [-1.30,1.04,1.15,1.23] },
 	                            "Oscarsborg"   :{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [-1.30,1.04,1.24,1.42] },
 	                            "Oslo"         :{"lat":"maxlat","lon":"maxlon", "par":"max", ">": [-1.20,1.07,1.31,1.59] },
@@ -80,7 +81,7 @@
     "order":{
 	"Duration":["1t","3t","6t","12t","24t"],
     "Station":["Viker","Oscarsborg","Oslo","Helgeroa","Tregde","Stavanger","Bergen","Måløy","Ålesund","Kristiansund","Heimsjø",
-    "Trondheim","Rørvik","Bodø","Narvik","Kabelvåg","Andenes","Harstad","Tromsø","Hammerfest","Honningsvåg","Vardø","Ny-Ålesund"],
+    "Trondheim","Rørvik","Bodø","Narvik","Kabelvåg","Andenes","Harstad","Tromsø","Hammerfest","Honningsvåg","Vardø","Ny Ålesund","Ny-Ålesund"],
     "Region":["Innlandet","Viken Øst","Oslo","Viken Vest","Vestfold og Telemark","Agder","Rogaland","Vestland","Møre og Romsdal","Trøndelag",
     "Nordland","Troms og Finnmark","Indre Skagerrak","Ytre Skagerrak","Fisker","Fladen","Utsira Sør","Utsira Nord",
     "Viking","Aust-Tampen","Storegga","Frøyabanken","Haltenbanken","Storegga-Haltenbanken","Sklinnabanken","Trænabanken",

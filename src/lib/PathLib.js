@@ -71,6 +71,15 @@ function Path() {
 	state.Utils.pushUrl(state);
 	//console.log("Setting home.");
     };
+    this.getSnapshort=function(state) { // store state
+	var snap={keys:state.Utils.cp(state.Path.keys),
+		select:state.Utils.cp(state.Path.select)}
+	if (snap.keys.path.other !== undefined) {
+	    console.log("Snapshort:",JSON.stringify(snap.keys.path));
+	    snap.keys.path.other=state.Utils.clean(snap.keys.path.other,2);
+	};
+	return snap;
+    };
     this.getSnapshot=function(state) { // store state
 	return {keys:state.Utils.cp(state.Path.keys),
 		other:state.Utils.cp(state.Path.other),
@@ -84,7 +93,7 @@ function Path() {
 	var film=state.Path.film;
 	var reel=film.reel;
 	if (snapshot === undefined) {
-	    snapshot=this.getSnapshot(state);
+	    snapshot=this.getSnapshort(state);
 	};
 	snapshot.label=film.label;
 	reel.push(snapshot);
@@ -95,7 +104,7 @@ function Path() {
 	var film=state.Path.film;
 	var reel=film.reel;
 	if (snapshot === undefined) {
-	    snapshot=this.getSnapshot(state);
+	    snapshot=this.getSnapshort(state);
 	};
 	snapshot.label=label;
 	reel[pos]=snapshot;
@@ -133,6 +142,7 @@ function Path() {
 	if (label===undefined) {label="";};
 	film.label=label;
 	console.log("Removing :",pos,label,reel.length);
+	state.Show.showFilm(state);
 	state.Utils.pushUrl(state);
 	return label;
     };
@@ -151,8 +161,7 @@ function Path() {
 	var reel=film.reel;
 	var len=reel.length;
 	if (pos !== undefined && pos < len) {
-	    // FT signing off...
-	    // console.log("Next film",film.play,pos,film.index,len);
+	    console.log("Next film",film.play,pos,film.index,len);
 	    var snapshot=reel[pos];
 	    this.setSnapshot(state,snapshot);
 	    this.setLabel(state,snapshot.label);
@@ -165,13 +174,13 @@ function Path() {
 	    } else { 
 		film.index= (film.index+1)%len;
 	    };
-	    console.log("Next index film",film.index,len);
+	    //console.log("Next index film",film.index,len);
 	    return this.nextFilm(state,film.index);
 	}
     };
     this.setMapTitle=function(state,label) {
 	var film=state.Path.film;
-	console.log("Setting map title:",label);
+	//console.log("Setting map title:",label);
 	state.Utils.pushUrl(state);
 	film.title=label;
     };
@@ -234,20 +243,27 @@ function Path() {
 	var keys=state.Path.keys.path;
 	keys.forEach(
 	    function(key,index) {
-		var vals=state.Path.select.val[key];
-		var range=state.Path.select.range[key];
-		//console.log("   select:",key,JSON.stringify(vals));
-		if (range !== undefined) {
-		    if (title !== "") { title=title + " | ";};
-		    title=title+key+"<"+range[0]+","+range[1]+">";
-		} else { 
-		    if (vals === undefined) {vals=[];};
-		    var lenv=vals.length
-		    for (var ii=0;ii<lenv;ii++) {
-			var val=vals[ii]
+		if (state.Path.select !== undefined
+		    && state.Path.select.val !== undefined
+		    && state.Path.select.range !== undefined) {
+		    var vals=state.Path.select.val[key];
+		    var range=state.Path.select.range[key];
+		    //console.log("   select:",key,JSON.stringify(vals));
+		    if (range !== undefined) {
 			if (title !== "") { title=title + " | ";};
-			title=title+state.Database.getTitleDynamic(state,key,val);
+			title=title+key+"<"+range[0]+","+range[1]+">";
+		    } else { 
+			if (vals === undefined) {vals=[];};
+			var lenv=vals.length
+			for (var ii=0;ii<lenv;ii++) {
+			var val=vals[ii]
+			    if (title !== "") { title=title + " | ";};
+			    title=title+state.Database.getTitleDynamic(state,key,val);
+			}
 		    }
+		} else {
+		    console.log("********* Corrupt select...",
+				JSON.stringify(state.Path.select));
 		}
 	    }
 	);
@@ -313,6 +329,7 @@ function Path() {
     this.makePath=function(state) { // note that not all keys are present in the data!
 	//console.log("Entering makepath.",JSON.stringify(this.keys));
 	var ii,key;
+	var bdeb=false;
 	var pathSet=[];
 	if (this.keys.path === undefined) {this.keys.path=[];};
 	if (this.keys.other === undefined) {this.keys.other=[];};
@@ -326,8 +343,7 @@ function Path() {
 	    this.keys.path=this.keys.path.filter(this.Unique);
 	    this.keys.other=this.keys.other.filter(this.Unique);
 	    this.trash=this.trash.filter(this.Unique);
-	    //console.log("setup:",JSON.stringify(setup));
-	    //console.log("Remove invalid keys from path.",JSON.stringify(this.keys));
+	    if (bdeb) {console.log("Remove invalid keys from path.",JSON.stringify(this.keys));};
 	    // remove invalid keys from path
 	    var plen = this.keys.path.length;
 	    for (ii = 0; ii < plen; ii++) {
@@ -343,7 +359,7 @@ function Path() {
 		    };
 		}
 	    }
-	    //console.log("Remove invalid keys from other.",JSON.stringify(this.keys));
+	    if (bdeb) {console.log("Remove invalid keys from other.",JSON.stringify(this.keys));};
 	    // remove invalid keys from other
 	    olen = this.keys.other.length;
 	    for (ii = 0; ii < olen; ii++) {
@@ -354,7 +370,7 @@ function Path() {
 		    olen=olen-1;
 		}
 	    }
-	    //console.log("Remove invalid keys from trash.",JSON.stringify(this.keys));
+	    if (bdeb) {console.log("Remove invalid keys from trash.",JSON.stringify(this.keys));};
 	    // remove invalid keys from trash
 	    olen = this.trash.length;
 	    for (ii = 0; ii < olen; ii++) {
@@ -365,24 +381,35 @@ function Path() {
 		    olen=olen-1;
 		}
 	    }
-	    //console.log("Update trash with keys.",JSON.stringify(this.keys));
+	    if (bdeb) {console.log("Select:",JSON.stringify(this.select));};
+	    if (bdeb) {console.log("Trash:",JSON.stringify(this.trash),JSON.stringify(this.where));};
+	    if (bdeb) {console.log("Updating trash with keys:",JSON.stringify(this.keys));};
 	    // we already have a path, update trash with new keys
-	    for (key in state.Database.keyCnt) {
-		if (this.keys.path.indexOf(key)  === -1 && 
-		    this.keys.other.indexOf(key)  === -1 && 
-		    this.trash.indexOf(key)  === -1 &&
-		    state.Utils.missing(this.ignore,key)) {
-		    pathSet[key]="trash";
-		    this.select.val[key]=undefined;
-		    this.select.range[key]=undefined;
-		    this.where[key]="";
-		    this.trash.push(key);
+	    if (this.select.val === undefined) { this.select.val={};};
+	    if (this.select.range === undefined) { this.select.range={};};
+	    if (this.keys !== undefined
+		&& this.keys.path !== undefined
+		&& this.keys.other !== undefined
+		&& this.trash !== undefined
+		&& this.where !== undefined) {
+		for (key in state.Database.keyCnt) {
+		    //console.log("Key:",key);
+		    if (this.keys.path.indexOf(key)  === -1 && 
+			this.keys.other.indexOf(key)  === -1 && 
+			this.trash.indexOf(key)  === -1 &&
+			state.Utils.missing(this.ignore,key)) {
+			pathSet[key]="trash";
+			this.select.val[key]=undefined;
+			this.select.range[key]=undefined;
+			this.where[key]="";
+			this.trash.push(key);
+		    };
 		}
 	    }
-	    //console.log("Update trash with keys.",JSON.stringify(this.keys));
+	    if (bdeb) {console.log("Updated trash with keys.",JSON.stringify(this.keys));};
 	} else {
 	    // new path...
-	    //console.log("New path");
+	    if (bdeb) {console.log("New path");};
 	    // ...define this.select.val for all keys in input data
 	    for (key in state.Database.keyCnt) {
 		pathSet[key]="data";
@@ -393,7 +420,7 @@ function Path() {
 	    this.select.val={}; // no values are set so far
 	    this.select.range={}; // no values are set so far
 	    this.where={}
-	    //console.log("Copy default trash keys.",JSON.stringify(state.Default.current.trash));
+	    if (bdeb) {console.log("Copy default trash keys.",JSON.stringify(state.Default.current.trash));};
 	    // copy default trash keys (that are used) to trash...
 	    if (state.Default.current.trash !== undefined) {
 		var tlen = state.Default.current.trash.length;
@@ -406,10 +433,10 @@ function Path() {
 			pathSet[key]=undefined; // ignore key from now on...
 		    }
 		}
-		//console.log("Pathset:",JSON.stringify(pathSet),JSON.stringify(state.Default.current.trash));
+		if (bdeb) {console.log("Pathset:",JSON.stringify(pathSet),JSON.stringify(state.Default.current.trash));};
 	    };
-	    //console.log("Copy default other keys.",JSON.stringify(this.keys));
-	    //console.log("makePath A:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));
+	    if (bdeb) {console.log("Copy default other keys.",JSON.stringify(this.keys));};
+	    if (bdeb) {console.log("makePath A:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));};
 	    // console.log("Added trash:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));
 	    // copy default other keys (that are used) to other...
 	    if (state.Default.current.other !== undefined) {
@@ -424,8 +451,8 @@ function Path() {
 		    }
 		}
 	    }
-	    //console.log("makePath B:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));
-	    //console.log("Add missing keys.",JSON.stringify(this.keys));
+	    if (bdeb) {console.log("makePath B:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));};
+	    if (bdeb) {console.log("Add missing keys.",JSON.stringify(this.keys));};
 	    // add missing keys to path
 	    for (key in state.Database.keyCnt) {
 		if (state.Utils.missing(this.ignore,key)) {
@@ -433,7 +460,7 @@ function Path() {
 			if (state.Utils.missing(this.keys.other,key)) {
 			    this.keys.other.push(key);
 			};
-			//console.log("Added key:",key);
+			if (bdeb) {console.log("Added key:",key);};
 			pathSet[key] = "added";
 		    }
 		};
@@ -444,7 +471,7 @@ function Path() {
 	    // 	state.Database.values[key].push(undefined);
 	    //     }
 	    // }
-	    // // sort sub-path according to count...
+	    // sort sub-path according to count...
 	    // this.keys.other=this.keys.other.sort(function(state,a, b) {
 	    //     if (state.Database.values[a]  === undefined) {
 	    // 	return -1;
@@ -454,8 +481,8 @@ function Path() {
 	    // 	return state.Database.values[a].length - state.Database.values[b].length
 	    //     }
 	    // });
-	    //console.log("makePath C:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));
-	    //console.log("Push other keys to table and rest.",JSON.stringify(this.keys));
+	    if (bdeb) {console.log("makePath C:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));};
+	    if (bdeb) {console.log("Push other keys to table and rest.",JSON.stringify(this.keys));};
 	    var glen = this.keys.other.length;
 	    for (ii = 0; ii < glen; ii++) {
 		key=this.keys.other[ii];
@@ -467,9 +494,9 @@ function Path() {
 	    }
 	}
 	//state.Path.setWhere(state);
-	//console.log("makePath D:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));
-	//console.log("makePath Where:",JSON.stringify(state.Path.where));
-	//console.log("makePath Select:",JSON.stringify(state.Path.keys.path),JSON.stringify(state.Path.select.val));
+	if (bdeb) {console.log("makePath D:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));};
+	if (bdeb) {console.log("makePath Where:",JSON.stringify(state.Path.where));};
+	if (bdeb) {console.log("makePath Select:",JSON.stringify(state.Path.keys.path),JSON.stringify(state.Path.select.val));};
 	state.Navigate.reset(state);
 	//console.log("keys:",JSON.stringify(state.Database.values));
 	//console.log("Before Valid:",JSON.stringify(state.Path.valid),JSON.stringify(state.Path.keys));
@@ -490,6 +517,13 @@ function Path() {
     }
     this.getIndex=function(state,trg) {
 	return this.keys.path.indexOf(trg);
+    };
+    this.getVisibleKeys=function(state) {
+	var buff=[];
+	state.Utils.cpArray(buff,state.Path.keys.path);
+	state.Utils.cpArray(buff,state.Path.keys.other);
+	//state.Utils.cpArray(buff,state.Path.trash);
+	return buff;
     };
     this.exportAllKeys=function(state) { // export keys from "all" to "rest"
 	this.other.table=[];
@@ -541,7 +575,11 @@ function Path() {
 	//console.log("this.Selecting:",key,"=",val,", where=",where);
 	var sid = state.Path.keys.other.indexOf(key);
 	if (sid !== -1) { // key is a table-key...
-	    state.Path.select.val[key]=[val];
+	    if (typeof (val)=="object") {
+		state.Path.select.val[key]=val;
+	    } else {
+		state.Path.select.val[key]=[val];
+	    }
 	    state.Path.where[key]=where;
 	    var src=state.Path.keys.other.splice(sid, 1); // remove from path
 	    if ( state.Utils.missing(state.Path.keys.path,src)) {
@@ -772,7 +810,9 @@ function Path() {
     this.getColKey=function(state) {
 	var arr=state.Utils.cp(this.other.table);
 	var pri=state.Layout.getPriorityIndex(state,arr);
-	if (state.Layout.getLayoutMode(state) === state.Layout.modes.layout.Map) {
+	var mode=state.Layout.getLayoutMode(state);
+	if (mode !== state.Layout.modes.layout.Table &&
+	    mode !== state.Layout.modes.layout.List) { // Map or Custom
 	    return "_lon";
 	} else if (pri[this.other.table[0]] < pri[this.other.table[1]]) {
 	    return this.other.table[1];
@@ -783,7 +823,9 @@ function Path() {
     this.getRowKey=function(state) {
 	var arr=state.Utils.cp(this.other.table);
 	var pri=state.Layout.getPriorityIndex(state,arr);
-	if (state.Layout.getLayoutMode(state) === state.Layout.modes.layout.Map) {
+	var mode=state.Layout.getLayoutMode(state);
+	if (mode !== state.Layout.modes.layout.Table &&
+	    mode !== state.Layout.modes.layout.List) { // Map or Custom
 	    return "_lat";
 	} else if (pri[this.other.table[0]] < pri[this.other.table[1]]) {
 	    return this.other.table[0];

@@ -23,7 +23,7 @@ const styles = theme => ({
 function SummaryCell(props) {
     const { classes,state,onclick,index,rowindex,
 	    colkey,rowkey,colvalues,rowval,
-	    elements,plan,key,label } = props;
+	    elements,plan,key,label,layout } = props;
     //console.log("Summary height:",plan.height);
     var style0={height:(plan.height)+"px",backgroundColor:'#FFF'};
     var style1={height:(plan.height)+"px",backgroundColor:'#EEE'};
@@ -45,6 +45,8 @@ function SummaryCell(props) {
 	} else {
 	    lab="";
 	};
+    } else {
+	lab=label;
     };
     var invalid=(minlev < 0); 
     var bgcolor=state.Colors.getLevelBgColor(maxlev);
@@ -55,7 +57,9 @@ function SummaryCell(props) {
     //console.log("Found invalid.",invalid,minlev,maxlev,JSON.stringify(elements));
     //console.log("Summary Plan:",JSON.stringify(plan));
     //var data={colkey:colkey,rowkey:rowkey};
-    var data=JSON.stringify({rowkey:rowkey,rowval:rowval,colkey:colkey,colvalues:colvalues,index:index,step:plan.step}); 
+    //console.log("SummaryCell:",JSON.stringify(plan));
+    var data=JSON.stringify({rowkey:rowkey,rowval:rowval,colkey:colkey,colvalues:colvalues,index:index,step:plan.step,layout:layout}); 
+    //console.log("SummaryCell data:",JSON.stringify(data),layout);
     return (
             <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} key={key}
 	         style={{color:fgcolor,backgroundColor:bgcolor}} onClick={onclick} height={plan.height} width={plan.width}

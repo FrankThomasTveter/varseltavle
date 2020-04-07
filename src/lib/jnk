@@ -1,9 +1,7 @@
-http://localhost:3000/?setup=defaults.json&Path={"keys":{"path":%5B"Phenomenon","Partner","Type"%5D,"other":%5B"date","Station","dtg","Airport","Region","Duration","Model","Issued","Method","ILS_direction","Aerodrome"%5D},"select":{"val":{"Phenomenon":%5B"Vannstand"%5D,"Partner":%5B"MetNo"%5D,"Type":%5B"Vannstandstasjon"%5D},"where":{},"cnt":{},"range":{}},"order":{"index":0,"reel":%5B{"keys":{"path":%5B"Phenomenon","Partner","Type"%5D,"other":%5B"date","Station","dtg","Airport","Region","Duration","Model","Issued","Method","ILS_direction","Aerodrome"%5D},"other":{"table":%5B"Station","date"%5D,"rest":%5B"dtg","Region","Model","Issued","Method"%5D},"select":{"val":{"Phenomenon":%5B"Vannstand"%5D,"Partner":%5B"MetNo"%5D,"Type":%5B"Vannstandstasjon"%5D},"where":{},"cnt":{},"range":{}},"order":{"index":null,"reel":%5B%5D,"play":false,"label":"","title":""},"label":"Vannstand"},{"keys":{"path":%5B"Phenomenon","Partner"%5D,"other":%5B"date","Type","dtg","Airport","Region","Duration","Model","Issued","Method","ILS_direction","Aerodrome","Station"%5D},"other":{"table":%5B"Type","date"%5D,"rest":%5B"dtg","Region","Model","Issued","Method"%5D},"select":{"val":{"Phenomenon":%5B"Middelvind"%5D,"Partner":%5B["MetNo"%5D},"where":{},"cnt":{},"range":{}},"order":{"index":null,"reel":%5B[%5D,"play":false,"label":"","title":""},"label":"Middelvind"}%5D,"play":true,"label":"Vannstand","title":"Vannstand"}}&Layout={"state":{"viewMode":0,"cellMode":0,"layoutMode":2,"cfont":0,"tooltip":1}}&
-
-MatrixLib.js:680 Element: 0 {"colval":"Regn","rowval":"2019-09-04_00-00-00.000Z","maxlev":3,"minlev":0,"maxrank":7.940784912000001,"cnt":6384,"def":0,
-"tooltip":{"Regn":{"maxrank":7.940784912000001,"docs":[
-
-{"Duration":"12t","Issued":"2019-09-04_00-00-00.000Z","Method":"P95","Model":"MEPS","Partner":"MetNo","Phenomenon":"Regn","Region":"Nordland","Type":"Fylke","date":"2019-09-06","dtg":"2019-09-06_16","level":3,"max":"198.51962280","maxlat":"67.38","maxlon":"15.87","min":".00000000","minlat":"65.65","minlon":"11.89","cnt":19195,"rank":7.940784912000001,"lat":"67.38","lon":"15.87","_thr":{"level":3,"val":198.5196228,"lat":"67.38","lon":"15.87","max":[0,5,10,25]},"_title":"Phenomenon=Regn, Duration=12t, max=198.51962280, lat=67.38, lon=15.87"},
-
-{"Duration":"12t","Issued":"2019-09-04_00-00-00.000Z","Method":"MBR0","Model":"MEPS","Partner":"MetNo","Phenomenon":"Regn","Region":"Nordland","Type":"Fylke","date":"2019-09-06","dtg":"2019-09-06_16","level":3,"max":"198.51962280","maxlat":"67.38","maxlon":"15.87","min":".00000000","minlat":"65.65","minlon":"11.89","cnt":21931,"rank":7.940784912000001,"lat":"67.38","lon":"15.87","_thr":{"level":3,"val":198.5196228,"lat":"67.38","lon":"15.87","max":[0,5,10,25]},"_title":"Phenomenon=Regn, Duration=12t, max=198.51962280, lat=67.38, lon=15.87"}]}}}
-SubTableComponent.js:116 BBX width/height: 152.72726440429688 95.45454406738281
+    this.setupMapX=function(state,docs) {
+	this.makeMapArea(state,docs);
+	this.makeMapRange(state);
+	this.addUndefinedKeyCnt(state,docs); // add "undefined"
+	this.addPathKeyCntValues(state);
+	this.addMapAreaKeys(state,docs);
+    };

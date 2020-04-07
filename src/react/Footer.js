@@ -36,13 +36,13 @@ function Footer(props) {
     return (
 	    <div className={classes.footer}>
             <Grid container spacing={10} className={classes.text}>
-	       <Grid item xs={3}>
+	       <Grid item xs={2}>
  	          <Adress />
 	       </Grid>
 	       <Grid item xs={6}>
 	          <LevelBar state={state}/>
 	       </Grid>
-	       <Grid item xs={5} style={{position: 'absolute', right: 5}}>
+	       <Grid item xs={4} style={{position: 'absolute', right: 5}}>
 	          <Status state={state}/>
 	       </Grid>
 	    </Grid>

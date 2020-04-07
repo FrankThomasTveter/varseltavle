@@ -5,6 +5,7 @@ import Path      from  "./PathComponent";
 import Table     from  "./TableComponent";
 import List      from  "./ListComponent";
 import Map       from  "./MapComponent";
+import Custom    from  "./CustomComponent";
 import Progress  from './Progress';
 
 //console.log("Inside Dataset.")
@@ -32,6 +33,8 @@ function Switcher(props) {
 	return (<Table state={state}   classes={classes}/>);
     } else if (mode === state.Layout.modes.layout.List) {
 	return (<List  state={state}   classes={classes}/>);
+    } else {
+	return (<Custom state={state} classes={classes}/>);
     }
 };
 

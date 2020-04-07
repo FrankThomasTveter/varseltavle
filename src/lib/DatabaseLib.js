@@ -13,7 +13,8 @@ function Database() {
     this.keyCnt={};
     this.values= {};
     this.epoch0=0;
-    this.data="data/";
+    this.jsonOrg={};
+    this.data="data";
     this.regfile="register";      // register file (shows current datfile)
     this.arrayConstructor=[].constructor;
     this.objectConstructor={}.constructor;
@@ -42,7 +43,9 @@ function Database() {
         state.Path.init(state);
         state.Layout.init(state);
         state.Threshold.init(state);
+        state.Custom.init(state);
 	state.Utils.init("Database",this);
+	console.log("Initial:",this.data);
 	state.File.next(state,response,callbacks);
     }.bind(this);
     this.updateLoop=function(state) {
@@ -69,24 +72,27 @@ function Database() {
 	};
     };
     this.loadRegister=function(state, response, callbacks ) {
-	var path=(state.Database.data||"data/") + state.Database.regfile;
+	var prefix=(state.Database.data||"data") + "/";
+	//console.log("Using register-prefix:",prefix);
+	var path=prefix + state.Database.regfile;
 	console.log("Database loadRegister:",path);
 	state.File.load(state,path,callbacks);
     };
-
     this.processRegister=function(state,response,callbacks) {
 	var files=response.split('\n');
 	var file=files[Math.min(files.length-1,state.Database.index)]; // register-respo
 	state.Database.files=files;
-	state.Database.index=Math.min(files.length-1,state.Database.index)
+	state.Database.index=Math.min(files.length-1,(state.Database.index||0))
 	state.File.next(state,file,callbacks);
     };	
     this.loadData=function(state, file, callbacks ) {
 	//console.log("Database loadData:",JSON.stringify(file));
 	if (file !== state.Database.loaded) { // load new data
-	    state.Database.loaded=file;
+	    state.Database.setLoaded(state,file);
 	    // console.log("Files:",JSON.stringify(state.Database.files));
-	    var path=(state.Database.data||"data/") + file;
+	    var prefix=(state.Database.data||"data") + "/";
+	    //console.log("Using data-prefix:",prefix);
+	    var path=prefix + file;
 	    //console.log("Database loadPath:",JSON.stringify(path));
 	    state.File.load(state,path,callbacks);
 	} else {
@@ -101,7 +107,7 @@ function Database() {
 	    try {
 		state.Database.json=JSON.parse(response);
 	    } catch (e) {
-		alert("Data '"+state.Database.files[state.Database.index]+"' contains Invalid JSON:"+e.name+":"+e.message);
+		alert("Data '"+state.Database.files[(state.Database.index||0)]+"' contains Invalid JSON:"+e.name+":"+e.message);
 	    }
 	    if (state.Database.json !== undefined) {
 		state.Database.processJson(state,state.Database.json,callbacks);
@@ -123,8 +129,18 @@ function Database() {
 	    state.Database.processJson(state,state.Database.json);
 	}
     };
+    this.saveDb=function(state) {
+	state.Utils.save(state.Utils.prettyJson(this.jsonOrg),this.loaded,"json");
+    };
+    this.resetDb=function(state,response,callbacks) {
+	state.Database.index=-1;
+	state.Database.processData(state,response,callbacks);
+    };
+    this.setLoaded=function(state,loaded) {
+	this.loaded=loaded;
+    };
     this.selectIndex=function(state,item,index) {
-	console.log("Setting file index:",index,item);
+	//console.log("Setting file index:",index,item);
 	state.Database.index=Math.max(0,Math.min(index,state.Database.files.length-1));
 	state.Database.loadData(state,item,[state.Database.processData]);
     };
@@ -207,6 +223,7 @@ function Database() {
 	    }
 	    // get modified date
 	    //console.log("Setting time.");
+	    this.jsonOrg=state.Utils.cp(json);
 	    this.epoch0=this.getTime(state,json.epoch);     // data file time
 	    this.setTime(state);     // data file time
 	    this.newDb();
@@ -241,6 +258,7 @@ function Database() {
 	    //var nrec=this.sanityCheck(state)	    // sanity check
 	    //console.log("Initially:",data.length," Extracted:",rcnt,' Database:',nrec);
 	    this.postProcess(state); // update distinct Database.values[key]
+	    //console.log("Delay keys:",JSON.stringify(delayKeys));
 	    if (delayKeys.length > 0) {// delayed home selection (MAX() and MIN())
 		this.makeWhere(state,delayKeys,home);
 		var where=this.getWhere(state,delayKeys,home);
@@ -248,6 +266,7 @@ function Database() {
 		this.dataToDb(state,docs)
 		this.postProcess(state); // update distinct Database.values[key]
 	    };
+	    //console.log("Make path...");
 	    state.Path.makePath(state); // initialise path
 	    //console.log("Indexing and cleaning up.");
 	    this.dbindex(state,state.Path.other.table); // make indexes
@@ -271,6 +290,7 @@ function Database() {
     };
     this.postProcess=function(state) { // update meta-data
 	var keys=Object.keys(state.Database.keyCnt);
+	//console.log("Entering postProcess.", JSON.stringify(keys));
 	var lenk=keys.length;
 	for (var ii=0;ii<lenk;ii++) {
 	    var key=keys[ii];
@@ -284,6 +304,7 @@ function Database() {
 		state.Database.values[key].push(doc[key]);
 	    };
 	};
+	//console.log("Done postProcess.");
     };
     this.extractData=function(state,data,parent,key,raw,hkeys,home) { // insert records into db (recursive)
 	var rcnt=0;
@@ -386,9 +407,13 @@ function Database() {
 	return rcnt;
     };
     this.dbextract=function(state,showFunc) { // extract data from db and show
+	this.bdeb=false;
 	// extract data from db and insert into data-array
 	// var parent={};//{test:{$exists:false}};
 	if (this.processing) {return};
+	var keys=state.Path.getVisibleKeys(state);
+	state.Utils.cpArray(keys,["lat","lon"]);
+	//console.log("Visible keys:",JSON.stringify(keys));
 	var where = this.getWhere(state);
 	//console.log("dbextract Path:",JSON.stringify(state.Path.keys));
 	console.log("dbextract Where:",where)
@@ -397,22 +422,15 @@ function Database() {
 	var m={};
 	state.Matrix.cnt=nrec;
 	if (nrec > state.Matrix.popSeries) { // maintain keyCnt
-	    var buff=[];
-	    state.Utils.cpArray(buff,state.Path.keys.path);
-	    state.Utils.cpArray(buff,state.Path.keys.other);
-	    state.Utils.cpArray(buff,state.Path.trash);
 	    state.Matrix.initKeyCnt(state);
-	    state.Matrix.makeKeyCnt(state,where,nrec,buff);
-	    //
+	    state.Matrix.makeKeyCntMapAreaSql(state,where,nrec,keys);
 	    state.Path.exportAllKeys(state); // can not export keys before we have a keyCnt
-	    state.Matrix.sortMatrixValues(state);
-	    //console.log("Count:",JSON.stringify(docs));
+	    state.Matrix.sortKeyValues(state);
+	    if (this.bdeb) {console.log("Count:",JSON.stringify(cntDocs0));}
 	    // add "undefined" range of keys that are not present in every doc...
+	    state.Matrix.addMapAreaKeys(state,this.db.tables.alarm.data); // add lat_/lon_
 	    var colkey=state.Path.getColKey(state);
 	    var rowkey=state.Path.getRowKey(state);
-	    var areaDocs=state.Database.getDocsCnt(state,where);
-	    state.Matrix.setMapArea(state,areaDocs);
-	    state.Matrix.addMapAreaKeys(state,this.db.tables.alarm.data); // add lat_ and lon_ to database...
 	    var cntDocs=state.Database.getDocsCnt(state,where,[colkey,rowkey]);
 	    if (this.bdeb) {console.log("dbextract cntDocs:",JSON.stringify(cntDocs));}
 	    state.Matrix.makeMatrixCntMap(state,cntDocs,m);
@@ -426,14 +444,13 @@ function Database() {
 	    var docs=this.getDocs(state,where); // get all docs
 	    //console.log(">>>Extraction key (where='",where,"') Docs:",docs.length);
 	    state.Matrix.initKeyCnt(state);
-	    state.Matrix.makeKeyCntMap(state,docs);
+	    state.Matrix.makeKeyCntMapArea(state,docs,keys);      // makes mapArea
 	    state.Matrix.makeMapRange(state);
 	    state.Matrix.addUndefinedKeyCnt(state,docs); // add "undefined"
 	    state.Matrix.addUndefinedKeyCntValues(state);
-	    state.Matrix.addMapAreaKeys(state,docs);
-	    //
+	    state.Matrix.addMapAreaKeys(state,docs); // add lat_/lon_
 	    state.Path.exportAllKeys(state); // can not export keys before we have a keyCnt
-	    state.Matrix.sortMatrixValues(state);
+	    state.Matrix.sortKeyValues(state);
 	    state.Matrix.makeMatrix(state,docs,m);
 	    //console.log ("Matrix:",JSON.stringify(m));
 	}

@@ -260,6 +260,37 @@ function Navigate() {
 	state.Path.setMapTitle(state,"");
 	state.Show.show(state);		
     };
+    this.selectCustom=function(state,layout,colkey,rowkey,colval,rowval,colwhere,rowwhere,colcnt,rowcnt) {
+	//console.log("SelectCustom:",layout,colkey,rowkey,colval,rowval,colwhere,rowwhere,colcnt,rowcnt);
+	var rank=state.Utils.cp(state.Path.keys.other);
+	var criteria=state.Custom.getCriteria(state,layout,colval,rowval);
+	if (criteria !== undefined) {
+	    var changed=false;
+	    var keys=Object.keys(criteria);
+	    var lenk=keys.length;
+	    for (var kk=0; kk< lenk; kk++) {
+		var key=keys[kk];
+		var vals=criteria[key];
+		if (state.Auto.selectTableKey(state,key,vals,colwhere,colcnt)) {
+		    //console.log("Selected:",colkey,colval,JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other));
+		    this.rank[key]=state.Utils.cp(rank);
+		    changed=true;
+		};
+	    };
+	    if (changed) {
+		//this.trash[colkey]=state.Path.checkTableKeys(state);
+		//console.log("state.Path.checkTableKeys Done.",colkey,JSON.stringify(this.trash[colkey]));
+		state.Html.setFootnote(state,"Extracting data.");
+		state.Html.setProgress(state, true);
+		state.Navigate.store(state);
+		state.Path.setMapTitle(state,"");
+		state.Show.show(state);
+	    }
+	    //console.log("Found criteria:",JSON.stringify(criteria));
+	} else {
+	    this.selectItem(state,colkey,rowkey,colval,rowval,colwhere,rowwhere,colcnt,rowcnt);
+	}
+    };
     this.selectItem=function(state,colkey,rowkey,colval,rowval,colwhere,rowwhere,colcnt,rowcnt) {
 	//console.log("Selectitem:",colkey,rowkey,colval,rowval,colwhere,rowwhere,colcnt,rowcnt);
 	//var colkey=state.Path.getColKey(state);

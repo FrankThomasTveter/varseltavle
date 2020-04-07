@@ -153,13 +153,13 @@ class EarthMap extends Component {
             var rlen=rowvalues.length;
             for(var ii=0; ii<rlen; ii++) {
 		var rowval=rowvalues[ii];
-		var rowrange=state.Matrix.getLatRange(state,rowvalues[ii]);
-		var rowwhere = state.Matrix.getLatWhere(state,"lat",rowvalues[ii]);
+		var rowrange=state.Grid.getLatRange(state,rowvalues[ii]);
+		var rowwhere = state.Grid.getLatWhere(state,"lat",rowvalues[ii]);
 		var clen=colvalues.length;
 		for(var jj=0; jj<clen; jj++) {
 		    var colval=colvalues[jj];
-		    var colrange=state.Matrix.getLonRange(state,colvalues[jj]);
-		    var colwhere = state.Matrix.getLonWhere(state,"lon",colvalues[jj]);
+		    var colrange=state.Grid.getLonRange(state,colvalues[jj]);
+		    var colwhere = state.Grid.getLonWhere(state,"lon",colvalues[jj]);
 		    var element=state.Matrix.getMatrixElement(colval,rowval,matrix);
 		    if (element !== undefined) {
 			var lon=element.colval;
@@ -222,6 +222,8 @@ class EarthMap extends Component {
 		    }
 		}
 	    }
+	} else {
+	    console.log("No matrix available...");
 	}
 	if (sum.cnt>0) {
 	    var cen={};

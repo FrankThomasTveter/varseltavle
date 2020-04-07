@@ -15,6 +15,8 @@ import Database from '../lib/DatabaseLib';
 import Default from '../lib/DefaultLib';
 import Html from '../lib/HtmlLib';
 import Layout from '../lib/LayoutLib';
+import Custom from '../lib/CustomLib';
+import Grid from '../lib/GridLib';
 import Matrix from '../lib/MatrixLib';
 import Navigate from '../lib/NavigateLib';
 import Path from '../lib/PathLib';
@@ -106,6 +108,8 @@ class App extends Component {
 	    File:      new File()  ,
 	    Database:  new Database()  ,
 	    Threshold: new Threshold() ,
+	    Custom:    new Custom()      ,
+	    Grid:      new Grid()      ,
 	    Matrix:    new Matrix()    ,
 	    Html:      new Html()      ,
 	    Utils:     new Utils()     ,

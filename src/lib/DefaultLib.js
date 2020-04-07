@@ -8,16 +8,19 @@ function Default() {
     // map: Default => setup
     this.cpJsonToDefaultFill= [[["Database","data"],        ["data"]],
 			       [["other"],                  ["other"]],
-			       [["trash"],                  ["trash"]]
+			       [["trash"],                  ["trash"]],
+			       [["custom"],                 ["custom"]]
 			      ];
     this.cpJsonToDefaultForce=[[["Threshold","thrs"],       ["thrs"]],
 			       [["Colors","colors"],        ["colors"]],
 			       [["Path","order"],           ["order"]],
 			       [["Path","select"],          ["select"]],
 			       [["Path","home"],            ["home"]],
+			       [["Path","film"],            ["film"]],
 			       [["Path","tooltip"],         ["tooltip"]],
 			       [["Layout","priority"],      ["priority"]],
-			       [["Layout","state"],         ["state"]]
+			       [["Layout","state"],         ["state"]],
+			       [["Custom","maps"],          ["custom"]]
 			      ];
     // map: Default => state
     this.cpStateToDefaultFill= [[["Database","data"],        ["Database","data"]],
@@ -25,6 +28,7 @@ function Default() {
 				[["Colors","colors"],        ["Colors","colors"]],
 				[["Path","order"],           ["Path","order"]],
 				[["Path","home"],            ["Path","home"]],
+				[["Path","film"],            ["Path","film"]],
 				[["Path","tooltip","keys"],  ["Path","tooltip","keys"]],
 				[["Path","tooltip","select"],["Path","tooltip","select"]],
 				[["Path","tooltip","sort"],  ["Path","tooltip","sort"]],
@@ -33,10 +37,12 @@ function Default() {
 				[["Path","keys","path"],     ["Path","keys","path"]],
 				[["Path","keys","other"],    ["Path","keys","other"]],
 				[["Layout","priority"],      ["Layout","priority"]],
-				[["Layout","state"],         ["Layout","state"]]
+				[["Layout","state"],         ["Layout","state"]],
+				[["Custom","maps"],          ["Custom","maps"]]
 			       ];
     this.cpStateToDefaultForce=[[["Path","home"],            ["Path","home"]],
-				[["Colors","colors"],        ["Colors","colors"]]];
+				[["Colors","colors"],        ["Colors","colors"]],
+				[["Custom","maps"],          ["Custom","maps"]]];
     this.cpDefaultToStateFill=this.cpStateToDefaultFill;
     this.cpDefaultToDefaultFill=this.cpStateToDefaultFill;
     this.init=function(state){
@@ -120,7 +126,7 @@ function Default() {
 	//JSON.stringify(setup, null, "   ");
 	return json;
     };
-    this.save=function(state) {
+    this.saveSetup=function(state) {
 	var setup=state.Utils.prettyJson(state.Default.getSetup(state));
 	state.Utils.save(setup,"setup.json","json");
     };

@@ -50,7 +50,7 @@ class Tooltip extends Component {
 	if (available) {
 	    return (<TableDetails state={state} data={data} tooltip={info.tooltip}/>);
 	} else {
-	    var onclick=() => {printData(data);state.Matrix.addTooltip(state,data);update();this.forceUpdate();}
+	    var onclick=() => {state.Matrix.addTooltip(state,data);update();this.forceUpdate();}//printData(data);
 	    return (<InfoDetails state={state} data={data} onclick={onclick} info={info}/>);
 	}
     }

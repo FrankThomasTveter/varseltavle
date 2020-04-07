@@ -20,7 +20,7 @@ function File() {
 	    var regHttp = new XMLHttpRequest();
 	    regHttp.addEventListener("progress",(e)=>state.Html.progressInfo(state,e));
 	    //regHttp.addEventListener("load",(e)=>state.Html.loadInfo(state,e));
-	    regHttp.addEventListener("error",(e)=>state.Html.errorInfo(state,e));
+	    //regHttp.addEventListener("error",(e)=>state.Html.errorInfo(state,e));
 	    regHttp.addEventListener("abort",(e)=>state.Html.abortInfo(state,e));
 	    regHttp.onreadystatechange = function() {
 		state.File.ready=true;

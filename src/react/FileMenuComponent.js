@@ -25,7 +25,7 @@ const styles = theme => ({
 // 
 function Download(props) {
     const {state,classes}=props;
-    var onclick=() => {state.Default.save(state);};
+    var onclick=() => {state.Default.saveSetup(state);};
     var title="Download setup";
     return <Button className={classes.button} onClick={onclick} title={title}><DownloadIcon/></Button>;
 };

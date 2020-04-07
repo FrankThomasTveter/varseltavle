@@ -107,8 +107,9 @@ function Threshold() {
 		    }
 		}
 	    }
-	    doc._thr={};
-	    doc.level=-2;  // no thresholds found...
+	    doc.lat=0;
+	    doc.lon=0;
+	    doc._thr={lat:0,lon:0,level:-2};// no thresholds found...
 	}
 	return [];
     };
@@ -122,13 +123,25 @@ function Threshold() {
 	}
     }
     this.getRank=function(state,doc) {
-	return doc._rank;
-    }
+	if (doc._thr !== undefined) {
+	    return doc._rank;
+	} else {
+	    return 0;
+	}
+    };
     this.getLat=function(state,doc) {
-	return doc._thr.lat;
+	if (doc._thr !== undefined) {
+	    return doc._thr.lat;
+	} else {
+	    return 0;
+	}
     }
     this.getLon=function(state,doc) {
-	return doc._thr.lon;
+	if (doc._thr !== undefined) {
+	    return doc._thr.lon;
+	} else {
+	    return 0;
+	}
     };
 };
 export default Threshold;
