@@ -9,35 +9,39 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FlagIcon from '@material-ui/icons/Flag';
 import BarIcon from '@material-ui/icons/BarChart';
 import ListIcon from '@material-ui/icons/Details';
-import MapIcon from '@material-ui/icons/Map';
+import ChartIcon from '@material-ui/icons/Map';
+import GlobeIcon from '@material-ui/icons/Public';
 
 const styles = theme => ({
-    view: {
-        marginLeft: 'auto',
-    },
     button:{
 	color:'white'
     },
+    buttonInvisible:{
+	color:'gray'
+    },
     chip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
         cursor: "pointer",
 	color:'white'
     },
 });
+
 function getModes(state,mode) {
     if (mode !== undefined) {
 	var layoutMode=0;
 	var cellMode=0;
-	if (mode === "FlagChart") {
+	if (mode === "Flags") {
 	    layoutMode=state.Layout.modes.layout.Table;
 	    cellMode=state.Layout.modes.cell.Sum;
-	} else if (mode === "BarChart") {
+	} else if (mode === "Bars") {
 	    layoutMode=state.Layout.modes.layout.Table;
 	    cellMode=state.Layout.modes.cell.Series;
 	} else if (mode === "List") {
 	    layoutMode=state.Layout.modes.layout.List;
-	} else if (mode === "MapChart") {
-	    layoutMode=state.Layout.modes.layout.Map;
+	} else if (mode === "Chart") {
+	    layoutMode=state.Layout.modes.layout.Chart;
+	} else if (mode === "Globe") {
+	    layoutMode=state.Layout.modes.layout.Globe;
 	} else {
 	    layoutMode=mode;
 	    cellMode=state.Layout.modes.cell.Sum;
@@ -47,6 +51,7 @@ function getModes(state,mode) {
 	return {layout:state.Layout.state.layoutMode,cell:state.Layout.state.cellMode};
     };
 };
+
 function ModeIcon (props) {
     const {state,classes,mode} = props;
     //console.log("Classes:",JSON.stringify(classes));
@@ -61,12 +66,15 @@ function ModeIcon (props) {
 	}
     } else if (layoutMode === state.Layout.modes.layout.List) {
 	return (<ListIcon/>);
-    } else if (layoutMode === state.Layout.modes.layout.Map) {
-	return (<MapIcon/>);
+    } else if (layoutMode === state.Layout.modes.layout.Chart) {
+	return (<ChartIcon/>);
+    } else if (layoutMode === state.Layout.modes.layout.Globe) {
+	return (<GlobeIcon/>);
     } else {
 	return (<div className={classes.chip}> {layoutMode} </div>);
     }
 };
+
 function renderMode (state,classes,onclose,mode,index) {
     var modes=getModes(state,mode);
     var layoutMode=modes.layout;
@@ -77,18 +85,24 @@ function renderMode (state,classes,onclose,mode,index) {
 	          <ModeIcon state={state} classes={classes} mode={mode}/>
 	       </Button>
 	    </MenuItem>);
-	   };
+};
+
 class Mode extends Component {
     state = {anchor: null,};
     render() {
-	const {classes, state}=this.props;
-	var modes=["FlagChart","BarChart","List","MapChart"];
-	state.Custom.addMaps(state,modes);
-	this.onClose = () => {this.setState({ anchor: null });};
-	this.onClick = (event) => {this.setState({ anchor: event.currentTarget });};
-	var mapFunction= (mode,index)=>renderMode(state,classes,this.onClose,mode,index);
-	return (<div className={classes.view}>
-		   <Button
+	const {classes, state, visible}=this.props;
+	var title;
+	if (visible !== undefined && ! visible && state.Settings.isInvisible(state,"Mode")) {
+	    return null;
+	} else if (visible !== undefined) {
+	    var modes=["Flags","Bars","List","Chart","Globe"];
+	    state.Custom.addMaps(state,modes);
+	    this.onClose = () => {this.setState({ anchor: null });};
+	    this.onClick = (event) => {this.setState({ anchor: event.currentTarget });};
+	    title="Select mode";
+	    var mapFunction= (mode,index)=>renderMode(state,classes,this.onClose,mode,index);
+	    return (<div className={classes.view}>
+		    <Button
                       className={classes.button}
                       aria-owns={this.state.anchor ? 'mode-menu' : undefined}
                       aria-haspopup="true"
@@ -105,12 +119,25 @@ class Mode extends Component {
 	          >
 		    {modes.map(mapFunction)}
 	          </Menu>
-		</div>);
+		    </div>);
+	} else {
+	    title="Show mode";
+	    var onclick = (event) => {state.Settings.toggle(state,"Mode");}
+	    if (state.Settings.isInvisible(state,"Mode")) {
+		return (<Button key="mode" className={classes.buttonInvisible} onClick={onclick} title={title}>
+			{<ModeIcon state={state} classes={classes}/>}
+			</Button>);
+	    } else {
+		return (<Button key="mode" className={classes.button} onClick={onclick} title={title}>
+			{<ModeIcon state={state} classes={classes}/>}
+			</Button>);
+	    };
+	}
     }
-}
-
+};
 Mode.propTypes = {
     classes: PropTypes.object.isRequired,
 };
+
 
 export default withStyles(styles)(Mode);

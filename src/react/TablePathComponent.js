@@ -9,17 +9,24 @@ const styles = theme => ({
         marginLeft: 'auto',
     },
     tabchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"red",
         borderColor:"blue",
     },
+    button:{},
+    buttonInvisible:{},
+    buttonDisabled:{},
 });
 function renderMenu(classes,state,keyitem,keyindex) {
     return (<span key={`table-${keyitem}`}>
-	    <TableMenu classes={{tabchip:classes.tabchip}} state={state} value={keyitem}/>
+	    <TableMenu classes={{tabchip:classes.tabchip,button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled}} state={state} value={keyitem}/>
 	    </span>);
 }
+
+//
+//
+
 class TablePath extends Component {
     state={anchor:null};
     render() {

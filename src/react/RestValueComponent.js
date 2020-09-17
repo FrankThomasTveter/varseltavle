@@ -9,15 +9,16 @@ const styles = theme => ({
         marginRight: 'auto',
     },
     restchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"blue",
         borderColor:"blue",
     },
 });
+
 class RestValue extends Component {
     render() {
-	const { classes, state, keyvalue, target, onclose } = this.props; // state, key, index, onclick, title, 
+	const { classes, state, keyvalue, target, onclose } = this.props; // state, key, index, onclick, title, keytype, 
 	var where=state.Database.getWhereValue(target,keyvalue);
 	var onclick=() => {state.Navigate.onClickRestValue(state,keyvalue,target,where);onclose();};
 	return <Chip

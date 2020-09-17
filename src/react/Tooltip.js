@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import {teal_palette} from '../mui/metMuiThemes';
 
-import Table  from './TooltipTable';
+import TooltipTable  from './TooltipTable';
 
 //import InfoIcon from '@material-ui/icons/Info';
 //import CancelIcon from '@material-ui/icons/Cancel';
@@ -13,7 +13,7 @@ const styles = theme => ({
     tooltip:{
 	border: '0px solid #999999',
 	backgroundColor:teal_palette.main,
-	zIndex:100,
+	zIndex:10000,
     },
 });
 
@@ -26,7 +26,7 @@ function TableDetails(props){
     //console.log("TableDetails tooltip:",JSON.stringify(tooltip));
     var key=data.rowkey+":"+data.colkey;
     return (<div key={key}>
-	       <Table state={state} keys={keys} click={click} subs={tooltip}/>
+	       <TooltipTable state={state} keys={keys} click={click} subs={tooltip}/>
 	    </div>
 	   );
 };
@@ -37,9 +37,9 @@ function InfoDetails(props) {
 	    </div>
 	   );
 };
-function printData(data) {
-    console.log("############## Data:",JSON.stringify(Object.keys(data)));
-};
+//function printData(data) {
+//    console.log("############## Data:",JSON.stringify(Object.keys(data)));
+//};
 class Tooltip extends Component {
     render() {
 	const {state,data,update}=this.props;

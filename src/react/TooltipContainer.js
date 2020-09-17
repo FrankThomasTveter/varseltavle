@@ -19,6 +19,7 @@ const styles = theme => ({
             color: theme.palette.primary.main,
 	},
     },
+    buttonInvisible:{},
     buttonDisabled: {},
 });
 class TooltipContainer extends Component {
@@ -54,10 +55,11 @@ class TooltipContainer extends Component {
 	};
 	var getContent= function(dataTip) {
 	    if (dataTip==null) {
+		//console.log("Tooltip no datatip...");
 		return null;
 	    } else {
 		const data=JSON.parse(dataTip);
-		//console.log("Tooltip:",JSON.stringify(dataTip),JSON.stringify(data));
+		//console.log("Tooltip:",JSON.stringify(dataTip));
 		return (<Tooltip state={state} classes={{tooltip:classes.tooltip}} data={data} update={this.update}/>);
 	    }
 	}.bind(this);
@@ -71,8 +73,8 @@ class TooltipContainer extends Component {
 		    getContent={getContent}
 		    effect='solid'
 		    delayHide={500}
-		    delayShow={200}
-		    delayUpdate={500}
+		    delayShow={300}
+		    delayUpdate={200}
 		    place={'bottom'}
 		    border={true}
 		    type={'light'}

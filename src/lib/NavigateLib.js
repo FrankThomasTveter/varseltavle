@@ -12,8 +12,8 @@ function Navigate() {
 	state.Navigate.history={pos:0,track:[]};
 	this.store(state);
     };
-    this.store=function(state) { // store state
-	var snapshot=state.Path.getSnapshot(state)
+    this.store=function(state,focus) { // store state
+	var snapshot=state.Path.getSnapshot(state,focus)
 	// remove old data...
 	if (state.Navigate.history.track.length>state.Navigate.history.pos+1) {
 	    state.Navigate.history.track.length=state.Navigate.history.pos+1;
@@ -43,35 +43,64 @@ function Navigate() {
 	    state.React.Config.show();
 	};
     };
-    this.canUndo=function(state) {
-	return (state.Navigate.history.pos > 0);
+    this.canUndoHistory=function(state) {
+	return (state.Navigate.history.pos);
     };
-    this.canRedo=function(state) {
-	return (state.Navigate.history.pos < state.Navigate.history.track.length-1);
+    this.undoHistory=function(state) {
+	//console.log(">>>>>> Undo:",this.canUndo(state));
+	state.Navigate.history.pos=state.Navigate.history.pos-1;
+	var snapshot=state.Navigate.history.track[state.Navigate.history.pos]
+	//console.log("Setting snapshot:",this.snapshotToString(state,snapshot));
+	state.Path.setSnapshot(state,snapshot);
+	this.refreshHistory(state);
+	state.Path.setMapTitle(state,"");
+	state.Show.show(state);
+    };
+    this.canUndo=function(state) {
+	return (this.canUndoHistory(state));
     };
     this.undo=function(state) {
 	//console.log(">>>>>> Undo:",this.canUndo(state));
-	if (this.canUndo(state)) {
-	    state.Navigate.history.pos=state.Navigate.history.pos-1;
-	    var snapshot=state.Navigate.history.track[state.Navigate.history.pos]
-	    //console.log("Setting snapshot:",this.snapshotToString(state,snapshot));
-	    state.Path.setSnapshot(state,snapshot);
-	    this.refreshHistory(state);
-	    state.Path.setMapTitle(state,"");
-	    state.Show.show(state);
+	if (this.canUndoHistory(state)) {
+	    this.undoHistory(state);
 	};
+    };
+    this.canRedoPath=function(state) {
+	return (state.Path.keys.path.length > 0);
+    };
+    this.redoPath=function(state) {
+	//console.log(">>>>>> Undo:",this.canUndo(state));
+	var len=state.Path.keys.path.length;
+	//console.log("Undoing Path:",len,JSON.stringify(state.Path.keys.path));
+	if (len>0) {
+	    var key=state.Path.keys.path[len-1];
+	    //console.log("Undoing:",key);
+	    this.onClickPath(state,"path",key);
+	}
+    }
+    this.canRedoHistory=function(state) {
+	return (state.Navigate.history.pos < state.Navigate.history.track.length-1);
+    };
+    this.canRedo=function(state) {
+	return (this.canRedoHistory(state) || this.canRedoPath(state));
+    };
+    this.redoHistory=function(state) {
+	//console.log(">>>>>> Redo:",this.canRedo(state),state.Navigate.history.pos,JSON.stringify(state.Navigate.history.track));
+	state.Navigate.history.pos=state.Navigate.history.pos+1;	
+	var snapshot=state.Navigate.history.track[state.Navigate.history.pos]
+	//console.log("Setting snapshot:",this.snapshotToString(state,snapshot));
+	state.Path.setSnapshot(state,snapshot);
+	this.refreshHistory(state);
+	state.Path.setMapTitle(state,"");
+	state.Show.show(state);
     };
     this.redo=function(state) {
 	//console.log(">>>>>> Redo:",this.canRedo(state),state.Navigate.history.pos,JSON.stringify(state.Navigate.history.track));
-	if (this.canRedo(state)) {
-	    state.Navigate.history.pos=state.Navigate.history.pos+1;	
-	    var snapshot=state.Navigate.history.track[state.Navigate.history.pos]
-	    //console.log("Setting snapshot:",this.snapshotToString(state,snapshot));
-	    state.Path.setSnapshot(state,snapshot);
-	    this.refreshHistory(state);
-	    state.Path.setMapTitle(state,"");
-	    state.Show.show(state);
-	}
+	if (this.canRedoHistory(state)) {
+	    this.redoHistory(state)
+	} else if (this.canRedoPath(state)) {
+	    this.redoPath(state)
+	};
     };
     this.onClickTablePath=function(state,skey,tkey) {
 	var reload=false;
@@ -98,14 +127,14 @@ function Navigate() {
     };
     this.onClickRestValue=function(state,val,key,where) {
 	//console.log("onClickRestValue:",val,key,JSON.stringify(state.Path.keys));
-	if (state.Auto.selectTableKey(state,key,val,where,1)) {
+	if (state.Auto.selectTableKey(state,key,val,where,1,true)) {
 	    state.Html.setFootnote(state,"Extracting data.");
 	    state.Html.setProgress(state, true);
 	    state.Navigate.store(state);
 	    state.Path.setMapTitle(state,"");
 	    state.Show.show(state);
 	};
-	console.log("onClickRestValue done:",val,key,JSON.stringify(state.Path.keys));
+	//console.log("onClickRestValue done:",val,key,JSON.stringify(state.Path.keys));
     };
     this.onClickPath=function(state,ttyp,tkey) {
 	var reload=false; // matrix changed?
@@ -117,10 +146,12 @@ function Navigate() {
 		var range=state.Path.getRange(state,tkey);
 		src=state.Path.keys.path.splice(tid, 1);                 // remove from path
 		if (range === undefined) { // remove if this is a range (lat/lon)
-		    state.Utils.pushKey(state.Path.keys.other,src,2);
+		    state.Utils.pushKey(state.Path.keys.other,src,1);
 		};
 		//state.Utils.spliceArray(state.Path.keys.other,0,0,src); // first position (table)
 		state.Path.cleanSelect(state);
+		state.Auto.setKeyNumber(state);
+		//state.Auto.reorderKeys(state);
 		state.Navigate.store(state);
 		reload=true;
 	    }
@@ -131,6 +162,7 @@ function Navigate() {
 		src=state.Path.keys.other.splice(tid, 1);                 // remove from path
 		state.Utils.pushKey(state.Path.keys.other,src,0);
 		//state.Utils.spliceArray(state.Path.keys.other,0,0,src); // first position (table)
+		state.Auto.reorderKeys(state);
 		state.Path.exportAllKeys(state);
 		state.Navigate.store(state);
 		reload=true;
@@ -139,28 +171,30 @@ function Navigate() {
 	    tid=state.Path.keys.other.indexOf(tkey);
 	    if (tid !== -1) {
 		src=state.Path.keys.other.splice(tid, 1);                 // remove from path
-		state.Utils.pushKey(state.Path.trash,src);
+		state.Utils.pushKey(state.Path.keys.trash,src);
 		//state.Utils.spliceArray(state.Path.keys.other,0,0,src); // first position (table)
+		state.Auto.reorderKeys(state);
 		state.Navigate.store(state);
 		reload=true;
 	    };
 	} else if (ttyp === "trash") {
-	    tid=state.Path.trash.indexOf(tkey);
+	    tid=state.Path.keys.trash.indexOf(tkey);
 	    tin=state.Path.keys.other.indexOf(tkey);
 	    sin=state.Path.keys.path.indexOf(tkey);
 	    tib=state.Path.other.table.indexOf(tkey);
-	    console.log("Trashing start:",JSON.stringify(state.Path.trash),tkey,tid,tin,sin,tib);
+	    console.log("Trashing start:",JSON.stringify(state.Path.keys.trash),tkey,tid,tin,sin,tib);
 	    if (tid !== -1) {                                             // trash => other
-		src=state.Path.trash.splice(tid, 1);
+		src=state.Path.keys.trash.splice(tid, 1);
 		state.Utils.pushKey(state.Path.keys.other,src);
 		//if ( tin === -1 ) {
 		//    state.Path.keys.other=state.Path.keys.other.concat(src);  // last position
 		//};
 	    } else if (tin !== -1 && tib !== -1) {                        // table => trash
 		src=state.Path.keys.other.splice(tin, 1);
-		state.Utils.pushKey(state.Path.trash,src);
+		state.Utils.pushKey(state.Path.keys.trash,src);
+		state.Auto.reorderKeys(state);
 		reload=true;
-		//state.Path.trash=state.Path.trash.concat(src);            // last position
+		//state.Path.keys.trash=state.Path.keys.trash.concat(src);            // last position
 	    } else if (sin !== -1 && tin === -1) {                         // select => other
 		state.Utils.pushKey(state.Path.keys.other,tkey);
 		//state.Path.keys.other=state.Path.keys.other.concat(tkey); // last position
@@ -168,12 +202,12 @@ function Navigate() {
 		src=state.Path.keys.other.splice(tin, 1);
 	    } else if (sin === -1 && tin !== -1) {                        // other => trash
 		src=state.Path.keys.other.splice(tin, 1);
-		state.Utils.pushKey(state.Path.trash,src);
-		//state.Path.trash=state.Path.trash.concat(src);            // last position
+		state.Utils.pushKey(state.Path.keys.trash,src);
+		//state.Path.keys.trash=state.Path.keys.trash.concat(src);            // last position
 	    };
 	    state.Path.exportAllKeys(state);
 	    state.Navigate.store(state);
-	    //console.log("Trashed:",JSON.stringify(state.Path.trash),JSON.stringify(state.Path.keys));
+	    //console.log("Trashed:",JSON.stringify(state.Path.keys.trash),JSON.stringify(state.Path.keys));
 	}
 	state.Html.setFootnote(state,"Extracting data.");
 	state.Html.setProgress(state, true);
@@ -187,33 +221,43 @@ function Navigate() {
 	var tid,tin,sin,src;
 	//console.log("Clicked:",ttyp,tkey,JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other));
 	//ttyp "select", "rest", "trash"
-	//console.log("Adding start:",tkey,JSON.stringify(state.Path.trash),JSON.stringify(state.Path.keys));
-	tid=state.Path.trash.indexOf(tkey);
+	//console.log("Adding start:",tkey,JSON.stringify(state.Path.keys.trash),JSON.stringify(state.Path.keys));
+	tid=state.Path.keys.trash.indexOf(tkey);
 	tin=state.Path.keys.other.indexOf(tkey);
 	sin=state.Path.keys.path.indexOf(tkey);
 	if (tin === -1) { // add if not already in state.Path.keys.other
 	    if (tid !== -1) {                                // trash => other
-		src=state.Path.trash.splice(tid, 1);
-		state.Utils.pushKey(state.Path.keys.other,src);
+		src=state.Path.keys.trash.splice(tid, 1);
+		state.Utils.pushKey(state.Path.keys.other,src); // last position
+		state.Path.exportAllKeys(state);
+		state.Auto.setKeyNumber(state);
 		//if ( tin === -1 ) {
 		//    state.Path.keys.other=state.Path.keys.other.concat(src);  // last position
 		//};
 	    } else if (sin !== -1) {                         // select => other
-		state.Utils.pushKey(state.Path.keys.other,tkey);
+		state.Utils.pushKey(state.Path.keys.other,tkey); // last position
 		//state.Path.keys.other=state.Path.keys.other.concat(tkey); // last position
+		state.Path.exportAllKeys(state);
+		state.Auto.setKeyNumber(state);
 	    } else { // not in trash,select or other, how strange
 		console.log("Strange key:",tkey,
-			    JSON.stringify(state.Path.trash),
+			    JSON.stringify(state.Path.keys.trash),
 			    JSON.stringify(state.Path.keys));
 	    };
 	} else { // remove if in state.Path.keys.other
 	    if (sin !== -1) { // is already in selected list
 		src=state.Path.keys.other.splice(tin, 1);
+		state.Path.exportAllKeys(state);
+		state.Auto.setKeyNumber(state);
 	    } else if ( tid === -1) { // move to trash if its not already there
 		src=state.Path.keys.other.splice(tin, 1);
-		state.Utils.pushKey(state.Path.trash,src);
+		state.Utils.pushKey(state.Path.keys.trash,src);
+		state.Path.exportAllKeys(state);
+		state.Auto.setKeyNumber(state);
 	    } else { // its already in trash, just delete it
 		src=state.Path.keys.other.splice(tin, 1);
+		state.Path.exportAllKeys(state);
+		state.Auto.setKeyNumber(state);
 	    }
 	};
 	state.Path.exportAllKeys(state);
@@ -242,6 +286,12 @@ function Navigate() {
 	}	
     };
     this.selectItemRange=function(state,colkey,rowkey,colrange,rowrange,colwhere,rowwhere,colcnt,rowcnt) {
+
+	//console.log("SelectItemRange:",colkey,JSON.stringify(colrange)," row=",rowkey,JSON.stringify(rowrange));
+	if (state.Path.focusHasChanged(state)) {
+	    //console.log("Stored focus...",JSON.stringify(state.Path.focus));
+	    state.Navigate.store(state,false);
+	};
 	var rank=state.Utils.cp(state.Path.keys.other);
 	if (this.setKeyRange(state,colkey,colrange,colwhere,colcnt)) {
 	    this.rank[colkey]=state.Utils.cp(rank);
@@ -302,15 +352,19 @@ function Navigate() {
 	    //console.log("Selected:",colkey,colval,JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other));
 	    this.rank[colkey]=state.Utils.cp(rank);
 	    changed=true;
+	} else if (state.Path.tkeys < 2) {
+	    state.Auto.reorderKeys(state);
 	} else {
-	    console.log("Unable to select:",colkey);
+	    console.log("Unable to select:",colkey,state.Path.tkeys);
 	};
 	if (state.Auto.selectTableKey(state,rowkey,rowval,rowwhere,rowcnt)) {
 	    //console.log("Selected:",rowkey,rowval,JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other));
 	    this.rank[rowkey]=state.Utils.cp(rank);
 	    changed=true;
+	} else if (state.Path.tkeys < 2) {
+	    state.Auto.reorderKeys(state);
 	} else {
-	    console.log("Unable to select:",rowkey);
+	    console.log("Unable to select:",rowkey,state.Path.tkeys);
 	}
 	if (changed) {
 	    //this.trash[colkey]=state.Path.checkTableKeys(state);
@@ -348,8 +402,8 @@ function Navigate() {
     };
     this.selectKey=function(state,key,val,where,cnt) {
 	var rank=state.Utils.cp(state.Path.keys.other);
-	console.log("SelecRow: rowkey=",key," val=",val);
-	console.log("SelectKey:",key,val,where,cnt);
+	//console.log("SelecRow: rowkey=",key," val=",val);
+	//console.log("SelectKey:",key,val,where,cnt);
 	if (state.Auto.selectTableKey(state,key,val,where,cnt)) {
 	    this.rank[key]=rank;
 	    //this.trash[key]=state.Path.checkTableKeys(state);
@@ -359,8 +413,10 @@ function Navigate() {
 	    state.Navigate.store(state);
 	    state.Path.setMapTitle(state,"");
 	    state.Show.show(state);
+	} else if (state.Path.tkeys < 2) {
+	    state.Auto.reorderKeys(state);
 	} else {
-	    console.log("Unable to select:",key);
+	    console.log("Unable to select:",key,state.Path.tkeys);
 	}
 	//console.log("Finally:",JSON.stringify(state.Path.keys.other));
     };

@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 //import KeyIcon from '@material-ui/icons/VpnKey';
-import KeyIcon from '@material-ui/icons/Visibility';
+import PathIcon from '@material-ui/icons/Explore';
 import Key     from './KeyComponent';
 
 const styles = theme => ({
@@ -14,13 +14,13 @@ const styles = theme => ({
         marginLeft: 'auto',
     },
     othchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"blue",
         borderColor:"blue",
     },
     trashchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
@@ -64,9 +64,13 @@ class KeyMenu extends Component {
 	this.onClick = event => {this.setState({ anchor: event.currentTarget });};
 	this.onClose = () => {this.setState({ anchor: null });};
 	var itms=state.Path.keys.path.map(function(item,index) {return [item,"select",false]}).concat(
-	    state.Path.other.rest.map(function(item,index) {return [item,"rest",true]}),
-	    state.Path.trash.map(function(item,index) {return [item,"trash",false]})
+	    state.Path.other.rest.map(function(item,index) {return [item,"otherRest",true]}),
+	    state.Path.other.ignore.map(function(item,index) {return [item,"otherIgnore",true]}),
+//	    state.Path.trash.ignore.map(function(item,index) {return [item,"trashIgnore",false]}),
+	    state.Path.trash.found.map(function(item,index) {return [item,"trashFound",false]}),
+	    state.Path.trash.rest.map(function(item,index) {return [item,"trashRest",false]})
 	).sort(state.Utils.ascendingArr);
+
 	var items=uniq(itms,state.Path.other.table);
 	var mapFunction= (item,index)=>renderMenuItem(classes,state,item,index);
 	//console.log("Keys.rendering:",JSON.stringify(state.Path.other));
@@ -80,7 +84,7 @@ class KeyMenu extends Component {
                       onClick={this.onClick}
 	              title={"Available Table keys"}
 		    >
-	  	       {<KeyIcon state={state}/>}
+	  	       {<PathIcon state={state}/>}
                      </Button>
 		     <Menu
                         id="keys-menu"

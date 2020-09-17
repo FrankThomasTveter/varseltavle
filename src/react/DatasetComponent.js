@@ -4,15 +4,25 @@ import PropTypes from  "prop-types";
 import Path      from  "./PathComponent";
 import Table     from  "./TableComponent";
 import List      from  "./ListComponent";
-import Map       from  "./MapComponent";
+import Globe     from  "./GlobeComponent";
+//import Chart     from  "./Test";
+import Chart     from  "./ChartComponent";
 import Custom    from  "./CustomComponent";
 import Progress  from './Progress';
 
 //console.log("Inside Dataset.")
 
 const styles = theme => ({
-    dataset:{},
+    dataset:{
+	border:  '0px solid blue',
+    },
+    path:{
+	border:  '0px solid blue',
+    },
     content:{},
+    button:{},
+    buttonInvisible:{},
+    buttonDisabled:{},
 });
 //        maxWidth: theme.spacing.getMaxWidth.maxWidth,
 
@@ -22,9 +32,12 @@ function Switcher(props) {
     //var dim        = state.Layout.getDim(state)
     var mode       = state.Layout.getLayoutMode(props.state);
     //console.log(">>>>>> Switcher Dim:",dim," mode:",mode);
-    if (mode === state.Layout.modes.layout.Map) {
+    if (mode === state.Layout.modes.layout.Chart) {
 	//console.log("Showing map...");
-	return (<Map   state={state}   classes={classes}/>);
+	return (<Chart   state={state}   classes={classes}/>);
+    } else if (mode === state.Layout.modes.layout.Globe) {
+	//console.log("Showing map...");
+	return (<Globe   state={state}   classes={classes}/>);
     } else if (progress) { // processing
 	return (<div style={{width:'100%',margin:'0 auto'}}>
 	          <Progress/>
@@ -54,9 +67,11 @@ class Dataset extends Component {
 	var mode       = state.Layout.getLayoutMode(state);
 	//console.log(">>>>>> Switcher Dim:",dim," mode:",mode);
 	//console.log("Setting progress:",active,mode);
-	if (mode === state.Layout.modes.layout.Map && mode===this.state.mode) {
+	if (mode === state.Layout.modes.layout.Globe && mode===this.state.mode) {
 	    this.setState({progress:active});
 	    //this.state.progress=active;
+	} else if (mode === state.Layout.modes.layout.Chart && mode===this.state.mode) {
+	    this.setState({progress:active});
 	} else {
 	    state.React.Dataset.setState({progress:active,mode:mode});
 	    //this.forceUpdate();
@@ -66,13 +81,20 @@ class Dataset extends Component {
         const { classes, state } = this.props;
         return (
             <div className={classes.dataset}>
-                <Path     state={state}/>
-		<Switcher state={state} classes={{content:classes.content}} progress={this.state.progress}/>
+                <Path     state={state}  classes={{dataset:classes.path,
+						   button:classes.button,
+						   buttonDisabled:classes.buttonDisabled}} />
+		<Switcher state={state} classes={{dataset:classes.dataset,
+						  button:classes.button,
+						  buttonDisabled:classes.buttonDisabled}}
+	                   progress={this.state.progress}/>
             </div>
         );
     }
 
 }
+
+
 
 Dataset.propTypes = {
     classes: PropTypes.object.isRequired,

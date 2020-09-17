@@ -47,7 +47,9 @@ function Matrix() {
 	    console.log("Key error...",new Error().stack);
 	}
     };
-    this.makeKeyCntMapAreaSql=function(state,where,nrec,keys) {
+    this.makeKeyCntMapAreaSql=function(state,where,nrec) {
+	var keys=state.Path.getActiveKeys(state);
+	state.Utils.cpArray(keys,["lat","lon","level","rank"]);
 	if (keys !== undefined) {
 	    var plen = keys.length;
 	    for (var ii = 0; ii < plen; ii++) {
@@ -66,12 +68,14 @@ function Matrix() {
 	} else {
     	    this.keyCnt[key]++;
 	}
+	//console.log("Update key cnt:",key,this.keyCnt[key]);
     };
     this.updateValues=function(state,key,val) {
-	if ( val !== undefined &&
-	     this.values[key].indexOf(val)  === -1 ) { // value not in range
+	 // check if value not in range
+	if (state.Path.ignore.indexOf(key)  === -1 && key !== "" &&
+	    val !== undefined && this.values[key].indexOf(val)  === -1 ) {
 		//console.log("Checking val=",JSON.stringify(val)," key=",key," doc=",JSON.stringify(doc));
-		//console.log("range=",state.Utils.toString(state.Path.trash));
+		//console.log("range=",state.Utils.toString(state.Path.keys.trash));
     		this.values[key].push(val);
 	};
     }
@@ -97,17 +101,23 @@ function Matrix() {
 	    }
 	}
     };
-    this.makeKeyCntMapArea=function(state,docs,keys) {
+    this.makeKeyCntMapArea=function(state,docs) {
+	//console.log("Visible keys:",JSON.stringify(keys));
 	var key;
-	var lenk=keys.length;
 	var maxlat,minlat,maxlon,minlon;
 	var dlen = docs.length;
 	//console.log("MakeKeyCntMapArea:",dlen);
 	for (var ii = 0; ii < dlen; ii++) {
     	    var doc=docs[ii];
     	    //var vals=[];
-	    for (var kk=0;kk<lenk;kk++) {
-		key=keys[kk];
+	    var dkeys=Object.keys(doc);
+	    if (dkeys.indexOf("lat") === -1 ) {state.Utils.cpArray(dkeys,["lat"]);}
+	    if (dkeys.indexOf("lon") === -1 ) {state.Utils.cpArray(dkeys,["lon"]); }
+	    if (dkeys.indexOf("level") === -1 ) {state.Utils.cpArray(dkeys,["level"]); }
+	    if (dkeys.indexOf("rank") === -1 ) {state.Utils.cpArray(dkeys,["rank"]); }
+	    var lend=dkeys.length;
+	    for (var kk=0;kk<lend;kk++) {
+		key=dkeys[kk];
 		var val=this.getDocVal(state,doc,key);
 		if (val !== undefined) {
 		    this.updateKeyCnt(state,key);
@@ -154,7 +164,7 @@ function Matrix() {
 	    var minlat=this.getDocVal(state,doc,"minlat");
 	    var maxlat=this.getDocVal(state,doc,"maxlat");
 	    state.Grid.setArea(minlat,maxlat,minlon,maxlon);
-	    if (this.bdeb) {console.log("setMapArea:",JSON.stringify(this.area),JSON.stringify(this.doc));};
+	    if (this.bdeb) {console.log("setMapArea:",JSON.stringify(state.Grid.area),JSON.stringify(doc));};
 	}
     }
     this.makeMapRange=function(state){
@@ -167,16 +177,17 @@ function Matrix() {
 	if (map !== undefined && map.cells !== undefined) {
 	    //console.log("Found custom map...",JSON.stringify(map));
 	    lats=state.Custom.getLats(state,map);
-	    this.values["_lat"]=lats.filter(distinct);
 	    lons=state.Custom.getLons(state,map);
-	    this.values["_lon"]=lons.filter(distinct);
-	    //console.log("Made values...",JSON.stringify(this.values));
 	} else {
 	    lats=state.Grid.getLats(state);
-	    this.values["_lat"]=lats.filter(distinct);
 	    lons=state.Grid.getLons(state);
-	    this.values["_lon"]=lons.filter(distinct);
 	};
+	lats=lats.filter(distinct); lats=lats.sort();
+	this.values["_lat"]=lats;
+	lons=lons.filter(distinct); lons=lons.sort();
+	this.values["_lon"]=lons;
+	//console.log("Made lat values... ",JSON.stringify(lats));
+	//console.log("Made lon values... ",JSON.stringify(lons));
     };
     this.addMapAreaKeys=function(state,docs) {
 	var layoutMode=state.Layout.getLayoutMode(state);
@@ -222,6 +233,7 @@ function Matrix() {
 	var found=false;
 	var colkey=state.Path.getColKey(state);
 	var rowkey=state.Path.getRowKey(state);
+	//var svgkey=state.Svg.getKey(state);
 	this.levCnt={};
 	if (this.bdeb) {console.log("Keys:",JSON.stringify(colkey),JSON.stringify(rowkey),);};
 	//var pos=[];
@@ -234,6 +246,7 @@ function Matrix() {
 	    var maxlev=this.getDocVal(state,doc,"maxlev");
 	    var maxrank=this.getDocVal(state,doc,"maxrank");
 	    var minlev=this.getDocVal(state,doc,"minlev");
+	    var svgid=state.Svg.getId(state,doc);
 	    //var minlon=this.getDocVal(state,doc,"minlon");
 	    //var maxlon=this.getDocVal(state,doc,"maxlon");
 	    //var minlat=this.getDocVal(state,doc,"minlat");
@@ -250,10 +263,20 @@ function Matrix() {
     	    // update matrix array element
 	    if (maxlev >= 0) { found=true;}
 	    if (arr !== undefined) {
-		arr.maxlev=maxlev;
-		arr.minlev=minlev;
-		arr.maxrank=maxrank;
-		arr.cnt=cnt;
+		if (arr.maxlev===undefined || arr.maxlev < maxlev || arr.maxrank < maxrank) {
+		    arr.maxlev=maxlev;
+		    arr.maxrank=maxrank;
+		    arr.svgid=svgid;
+		    arr.svgcnt=cnt;
+		} else if ( arr.svgcnt===undefined || (arr.svgcnt < cnt && arr.maxlev===maxlev && arr.maxrank < maxrank)) {
+		    arr.maxrank=maxrank;
+		    arr.svgid=svgid;
+		    arr.svgcnt=cnt;
+		};
+		if (arr.minlev===undefined || arr.minlev > minlev) {arr.minlev=minlev;}
+		if (arr.maxrank===undefined || arr.maxrank < maxrank) {arr.maxrank=maxrank;}
+		if (arr.cnt===undefined) {arr.cnt=0;};
+		arr.cnt=arr.cnt+cnt;
 		arr.def=0;
 		//arr.docs=[];
     		//console.log ("Array:",JSON.stringify(arr));
@@ -273,6 +296,7 @@ function Matrix() {
 	var found=false;
 	var colkey=state.Path.getColKey(state);
 	var rowkey=state.Path.getRowKey(state);
+	//var svgkey=state.Svg.getKey(state);
 	this.levCnt={};
 	//var pos=[];
 	var dlen=docs.length;
@@ -280,6 +304,7 @@ function Matrix() {
     	    var doc=docs[ii];
 	    var colval=this.getDocVal(state,doc,colkey);
 	    var rowval=this.getDocVal(state,doc,rowkey);
+	    var svgid=state.Svg.getId(state,doc);
 	    //console.log("Found doc:",colval,rowval,doc["lon"],doc["lat"])
     	    // find matrix array element
     	    var arr=this.makeMatrixElement(state,colval,rowval,matrix);
@@ -290,7 +315,7 @@ function Matrix() {
 	    if (dlev >= 0) { found=true;}
 	    this.updateLevCnt(state,colval,dlev);
 	    this.updateLevCnt(state,rowval,dlev);
-    	    this.updateMatrixElement(state,arr,dlev,doc);
+    	    this.updateMatrixElement(state,arr,dlev,svgid,doc);
 	}
 	if (! found) {
 	    console.log("makeMatrix No relevant thresholds found.");
@@ -313,6 +338,7 @@ function Matrix() {
 	if (first) {
 	    m.colval=colval;
 	    m.rowval=rowval;
+	    //console.log("Creating element ",colval,",",rowval);
 	};
 	return m
     };
@@ -342,6 +368,35 @@ function Matrix() {
 	//	//console.log(colval,":",rowvalues);
 	//    };
 	//};
+    };
+    this.getMatrixDocs=function(matrix,skeys) {
+	var lens=skeys.length;
+	var ret=[];
+	for (var irow in matrix) {
+	    if (matrix.hasOwnProperty(irow)) {
+		var cols=matrix[irow];
+		for (var icol in cols) {
+		    if (cols.hasOwnProperty(icol)) {
+			var docs=cols[icol].docs;
+			console.log("Found docs:",JSON.stringify(docs));
+			for (var idoc in docs) {
+			    if (docs.hasOwnProperty(idoc)) {
+				var doc=docs[idoc];
+				var dd={};
+				for (var i = 0; i < lens; i++) {
+				    var key=skeys[i];
+				    if (doc[key] !== undefined) {
+					dd[key] = doc[key];
+				    }
+				}
+				ret.push(dd);
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	return ret;
     };
     this.getMatrixElements=function(icolvalues,irowval,matrix,iindex,istep) {
 	var colvalues= (icolvalues === undefined ? undefined : icolvalues.slice());
@@ -400,9 +455,10 @@ function Matrix() {
 	return elements;
     };
     this.getDocVal=function(state,doc,key) {
+	if (key === undefined || key === null) { return null; };
 	var val = doc[key];if (val  === undefined) {val="";};return val;
     };
-    this.updateMatrixElement=function(state,arr,dlev,doc) { // called once for every hit
+    this.updateMatrixElement=function(state,arr,dlev,svgid,doc) { // called once for every hit
 	if (arr  === undefined) {
 	    console.log("Undefined matrix element.");
 	    return;
@@ -412,6 +468,11 @@ function Matrix() {
 	if (arr.maxlev  === undefined || arr.maxlev === -1 ||
 	    (dlev !== -1 && arr.maxlev < dlev)) {
 	    arr.maxlev=dlev;
+	    arr.svgid=svgid;
+	    arr.svgcnt=1;
+	} else if (arr.svgcnt===undefined || arr.maxlev===dlev) {
+	    arr.svgid=svgid;
+	    arr.svgcnt=1; // oh well, just use the icon from the last one...
 	};
 	if (arr.minlev === undefined || (arr.minlev > dlev)) {
 	    arr.minlev=dlev;
@@ -437,7 +498,7 @@ function Matrix() {
 		el.maxrank=rank;
 		el.docs=[];
 		el.docs.push(doc);
-	    } else if (el.maxlev === dlev && el.maxrank === rank) {
+	    } else if (el.maxlev === dlev && el.maxrank === rank && dlev > 0) {
 		if ((dlev > 0 && dlev < state.Threshold.getMaxLevel(doc) && 
 		     el.docs.length < 3) || el.docs.length < 1) {
 		    el.docs.push(doc);
@@ -690,30 +751,36 @@ function Matrix() {
 	return docs;
     };
     this.checkTooltip=function(state,data) {
-	var rowval=data.rowval;
-	var colvalues=data.colvalues;
-	var step=data.step;
-	var index=data.index;
-	// get elements
-	var elements=this.getMatrixElements(colvalues,rowval,state.React.matrix,index,step)||[];
-	// loop over elements	
-	var lene=elements.length;
-	var ttset=true;
-	for (var ee=0; ee<lene; ee++) {
-	    // check if elements have tooltip set
-	    if (elements[ee].tooltip===undefined) {
-		ttset=false;
-	    }
-	    //console.log("Element:",ee,JSON.stringify(elements[ee]));
-
-	};
-	return ttset;
+	if (data !== null && data !== undefined) {
+	    var rowval=data.rowval;
+	    var colvalues=data.colvalues;
+	    var step=data.step;
+	    var index=data.index;
+	    // get elements
+	    var elements=this.getMatrixElements(colvalues,rowval,state.React.matrix,index,step)||[];
+	    // loop over elements	
+	    var lene=elements.length;
+	    var ttset=true;
+	    for (var ee=0; ee<lene; ee++) {
+		// check if elements have tooltip set
+		if (elements[ee].tooltip===undefined) {
+		    ttset=false;
+		}
+		//console.log("Element:",ee,JSON.stringify(elements[ee]));
+		
+	    };
+	    return ttset;
+	} else {
+	    return false;
+	}
     };
     this.addTooltip=function(state,data) {
 	//data={rowkey,rowval,colkey,colvalues,index,step,layout}
 	if (this.bdeb) {console.log("Updated Matrix with tooltip.",data.rowkey,data.colkey);};
 	//console.log("Map:",JSON.stringify(data.map),JSON.stringify(data.layout));
-	if (data.map === undefined) {
+	if (data === null || data === undefined) {
+	    console.log("No data available...",data);
+	} else if (data.map === undefined) {
 	    // get elements
 	    var elements=this.getMatrixElements(data.colvalues,data.rowval,state.React.matrix,data.index,data.step)||[];
 	    var lene=elements.length;
@@ -754,12 +821,13 @@ function Matrix() {
 	for (var ii = 0; ii < dlen; ii++) {
     	    var doc=docs[ii];
 	    var rank=doc._rank
+	    var dlev=doc.level;
 	    var el=this.getTooltipElement(state,tooltip,doc);
 	    if (el.maxrank === undefined || el.maxrank < rank) {
 		el.maxrank=rank;
 		el.docs=[];
 		el.docs.push(doc);
-	    } else if (el.maxrank === rank) {
+	    } else if (el.maxlev === dlev && el.maxrank === rank && dlev > 0) {
 		if (rank!==0 || el.docs.length < 3) {
 		    el.docs.push(doc);
 		}
@@ -774,7 +842,6 @@ function Matrix() {
 	//console.log("Element:",JSON.stringify(el));
 	var colkey= state.Path.getColKey(state);
 	var rowkey= state.Path.getRowKey(state);
-	var criteria;
 	if (el !== undefined) {
 	    if (mode === undefined ||  ! state.Custom.mapHasCells(state,mode)) {
 		rowval=el.rowval;
@@ -825,7 +892,9 @@ function Matrix() {
     this.getTooltipInfo=function(state,data) {
 	// get elements
 	var elements=[];
-	if (data.map === undefined) {
+	if (data === null || data === undefined) {
+	    console.log("No data available...");
+	} else if (data.map === undefined) {
 	    elements=this.getMatrixElements(data.colvalues,data.rowval,state.React.matrix,data.index,data.step);
 	} else {
 	    //console.log("getTooltipInfo data:",JSON.stringify(Object.keys(data)));

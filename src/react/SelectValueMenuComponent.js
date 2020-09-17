@@ -13,13 +13,12 @@ import Edit     from './EditComponent';
 
 const styles = theme => ({
     settings:{},
-    button:{},
     values: {
 	display: 'inline-block',
         marginLeft: 'auto',
     },
     selectchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"red",
         borderColor:"blue",
@@ -39,6 +38,9 @@ const styles = theme => ({
         marginRight: 'auto',
 	height:'100%',
     },
+    button:{},
+    buttonInvisible:{},
+    buttonDisabled:{},
 });
 function renderMenuItem(classes,state,keyitem,valueitem,valueindex) {
     var vals=state.Path.select.val[keyitem]
@@ -74,7 +76,7 @@ function Items(props) {
 	     {mapFunction(state.Database.makeKeytrg(state,keyitem,state.Database.keytrg.Max),-1)}
 	     {mapFunction("",-1)}
 	     <MenuItem key="reload" onClose={onclose} className={classes.reload}>
-	        <Reload state={state} onclose={onclose}/>
+	    <Reload state={state} onclose={onclose} classes={{button:classes.button}} visible={true}/>
 	     </MenuItem>
 	    </Menu>
 	   );
@@ -103,7 +105,7 @@ function Range(props) {
 	        <Edit state={state} classes={{input:classes.button}} label={"Max:"} index={1} range={range} setvalue={setValue} onclose={onclose}/>
 	     </MenuItem>
 	     <MenuItem key="reload" onClose={onclose} className={classes.reload}>
-	        <Reload state={state} onclose={onclose}/>
+	    <Reload state={state} onclose={onclose} classes={{button:classes.button}} visible={true}/>
 	     </MenuItem>
 	    </Menu>
 	   );

@@ -23,12 +23,13 @@ const styles = theme => ({
             color: theme.palette.primary.main,
 	}
     },
+    buttonInvisible:{},
     buttonDisabled: {},
 });
 //   className={classes.select}  -> horisontal layout
 function renderMenuItem(classes,state,keyitem,keyindex) {
-    return (<MenuItem key={keyitem}>  
-	       <SelectKey state={state} title={keyitem} keyitem={keyitem}/>
+    return (<MenuItem key={keyitem[0]+"_"+keyitem[1]}>  
+	    <SelectKey state={state} title={keyitem[0]} keytype={keyitem[1]} keyitem={keyitem[0]} keyactive={keyitem[2]}/>
 	    </MenuItem>
 	   );
 }
@@ -38,11 +39,15 @@ class SelectMenu extends Component {
         const { classes, state } = this.props;
 	this.onClick = event => {this.setState({ anchor: event.currentTarget });};
 	this.onClose = () => {this.setState({ anchor: null });};
-	var items=state.Path.keys.path||[];
+	var itms=state.Path.keys.path.map(function(item,index) {return [item,"select",true]}).concat(
+	    state.Path.other.table.map(function(item,index) {return [item,"otherTable",true]}),
+	    state.Path.other.rest.map(function(item,index) {return [item,"otherRest",true]})
+	);
+	//var items=state.Path.keys.path||[];
 	//items=items.sort(state.Utils.ascending);
 	var mapFunction= (item,index)=>renderMenuItem(classes,state,item,index);
 	//console.log("Select.rendering",items.length,JSON.stringify(anchor),Boolean(anchor));
-	var disabled=(items.length===0);
+	var disabled=(itms.length===0);
 	//className={classes.button}
 	if (disabled) {
 	    return (
@@ -65,7 +70,7 @@ class SelectMenu extends Component {
                       aria-owns={this.state.anchor ? 'selects-menu' : undefined}
                       aria-haspopup="true"
                       onClick={this.onClick}
-	              title={"Selected order"}
+	              title={"Key order"}
 		      disabled={disabled} 
 		    >
 	  	       <SelectIcon state={state}/>
@@ -77,7 +82,7 @@ class SelectMenu extends Component {
                         open={Boolean(this.state.anchor)}
                         onClose={this.onClose}
 		     >
-		        {items.map(mapFunction)}
+		        {itms.map(mapFunction)}
 	             </Menu>
 		</div>
 	    );

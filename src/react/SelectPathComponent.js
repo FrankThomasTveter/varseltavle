@@ -7,8 +7,12 @@ import SelectValueMenu from './SelectValueMenuComponent';
 const styles = theme => ({
     settings:{},
     config: {
-        marginLeft: 'auto',
+     marginLeft: 'auto',
     },
+    span:{},
+    button:{},
+    buttonInvisible:{},
+    buttonDisabled:{},
 });
 function renderSelectPath(classes,state,item,index) {
     var key=state.Path.keys.path[index];
@@ -19,10 +23,15 @@ function renderSelectPath(classes,state,item,index) {
     };
     var onclick=() => state.Navigate.onClickPath(state,'path',key);
     var title="'"+state.Path.where[key]+"'";
-    return (<span key={`select-${key}`}>
-	    <SelectValueMenu state={state} classes={{}} keyitem={item} keyindex={index} label={lab} onclick={onclick} title={title}/>
+    return (<span key={`select-${key}`} className={classes.span}>
+	    <SelectValueMenu state={state} classes={{button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled}} keyitem={item} keyindex={index} label={lab} onclick={onclick} title={title}/>
 	    </span>);
 }
+
+//
+
+//
+
 class SelectPath extends Component {
     state={anchor:null};
     render() {

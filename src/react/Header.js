@@ -18,8 +18,6 @@ const styles = theme => ({
     },
 });
 
-
-
 function Header(props) {
     const { classes, state } = props;
     return (

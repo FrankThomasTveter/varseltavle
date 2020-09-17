@@ -7,6 +7,8 @@ import RemoveIcon from '@material-ui/icons/Delete';
 
 const styles = theme => ({
     button: {},
+    buttonInvisible: {},
+    buttonDisabled: {},
     remove: {
         marginLeft: 'auto',
     },

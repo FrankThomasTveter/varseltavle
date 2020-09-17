@@ -63,6 +63,7 @@ function Show() {
 	this.showMode(state);
     };
     this.showPath=function(state) {
+	state.Utils.pushUrl(state);
 	if (state.React.Path !== undefined) {
 	    state.React.Path.showPath(state); // forceUpdate()
 	} else {
@@ -80,6 +81,7 @@ function Show() {
 	}
     };
     this.showConfig=function(state) {
+	state.Utils.pushUrl(state);
 	if (state.React.Config !== undefined) {
 	    state.React.Config.show(state); // forceUpdate()
 	} else {
@@ -87,6 +89,7 @@ function Show() {
 	}
     };
     this.showSettings=function(state) {
+	state.Utils.pushUrl(state);
 	if (state.React.Settings !== undefined) {
 	    state.React.Settings.show(state); // forceUpdate()
 	} else {
@@ -94,27 +97,40 @@ function Show() {
 	}
     };
     this.showMatrix=function(state,matrix) {
+	state.Utils.pushUrl(state);
 	if (state.React.Dataset !== undefined) {
 	    state.React.Dataset.showMatrix(state,matrix);
 	}
     };
     this.showFilm=function(state) {
+	state.Utils.pushUrl(state);
 	if (state.React.ReelAdd !== undefined) {
 	    state.React.ReelAdd.showLabel(state);
 	}
     };
+    this.showMapInfo=function(state,force) {
+	if (force === undefined) {force=true;};
+	if (state.React.MapInfo !== undefined) {
+	    state.React.MapInfo.showMapInfo(state,force);
+	}
+    };	
     this.showDataset=function(state,matrix,force) {
+	state.Utils.pushUrl(state);
 	//console.log("Showing table...");
 	if (matrix !== undefined) {
 	    //console.log("Defining matrix...");
 	    state.React.matrix=matrix;
 	};
 
-	//console.log("ShowTable:",state.Layout.state.layoutMode,state.Layout.modes.layout.Map);
+	//console.log("ShowTable:",state.Layout.state.layoutMode,state.Layout.modes.layout.Globe);
 
-	if (state.Layout.state.layoutMode === state.Layout.modes.layout.Map) {
-	    if (state.React.Map !== undefined) {
-		state.React.Map.showMap(state,force);
+	if (state.Layout.state.layoutMode === state.Layout.modes.layout.Chart) {
+	    if (state.React.Chart !== undefined) {
+		state.React.Chart.showMap(state,force);
+	    }
+	} else if (state.Layout.state.layoutMode === state.Layout.modes.layout.Globe) {
+	    if (state.React.Globe !== undefined) {
+		state.React.Globe.showMap(state,force);
 	    }
 	} else {
 	    if (state.React.Table !== undefined) {
@@ -122,6 +138,11 @@ function Show() {
 	    }
 	}
 	//console.log("Showing table done...");
+    };
+    this.showFocus=function(state) {
+	if (state.React.Chart !== undefined) {
+	    state.React.Chart.showFocus(state);
+	}
     };
     this.showTooltip=function(state) {
 	if (state.React.Tooltip !== undefined) {

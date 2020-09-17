@@ -4,7 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from "@material-ui/core/Typography/Typography";
 import Grid from "@material-ui/core/Grid/Grid";
 
-
 const styles = theme => ({
     root: {
         backgroundColor: theme.palette.primary.main,
@@ -23,14 +22,13 @@ const styles = theme => ({
 //text        maxWidth: theme.spacing.getMaxWidth.maxWidth,
 //text        margin: theme.spacing.getMaxWidth.margin,
 
-
 function Adress(props) {
     // const { classes } = props;
     return (
 
             <Grid item xs={12} sm={12}>
              <Typography color={"inherit"}>
-               <a href="https://met.no"> met.no </a>
+            <a href="https://met.no"> met.no </a>
              </Typography>
             </Grid>
     );

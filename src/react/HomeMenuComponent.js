@@ -21,6 +21,9 @@ const styles = theme => ({
     button:{
 	color:'white'
     },
+    buttonInvisible:{
+	color:'gray'
+    },
 });
 // 
 function SetHome(props) {
@@ -38,16 +41,21 @@ function GoHome(props) {
 class HomeMenu extends Component {
     state={anchor:null};
     render() {
-        const { classes, state } = this.props;
-	this.onClick = event => {this.setState({ anchor: event.currentTarget });};
-	this.onClose = () => {this.setState({ anchor: null });};
-	return (<div className={classes.tableHome}>
+        const { classes, state, visible } = this.props;
+	var onclick,title;
+	if (visible !== undefined && ! visible && state.Settings.isInvisible(state,"Home")) {
+	    return null;
+	} else if (visible !== undefined) {
+	    this.onClick = (event)=>{this.setState({ anchor: event.currentTarget });};
+	    this.onClose = ()=>{this.setState({ anchor: null });};
+	    title="Home settings";
+	    return (<div className={classes.tableHome}>
 		   <Button
                       className={classes.button}
                       aria-owns={this.state.anchor ? 'tablehomes-menu' : undefined}
                       aria-haspopup="true"
                       onClick={this.onClick}
-	              title={"Value home"}
+	              title={title}
 		   >
 	  	       {<HomeIcon state={state}/>}
                      </Button>
@@ -66,7 +74,16 @@ class HomeMenu extends Component {
 		        </MenuItem>
 	             </Menu>
 		</div>
-	);
+	       );
+	} else {
+	    onclick = ()=>{state.Settings.toggle(state,"Home");}
+	    title="Show Home";
+	    if (state.Settings.isInvisible(state,"Home")) {
+		return <Button key="home" className={classes.buttonInvisible} onClick={onclick} title={title}><HomeIcon/></Button>;
+	    } else {
+		return <Button key="home" className={classes.button} onClick={onclick} title={title}><HomeIcon/></Button>;
+	    };
+	}
     }
 }
 

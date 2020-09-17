@@ -4,16 +4,28 @@ import { withStyles } from '@material-ui/core/styles';
 
 import {teal_palette} from '../mui/metMuiThemes';
 
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
+//import Paper from '@material-ui/core/Paper';
+//import Grid from '@material-ui/core/Grid';
 
 import SummaryCell from './SummaryCell';
 import SeriesCell  from './SeriesCell';
 import CanvasText  from './CanvasTextComponent';
-import Tooltip  from './TooltipContainer';
+import TooltipContainer  from './TooltipContainer';
+
+//const footheight="30px";
+//const headerheight="70px";
+//const footAndHeaderheight = "100px";
 
 const styles = theme => ({
-    content:{},
+    dataset:{},
+    tooltip:{width:'70%'},
+    content: {
+//	border:  '10px solid red',
+///	height: '100%',
+	width: 'calc(98% - 5px)',
+	border: '0px',
+//	background:'green',
+    },
     divHdrLeft : {
 	display: 'inline-block',
 	justifyContent: 'left',
@@ -37,7 +49,7 @@ const styles = theme => ({
     divTable :{
 	display: 'table',
 	width: '100%',
-//	border:  '1px solid red',
+        //border:  '10px solid green',
     },
     divTableRow:  {
 	backgroundColor:teal_palette.main,
@@ -79,7 +91,10 @@ const styles = theme => ({
     paperImage: {
         textAlign: 'center',
         padding: theme.spacing(2),
-    }
+    },
+    button:{},
+    buttonInvisible:{},
+    buttonDisabled:{},
 });
 
 //const mui = createTheme({palette:teal_palette});
@@ -110,7 +125,6 @@ function FirstDataCell (props) {
 		</div>);
     }
 }
-//{rowval}
 function DataCell(props) {
     const {classes,state,elements,mode,plan,rowindex,...other}=props;
     if (elements===undefined) {
@@ -127,19 +141,25 @@ function DataCell(props) {
 	//return null;
     }
 }
+//{rowval}
 function renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,rowwhere,range,mode,plan,val,index) {
     //console.log("Making data cell:",rowval,val,index,plan,JSON.stringify(colvalues));
     if (index%plan.step === 0) {
 	// get elements and range
 	//console.log("Processing:",val,colvalues[index],plan.step);
 	var matrix=state.React.matrix;
+	//console.log("Matrix:",JSON.stringify(matrix));
 	var elements=state.Matrix.getMatrixElements(colvalues,rowval,matrix,index,plan.step);
-	//console.log("Elements:",rowval,index,' =>',JSON.stringify(elements));
+	//console.log("Elements:",JSON.stringify(colvalues),":",rowval,typeof(rowval),rowval==null,":",index,' =>',JSON.stringify(elements));
 	// get count and colwhere
         var cnt = Math.min(colvalues.length,index+plan.step)-index;
         var colwhere = state.Database.getColWhere(colkey,colvalues,index,plan.step);
 	// make onclick
 	var onclick=() => state.Navigate.selectItem(state,colkey,rowkey,colvalues[index],rowval,colwhere,rowwhere,cnt,1);
+
+	//var info=state.Matrix.getInfo(state,elements);
+	//var color=state.Colors.getLevelBgColor(info.maxlev);
+	//console.log("Rendering data cell ...",info.maxlev,color);
 	return (<DataCell classes={classes} state={state} key={`col-${index}`} rowindex={rowindex} index={index} onclick={onclick}
 		colkey={colkey} rowkey={rowkey} colvalues={colvalues} rowval={rowval} colwhere={colwhere} rowwhere={rowwhere} 
 		elements={elements} mode={mode} plan={plan} range={range}
@@ -148,7 +168,6 @@ function renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,ro
 	return null;
     }
 }
-//{{rowkey:'test1',colkey:'test2'}}
 function dataRow(classes,state,colkey,rowkey,colvalues,mode,plans,rowval,rowindex) {
     var rowwhere=state.Database.getWhereValue(rowkey,rowval);
     var onclick=() => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1);}
@@ -158,7 +177,8 @@ function dataRow(classes,state,colkey,rowkey,colvalues,mode,plans,rowval,rowinde
     };
     //console.log("Making data cols.",rowval,colkey,JSON.stringify(colvalues));
     //console.log("We have a matrix(",rowval,") with range:",JSON.stringify(range));
-    var mapFunction= (val,index)=>renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,rowwhere,range,mode,plans.cell,val,index);
+    var mapFunction= (val,index)=>{return renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,rowwhere,range,mode,plans.cell,val,index);};
+    //console.log("Colvalue:",val,index);
     return (<div className={classes.divTableRow} key={rowindex.toString()}>
 	    <FirstDataCell classes={classes} state={state} key={'0'} colkey={colkey} rowkey={rowkey} rowval={rowval} onclick={onclick} 
 	                   plan={plans.row} rowindex={rowindex}/>
@@ -173,7 +193,7 @@ function renderZeroRow(classes,state,colkey,colvalues,plans) {
 function DataRows(props) {
     const { classes, state, plans, colkey, colvalues, rowkey, rowvalues, mode } = props;
     //console.log("Making data cols.",colkey,JSON.stringify(colvalues));
-    var mapFunction= (val,index)=>dataRow(classes,state,colkey,rowkey,colvalues,mode,plans,val,index);
+    var mapFunction= (val,index)=>{return dataRow(classes,state,colkey,rowkey,colvalues,mode,plans,val,index);};
     if (rowvalues.length===0) {
 	return renderZeroRow(classes,state,colkey,colvalues,plans);
     } else {
@@ -234,7 +254,7 @@ function renderHdrCell(classes,state,colkey,colvalues,rowkey,plan,val,index) {
 function HdrRow(props) {
     const { classes, state, plans, colkey, colvalues, rowkey } = props; //, rowvalues
     //console.log("Making header row.",colkey,JSON.stringify(colvalues));
-    var mapFunction= (val,index)=>renderHdrCell(classes,state,colkey,colvalues,rowkey,plans.col,val,index);
+    var mapFunction= (val,index)=>{return renderHdrCell(classes,state,colkey,colvalues,rowkey,plans.col,val,index);};
     return (<div className={classes.divTableRow} key={0}>
 	       <FirstHdrCell classes={classes} state={state} colkey={colkey} rowkey={rowkey} plans={plans} style={{height:"100%"}}/>
 	       {colvalues.map(mapFunction)}
@@ -245,18 +265,18 @@ function Details(props) {
     const { classes, state } = props; // classes, element
     var colkey = state.Path.getColKey(state)||"";
     var rowkey = state.Path.getRowKey(state)||"";
-    var colvalues = state.Path.filterKeys(state,state.Matrix.values[colkey]||[""]);
-    var rowvalues = state.Path.filterKeys(state,state.Matrix.values[rowkey]||[""]);
+    var colvalues = state.Path.filterKeys(state,state.Matrix.values[colkey]||[null]);
+    var rowvalues = state.Path.filterKeys(state,state.Matrix.values[rowkey]||[null]);
     var cellMode  = state.Layout.getCellMode(state);
     //var ncol=colvalues.length + 1;
     //var nrow=rowvalues.length + 1;
     //DOM.style.font
     var border=0;
     if (cellMode===state.Layout.modes.cell.Sum) {
-	border=1;
+	border=2;
     };
-    var width=0.9*window.innerWidth;
-    var height=0.94*window.innerHeight - 100;
+    var width=0.95*window.innerWidth-5;
+    var height=0.97*window.innerHeight - 100;
     var plans=state.Layout.makePlans(colkey,rowkey,colvalues,rowvalues,width,height,border);
     //console.log("Table Plans:",JSON.stringify(plans));
     //console.log("Heights:",window.innerHeight,height,plans.hdr.height,plans.cell.height);
@@ -314,18 +334,23 @@ class Table extends Component {
     render() {
 	const { classes, state } = this.props;
 	//console.log("##### Rendering Table.");
-	return (<div ref={el=>{this.element(el)}} className={classes.content}>
-		   <Grid container spacing={10}>
-		      <Grid item xs={12} > 
-                         { <Paper className={classes.paper}>
-		              <Details state={state} classes={classes} element={this}/>
-                           </Paper>}
-                      </Grid>
-                   </Grid>
-		   <Tooltip state={state} classes={{button:classes.button}} element={this} type={'cell'}/>
+	return (<div className={classes.content} ref={el=>{this.element(el)}}>
+		   <Details state={state} classes={classes} element={this}/>
+		   <TooltipContainer state={state} classes={{button:classes.button}} element={this} type={'cell'}/>
 	        </div>);
     }
 }
+
+
+
+//		   <Grid container spacing={00}>
+//		      <Grid item xs={12} > 
+//                         { <Paper className={classes.paper}>
+//                           </Paper>}
+//                      </Grid>
+//                   </Grid>
+
+
 
 Table.propTypes = {
     classes: PropTypes.object.isRequired,

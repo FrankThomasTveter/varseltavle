@@ -9,13 +9,13 @@ const styles = theme => ({
         marginRight: 'auto',
     },
     othchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"blue",
         borderColor:"blue",
     },
     trashchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
@@ -24,7 +24,7 @@ const styles = theme => ({
 class Priority extends Component {
     render() {
         const { classes, state, priorityitem } = this.props;
-	var tpos=state.Path.trash.indexOf(priorityitem);
+	var tpos=state.Path.keys.trash.indexOf(priorityitem);
 	var onclick=() => state.Layout.increasePriority(state,priorityitem);
 	var chip=(tpos!==-1 ? classes.trashchip : classes.othchip);
 	return (
