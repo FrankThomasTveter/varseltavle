@@ -14,13 +14,13 @@ const styles = theme => ({
         marginLeft: 'auto',
     },
     othchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"blue",
         borderColor:"blue",
     },
     trashchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
@@ -65,7 +65,7 @@ class UploadMenu extends Component {
 	this.onClose = () => {this.setState({ anchor: null });};
 	var itms=state.Path.keys.path.map(function(item,index) {return [item,"select",false]}).concat(
 	    state.Path.other.rest.map(function(item,index) {return [item,"rest",true]}),
-	    state.Path.trash.map(function(item,index) {return [item,"trash",false]})
+	    state.Path.keys.trash.map(function(item,index) {return [item,"trash",false]})
 	).sort(state.Utils.ascendingArr);
 	var items=uniq(itms,state.Path.other.table);
 	var mapFunction= (item,index)=>renderMenuItem(classes,state,item,index);

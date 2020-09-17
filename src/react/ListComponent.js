@@ -12,9 +12,12 @@ import Grid from '@material-ui/core/Grid';
 //	overflow: 'hidden',
 
 const styles = theme => ({
+    dataset: {},
     root: {
 	height: '100%',
     },
+    button:{},
+    buttonDisabled:{},
     paper: {
 	tableLayout: 'fixed',
 	padding:0,
@@ -63,20 +66,23 @@ const styles = theme => ({
 function renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index){
     if (doc===undefined) {
 	return <div className={classes.divTableCell} style={{backgroundColor:'#EEE'}}/>
-    } else {    
+    } else {
 	var val=doc[skey];
+	var where=state.Database.getWhereValue(skey,val);
+	var onClick=()=>{state.Navigate.selectKey(state,skey,val,where,1);};
 	if (val === undefined) {val="";};
 	//console.log("Key:",skey," Val:",JSON.stringify(val),JSON.stringify(doc[skey]));
 	return (
-            <div className={classes.divTableCell} style={{color:fgcolor,backgroundColor:bgcolor}} key={skey}>
+		<div className={classes.divTableCell} style={{color:fgcolor,backgroundColor:bgcolor,cursor: "pointer"}} key={skey} onClick={onClick}>
 		{val}
 	    </div>
 	);
     }
 };
-function renderDoc(classes,state,skeys,plan,doc,lev,index) {
+function renderDoc(classes,state,skeys,plan,doc,index) {
     //console.log("We have a matrix(",rowval,") with range:",JSON.stringify(range));
     //var lev=doc.level;
+    var lev=doc.__lev;
     var bgcolor=state.Colors.getLevelBgColor(lev);
     var fgcolor=state.Colors.getLevelFgColor(lev);
     var mapFunction= (skey,index)=>renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index);
@@ -86,6 +92,7 @@ function renderDoc(classes,state,skeys,plan,doc,lev,index) {
 };
 function getDataRowList(classes,state,skeys,plans) {
     const items=[];
+    const docs=[];
     var matrix=state.React.matrix;
     //var ret=null;
     if (matrix!==undefined) {
@@ -103,21 +110,57 @@ function getDataRowList(classes,state,skeys,plans) {
 		    //console.log("We have a matrix with range:",JSON.stringify(range));
 		    if (element !== undefined && element.docs !== undefined) {
 			let lev=element.maxlev;
-			var mapFunction=(doc,index) =>renderDoc(classes,state,skeys,plans.cell,doc,lev,index);
-			items.push(element.docs.map(mapFunction));
+			element.docs.forEach((doc)=>{doc.__lev=lev;});
+			docs.push.apply(docs,element.docs);
 		    };
 		};
 	    }
 	}
     };
+    // sort
+    if (state.Path.shouldSort()) {
+	var key=state.Path.getSortKey();
+	var dir=state.Path.getSortDir();
+	if (state.Path.isNumeric(key)) {
+	    //console.log("Numeric sort:",key);
+	    if (dir) { // ascending
+		docs.sort((a,b) => b[key]-a[key]);
+	    } else {
+		docs.sort((a,b) => a[key]-b[key]);
+	    }
+	} else {
+	    if (dir) { // ascending
+		docs.sort((a,b) => {return (a[key] > b[key])?-1:((a[key]===b[key])?0:+1);});
+	    } else {
+		docs.sort((a,b) => {return (a[key] > b[key])?+1:((a[key]===b[key])?0:-1);});
+	    }
+	};
+    }
+    // make react-components...
+    var mapFunction=(doc,index) =>renderDoc(classes,state,skeys,plans.cell,doc,index);
+    items.push(docs.map(mapFunction));
+    //console.log("Docs:",JSON.stringify(docs));
     return items;
 };
 // ---------------- HDR
 function renderHdrList(classes,state,plan,val,index) {
     //console.log("HdrCell:",val);
+    var up="↑";
+    var down="↓";
+    var label=val;
+    var dir;
+    if (state.Path.sortKey(val)) {
+	dir=state.Path.sortDirUp(val)
+	if (dir) {
+	    label=label + up;
+	} else {
+	    label=label + down;
+	}
+    }
     var cursor=classes.divTableCell;
-    return (<div className={cursor} style={{backgroundColor:'#DDD'}} key={`col-${index}`} >
-	    {val}
+    var onClick=() => {state.Path.setSortKey(val);state.Show.showMatrix(state,state.React.matrix,true);};
+    return (<div className={cursor} style={{backgroundColor:'#DDD',cursor: "pointer",}} key={`col-${index}`} onClick={onClick}>
+	    {label}
  	    </div> );
 }
 function HdrRow(props) {
@@ -142,7 +185,8 @@ function Details(props) {
 		</div>
 	       );
     } else {
-        var skeys = state.Matrix.sortedKeys(state,state.Matrix.keyCnt);
+        var skeys = state.Path.getVisibleKeys(state);
+	//console.log("Skeys:",skeys);
  	//DOM.style.font
 	var border=2;
 	var label="";
@@ -183,7 +227,7 @@ class List extends Component {
 	const { classes, state } = this.props;
 	//console.log("##### Rendering List.");
 	return (<div ref={el=>{this.element(el)}} className={classes.root}  style={{width: '100%', height: '100%'}}>
-		 <Grid container spacing={12}>
+		 <Grid container>
 		  <Grid item xs={12} > 
                    { <Paper className={classes.paper}>
 		       <Details state={state} classes={classes} element={this}/>

@@ -2,12 +2,12 @@ import React, { Component} from 'react';
 import Dataset  from   './DatasetComponent';
 import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import createTheme from '../mui/createTheme'
+import {black_palette, teal_palette} from '../mui/metMuiThemes'
 import PropTypes from "prop-types";
 import Header   from    "./Header";
 import Footer   from    "./Footer";
 import BackGroundImage from "../images/waves.png";
-import {black_palette, teal_palette} from '../mui/metMuiThemes'
-import {BrowserRouter, Switch, Route} from 'react-router-dom';
+//import {BrowserRouter, Switch, Route} from 'react-router-dom';
 
 import Colors from '../lib/ColorsLib';
 import File from '../lib/FileLib';
@@ -22,7 +22,9 @@ import Navigate from '../lib/NavigateLib';
 import Path from '../lib/PathLib';
 import Auto from '../lib/AutoLib';
 import Show from '../lib/ShowLib';
+import Svg from '../lib/SvgLib';
 import Threshold from '../lib/ThresholdLib';
+import Settings from '../lib/SettingsLib';
 import Utils from '../lib/UtilsLib';
 import { SnackbarProvider, withSnackbar } from 'notistack';
 
@@ -50,6 +52,7 @@ const styles = theme => ({
  	border:  '1px solid green',
     },
     header: {
+	backgroundColor:teal_palette.main,
 	position:'fixed',
 	height: 'calc('+headerheight+' + 2%)',
 	maxHeight: headerheight,
@@ -61,26 +64,40 @@ const styles = theme => ({
 	position:'fixed',
 	marginLeft:'5%',
 	top: '75px',
+	bottom: '30px',
 	height: 'calc(95% - '+footAndHeaderheight+')',
 //	padding: '10px',
-	width: '90%',
+	width: '92%',
 //	border:  '1px solid green',
         overflowY: 'auto',
 	maxHeight: '100%',
 	maxWidth: '99%',
     },
     content: {
-//	border:  '1px solid red',
+	border:  '10px solid red',
 ///	height: '100%',
 	width: 'calc(98% - 5px)',
     },
     footer: {
+	backgroundColor:teal_palette.main,
 	position:'fixed',
 	height: 'calc('+footheight+' + 3%)',
 	width: '100%',
 	left:0,
 	bottom:0,
     },
+    button: {
+	backgroundColor:black_palette.main,
+	color:'white',
+	"&$buttonDisabled": {
+            color: theme.palette.primary.main,
+	},
+    },
+    buttonInvisible: {
+	backgroundColor:black_palette.main,
+	color:'gray'
+    },
+    buttonDisabled: {},
 });
 
 //        backgroundColor: theme.palette.primary.main,
@@ -105,13 +122,15 @@ class App extends Component {
 	    Auto:      new Auto()      ,
 	    Navigate:  new Navigate()  ,
 	    Show:      new Show()      ,
-	    File:      new File()  ,
+	    File:      new File()      ,
 	    Database:  new Database()  ,
+	    Svg:       new Svg()       ,
 	    Threshold: new Threshold() ,
-	    Custom:    new Custom()      ,
+	    Custom:    new Custom()    ,
 	    Grid:      new Grid()      ,
 	    Matrix:    new Matrix()    ,
 	    Html:      new Html()      ,
+	    Settings:  new Settings()     ,
 	    Utils:     new Utils()     ,
 	    React: { App : this },
 	    cnt:0
@@ -121,7 +140,7 @@ class App extends Component {
     };
     getpath() {
 	var path="/";
-	if (process.env.NODE_ENV !== 'development') {
+	if (process.env.NODE_ENV !== 'development' || true) {// get path from public url
             var raw=process.env.PUBLIC_URL;
             path=raw+path;
             var pos=raw.indexOf("//");
@@ -160,34 +179,35 @@ class App extends Component {
     render() {
         const { classes } = this.props;
 	const state       = this.state;
-        return (
-             <BrowserRouter  className={classes.root}>
-                <div className={classes.root}>
-		<Switch>
-                   <Route exact={true} path={this.path[1]} render={() => (
-                        <MuiThemeProvider theme={createTheme(teal_palette, black_palette)}>
+        return (<div className={classes.root}>
+                  <MuiThemeProvider theme={createTheme(teal_palette, black_palette)}>
                             <Header  state={state} classes={{header:classes.header}}/>
-                            <Dataset state={state} classes={{dataset:classes.dataset,content:classes.content}}/>
+                <Dataset state={state} classes={{dataset:classes.dataset,content:classes.content,button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled}}/>
                             <Footer  state={state} classes={{footer:classes.footer}}/>
                         </MuiThemeProvider>
-                    )}/>
-                   <Route exact={true} path={this.path[2]} render={() => (
-                        <MuiThemeProvider theme={createTheme(teal_palette, black_palette)}>
-                            <Header  state={state} classes={{header:classes.header}}/>
-                            <Dataset state={state} classes={{dataset:classes.dataset,content:classes.content}}/>
-                            <Footer  state={state} classes={{footer:classes.footer}}/>
-                        </MuiThemeProvider>
-                    )}/>
-		</Switch>
                 </div>
-            </BrowserRouter>
         );
     }
 }
 
 
+// messes up the tables...
 
 
+
+//		<Switch>
+//                   <Route exact={true} path={this.path[1]} render={() => (
+//             <BrowserRouter  className={classes.root}>
+//                    )}/>
+//                   <Route exact={true} path={this.path[2]} render={() => (
+//                        <MuiThemeProvider theme={createTheme(teal_palette, black_palette)}>
+//                            <Header  state={state} classes={{header:classes.header}}/>
+//                            <Dataset state={state} classes={{dataset:classes.dataset,content:classes.content}}/>
+//                            <Footer  state={state} classes={{footer:classes.footer}}/>
+//                        </MuiThemeProvider>
+//                    )}/>
+//		</Switch>
+//            </BrowserRouter>
 
 //                            <div className={classes.content}>
 //                            </div>

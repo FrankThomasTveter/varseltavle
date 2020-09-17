@@ -22,7 +22,7 @@ const styles = theme => ({
 });
 function AddReel(props) {
     const {classes,onadd}=props;//state,
-    var title="Play or pause.";
+    var title="Add to reel.";
     return <Button className={classes.button} onClick={onadd} title={title}><AddIcon/></Button>;
 };
 class ReelAdd extends Component {
@@ -38,6 +38,8 @@ class ReelAdd extends Component {
 	this.handleChange=(event) => {
 	    //console.log("handleChange:",event.target.value);
 	    state.Path.setLabel(state,event.target.value);
+	    state.Path.setMapTitle(state,event.target.value);
+	    state.Show.showMapInfo(state,true);
 	    this.setState({label:event.target.value});
         }
 	//

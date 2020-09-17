@@ -26,6 +26,7 @@ const styles = theme => ({
             color: theme.palette.primary.main,
 	},
     },
+    buttonInvisible:{},
     buttonDisabled: {},
 });
 function RemoveReel(props) {
@@ -65,7 +66,7 @@ class ReelMenu extends Component {
 	this.onClick  = event => {this.setState({ anchor: event.currentTarget });};
 	this.onClose  = () => {this.setState({ anchor: null });};
 	this.onRemove = (index) => {this.setState({label:state.Path.removeFilm(state,index)});};
-	this.onUpward = (index) => {state.Path.moveFilm(state,index);state.Show.showSettings(state);};
+	this.onUpward = (index) => {state.Path.moveFilm(state,index);state.Show.showConfig(state);state.Show.showSettings(state);};
 	//
 	this.onClick=this.onClick.bind(this);
 	this.onClose=this.onClose.bind(this);
@@ -99,7 +100,7 @@ class ReelMenu extends Component {
                       aria-owns={this.state.anchor ? 'reel-menu' : undefined}
                       aria-haspopup="true"
                       onClick={this.onClick}
-	              title={"Value reel"}
+	              title={"Reel"}
 		      disabled={items.length===0} 
 		    >
 	  	        <FilmIcon state={state}/>

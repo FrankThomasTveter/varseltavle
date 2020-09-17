@@ -4,7 +4,11 @@ import { withStyles } from '@material-ui/core/styles';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Chip from '@material-ui/core/Chip';
+//import FullIcon from '@material-ui/icons/HourglassFull';
+//import EmptyIcon from '@material-ui/icons/HourglassEmpty';
 import Remove     from './RemoveComponent';
+import OtherFullIcon from '@material-ui/icons/HourglassFull';
+import OtherEmptyIcon from '@material-ui/icons/HourglassEmpty';
 
 import RestValue from './RestValueComponent';
 
@@ -13,7 +17,7 @@ const styles = theme => ({
         marginLeft: 'auto',
     },
     tabchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"red",
         borderColor:"blue",
@@ -23,12 +27,22 @@ const styles = theme => ({
         marginRight: 'auto',
 	height:'100%',
     },
+    button:{},
+    buttonInvisible:{},
+    buttonDisabled:{},
 });
-function renderMenuItem(classes,state,item,index,keyitem,onClose) {
+function getChipIcon(keytype) {
+    if (keytype === "otherRest") {
+	return <OtherFullIcon/>;
+    } else {
+	return <OtherEmptyIcon/>;
+    }
+}
+function renderMenuItem(classes,state,item,index,keyitem,keytype,onClose) {
     //console.log("KeyItem:",keyitem);
     if (item !== undefined) {
 	return (<MenuItem key={'rest-'+item}>
-	       <RestValue state={state} keyvalue={item} target={keyitem} onclose={onClose}/> 
+		<RestValue state={state} keyvalue={item} keytype={keytype} target={keyitem} onclose={onClose}/> 
 	    </MenuItem>);
     } else {
 	return null;
@@ -37,7 +51,7 @@ function renderMenuItem(classes,state,item,index,keyitem,onClose) {
 class RestMenu extends Component {
     state={anchor:null};
     render() {
-        const { classes, state, keyitem, remove } = this.props;
+        const { classes, state, keyitem, keytype, remove } = this.props;
 	this.onClick = event => {
 	    if (items.length===0) {
 		this.setState({ anchor: null });
@@ -53,12 +67,14 @@ class RestMenu extends Component {
 	};
 	var items=state.Database.getKeyValues(state,keyitem);//state.Database.values[keyitem];
 	items=items.sort(state.Utils.ascending);
-	var mapFunction= (item,index)=>renderMenuItem(classes,state,item,index,keyitem,this.onClose);
+	var icon=getChipIcon(keytype);
+	//console.log("Rest key:",keyitem,keytype);
+	var mapFunction= (item,index)=>renderMenuItem(classes,state,item,index,keyitem,keytype,this.onClose);
 	//console.log("RestMenu.rendering:",keyitem,JSON.stringify(items));
-	return (
-		<div className={classes.config} key={keyitem}>
-		   <Chip
+	return (<div className={classes.config} key={keyitem}>
+		   <Chip key={keyitem}
                       label={keyitem}
+	              icon={icon}
                       aria-owns={this.state.anchor ? 'keys-menu' : undefined}
                       aria-haspopup="true"
                       onClick={this.onClick}
@@ -71,15 +87,15 @@ class RestMenu extends Component {
                         onClose={this.onClose}
 		     >
 		       <MenuItem key="remove" onClose={this.onClose} className={classes.remove}>
-		          <Remove state={state} keyitem={keyitem} onclick={this.remove} onclose={this.onClose}/>
+		<Remove state={state} keyitem={keyitem} onclick={this.remove} onclose={this.onClose} classes={{button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled}}/>
 		       </MenuItem>
 		        {items.map(mapFunction)}
 		        {mapFunction("",-1)}
 	             </Menu>
-		</div>
-	);
+	</div>);
     }
 }
+
 
 RestMenu.propTypes = {
     classes: PropTypes.object.isRequired,

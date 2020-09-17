@@ -9,13 +9,13 @@ const styles = theme => ({
         marginRight: 'auto',
     },
     othchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"blue",
         borderColor:"blue",
     },
     trashchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
@@ -24,7 +24,7 @@ const styles = theme => ({
 class Value extends Component {
     render() {
         const { classes, state, keyitem, valueitem } = this.props;
-	var tpos=state.Path.trash.indexOf(valueitem);
+	var tpos=state.Path.keys.trash.indexOf(valueitem);
 	var onclick=() => state.Path.bumpOrder(state,keyitem,valueitem);
 	var chip=(tpos!==-1 ? classes.trashchip : classes.othchip);
 	return (

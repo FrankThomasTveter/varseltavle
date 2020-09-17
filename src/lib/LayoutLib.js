@@ -13,6 +13,9 @@ function Layout() {
     this.lfonts=["24px Fixed","36px Fixed","48px Fixed","72px Fixed","96px Fixed"
 	       ];
     //
+    this.efonts=["48px Fixed","72px Fixed","96px Fixed","124px Fixed","156px Fixed",
+	       ];
+    //
     this.state={viewMode:0,       // should we show trash contents?
 		cellMode:0,       // sum, series, item
 		layoutMode:0,     // table, list, map
@@ -27,7 +30,8 @@ function Layout() {
 		     },
 		layout:{Table:0,
 			List:1,
-			Map:2
+			Chart:2,
+			Globe:3
 		       }
 	       };
     this.toggleTooltip=function(state) {
@@ -55,18 +59,22 @@ function Layout() {
     this.toggleMode=function(state,layoutMode,cellMode) {
 	//console.log("ToggleMode:",layoutMode,cellMode);
 	//var reload=(layoutMode !== state.Layout.state.layoutMode);
-	var newismap = layoutMode===state.Layout.modes.layout.Map;
-	var oldismap = state.Layout.state.layoutMode===state.Layout.modes.layout.Map;
+	var newismap = (layoutMode===state.Layout.modes.layout.Chart ||
+			layoutMode===state.Layout.modes.layout.Globe);
+	var oldismap = (state.Layout.state.layoutMode===state.Layout.modes.layout.Chart ||
+			state.Layout.state.layoutMode===state.Layout.modes.layout.Globe);
 	var newiscus=(layoutMode!==state.Layout.modes.layout.Table &&
 			 layoutMode!==state.Layout.modes.layout.List &&
-			 layoutMode!==state.Layout.modes.layout.Map);
+			 layoutMode!==state.Layout.modes.layout.Chart &&
+			 layoutMode!==state.Layout.modes.layout.Globe);
 	var oldiscus=(state.Layout.state.layoutMode!==state.Layout.modes.layout.Table &&
 			 state.Layout.state.layoutMode!==state.Layout.modes.layout.List &&
-			 state.Layout.state.layoutMode!==state.Layout.modes.layout.Map);
+			 state.Layout.state.layoutMode!==state.Layout.modes.layout.Chart &&
+			 state.Layout.state.layoutMode!==state.Layout.modes.layout.Globe);
 	var changed= state.Layout.state.layoutMode!==layoutMode;
-	var reload=(   ( newismap && ! oldismap)
-		    || ( oldismap && ! newismap)
-		    || ( oldiscus && (! newiscus || changed))
+	var reload=(   ( newismap && (! oldismap || changed))
+		       || ( oldismap && (! newismap || changed))
+		       || ( oldiscus && (! newiscus || changed))
 		       || ( newiscus && (! oldiscus || changed)));
 	//console.log("Reload:",reload,newismap,oldismap,newiscus,oldiscus,changed);
 	state.Layout.state.layoutMode=layoutMode;
@@ -187,19 +195,32 @@ function Layout() {
 	};
 	return state.Layout.priority; //state.Utils.invertedArray()
     };
-    this.increaseSelect=function(state,key){
-	var kid=state.Path.keys.path.indexOf(key);
-	console.log("Bumping:",key,kid,JSON.stringify(state.Path.keys.path));
-	if (kid !== -1 && kid > 0) {
-	    var src=state.Path.keys.path.splice(kid, 1); // remove from array   
-	    state.Utils.spliceArray(state.Path.keys.path,kid-1,0,src);
-	}
+    this.increaseSelect=function(state,key,type){
+	var kid,src;
+	if (type === "select") {
+	    kid=state.Path.keys.path.indexOf(key);
+	    //console.log("Bumping:",key,kid,JSON.stringify(state.Path.keys.path));
+	    if (kid !== -1 && kid > 0) {
+		src=state.Path.keys.path.splice(kid, 1); // remove from array   
+		state.Utils.spliceArray(state.Path.keys.path,kid-1,0,src);
+	    }
+	} else if (type === "otherTable" || type === "otherRest") {
+	    kid=state.Path.keys.other.indexOf(key);
+	    //console.log("Bumping:",key,kid,JSON.stringify(state.Path.keys.path));
+	    if (kid !== -1 && kid > 0) {
+		src=state.Path.keys.other.splice(kid, 1); // remove from array   
+		state.Utils.spliceArray(state.Path.keys.other,kid-1,0,src);
+	    }
+	};
+	// export
+	state.Path.exportAllKeys(state);
+	//console.log("IncreaseSelect:",key,type,JSON.stringify(state.Path.keys));
 	state.Show.showConfig(state);
 	state.Show.showPath(state);
     };
     this.increasePriority=function(state,key){
 	var kid=state.Layout.priority.indexOf(key);
-	console.log("Bumping:",key,kid,JSON.stringify(state.Layout.priority));
+	//console.log("Bumping:",key,kid,JSON.stringify(state.Layout.priority));
 	if (kid !== -1 && kid > 0) {
 	    var src=state.Layout.priority.splice(kid, 1); // remove from array   
 	    state.Utils.spliceArray(state.Layout.priority,kid-1,0,src);
@@ -386,6 +407,9 @@ function Layout() {
     this.getLargeFont=function(){
 	return this.lfonts[this.state.cfont];
     };
+    this.getExtraLargeFont=function(){
+	return this.efonts[this.state.cfont];
+    };
     this.makePlan=function(label,iwidth,iheight){
 	// get height/width ratio
 	var plan={};
@@ -437,9 +461,9 @@ function Layout() {
 	    hdr1Width=0;
 	    hdr2Width=0;
 	    hx=(cellWidth)/2;
-	    var height=iheight-((lenr+1)*(border+5))-15;
+	    //var height=iheight-((lenr+1)*(border+5))-15;
 	    var width=iwidth;
-	    var cheight=iheight-hdrHeight;
+	    cheight=iheight-hdrHeight;
 	    cellHeight=cheight/lenr - 2*border-5;
 	    //console.log("CellHeight:",cellHeight,height,lenr,border);
 	    cellWidth=width/lenc - 2*border;
@@ -483,9 +507,9 @@ function Layout() {
 		//console.log("Plan (rot+step):",JSON.stringify(plans),stp,cellWidth,hdrHeight,hx);
 	    }
 	    // calculate cell height
-	    var cheight=iheight-hdrHeight-2*border;
+	    cheight=iheight-hdrHeight-2*border;
 	    //height=iheight-hdrHeight-((lenr+1)*border)-15;
-	    console.log("Height:",iheight,cheight,mheight*lenr);
+	    //console.log("Height:",iheight,cheight,mheight*lenr);
 	    if (mheight*lenr < cheight) { // 
 		cellHeight=Math.min(mheight*10,cheight/lenr)-2*border-3;
 	    } else {

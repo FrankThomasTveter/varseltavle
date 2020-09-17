@@ -3,7 +3,8 @@
 function Grid() {
     this.bdeb=false;
     this.resolution=20; // map resolution
-    this.eps=0.5;       // marker resolution
+    this.eps=0.01;       // marker resolution
+    this.res={};
     this.area={};
     this.init=function(state){
 	var par="Grid";
@@ -15,12 +16,11 @@ function Grid() {
     this.rounddown=function(val) {
 	return Math.floor(val*1000)/1000;
     }
-    this.posToVal=function(state,pos,min,max) {
-	var res=this.getRes(min,max);//this.resolution-1
+    this.posToVal=function(state,pos,min,max,res) {
 	if (pos !== undefined &&
 	    min !== undefined && ! isNaN(min) &&
 	    max !== undefined && ! isNaN(max)) {
-	    var dlon=Math.max(this.eps,(max-min)/res);
+	    var dlon=Math.max(this.eps,(max-min)/(res-1));
 	    //var dbor=dlon/2;
 	    var val=( (Number(pos)) * dlon ) + min;
 	    if (this.bdeb) {console.log("PosToVal ",pos,min,max,val);};
@@ -29,15 +29,17 @@ function Grid() {
 	    return 0;
 	};
     };
-    this.valToPos=function(state,val,min,max) {
-	var res=this.getRes(min,max);//this.resolution-1
+    this.valToPos=function(state,val,min,max,res) {
+	if (res === undefined) {
+	    res=this.getRes(min,max);//this.resolution-1
+	};
 	if (val !== undefined &&
 	    min !== undefined && ! isNaN(min) &&
 	    max !== undefined && ! isNaN(max) ) {
-	    var dlon=Math.max(this.eps,(max-min)/res);;
+	    var dlon=Math.max(this.eps,(max-min)/(res-1));;
 	    if (max===min) {
-		console.log("ValToPos#",Number(val)-min,dlon,res/2);
-		return Math.floor(res/2);
+		console.log("ValToPos#",Number(val)-min,dlon,(res-1)/2);
+		return Math.floor((res-1)/2);
 	    } else {
 		//console.log("ValToPos init:",val,min,max,res);
 		var dbor=dlon/2;
@@ -53,22 +55,22 @@ function Grid() {
     this.lonToPos=function(state,val) {
 	var min=this.area.minlon;
 	var max=this.area.maxlon;
-	return this.valToPos(state,val,min,max)
+	return this.valToPos(state,val,min,max,this.res.lon)
     };
     this.posToLon=function(state,pos) {
 	var min=this.area.minlon;
 	var max=this.area.maxlon;
-	return this.posToVal(state,pos,min,max)
+	return this.posToVal(state,pos,min,max,this.res.lon)
     };
     this.latToPos=function(state,val) {
 	var min=this.area.minlat;
 	var max=this.area.maxlat;
-	return this.valToPos(state,val,min,max)
+	return this.valToPos(state,val,min,max,this.res.lat)
     };
     this.posToLat=function(state,pos) {
 	var min=this.area.minlat;
 	var max=this.area.maxlat;
-	return this.posToVal(state,pos,min,max)
+	return this.posToVal(state,pos,min,max,this.res.lat)
 	};
     this.getRes=function (min,max) {
 	var dlat=Math.max(this.eps,(max-min)/this.resolution);
@@ -76,22 +78,23 @@ function Grid() {
 	res=this.resolution;
 	return res;
     }
-    this.getResolution=function () {
+    this.setResolution=function () {
 	var a=this.area;
 	var res={lat:this.getRes(a.minlat,a.maxlat)+1,lon:this.getRes(a.minlon,a.maxlon)+1};
 	//console.log("Resolution:",JSON.stringify(res));
-	return res;
+	this.res=res;
     };
     this.getLonRange=function(state,lon) {
 	var min=parseFloat(this.area.minlon);//Number(arr[0]);
 	var max=parseFloat(this.area.maxlon);//Number(arr[arr.length-1]);
-	var pos=this.valToPos(state,lon,min,max);
-	var lonmin=this.rounddown(this.posToVal(state,pos-0.506,min,max));
-	var lonmax=this.roundup(this.posToVal(state,pos+0.494,min,max));
+	var pos=this.valToPos(state,lon,min,max,this.res.lon);
+	var lonmin=this.rounddown(this.posToVal(state,pos-0.5,min,max,this.res.lon));
+	var lonmax=this.roundup(this.posToVal(state,pos+0.5,min,max,this.res.lon));
+	//console.log("GetLonRange:",min,max,lon,"->",pos," (->",this.posToVal(state,pos,min,max,this.res.lon),") result:",lonmin,lonmax);
 	return {min:lonmin,max:lonmax};
     }
     this.getLonWhere=function(state,keylon,lon) {
-	var range=this.getLonRange(state,lon);
+	var range=this.getLonRange(state,lon,this.res.lon);
 	var lonmin=range.min;
 	var lonmax=range.max;
 	if (parseFloat(lonmin) < parseFloat(lonmax)) {
@@ -103,9 +106,9 @@ function Grid() {
     this.getLatRange=function(state,lat) {
 	var min=parseFloat(this.area.minlat);//Number(arr[0]);
 	var max=parseFloat(this.area.maxlat);//Number(arr[arr.length-1]);
-	var pos=this.valToPos(state,lat,min,max);
-	var latmin=this.rounddown(this.posToVal(state,pos-0.506,min,max));
-	var latmax=this.roundup(this.posToVal(state,pos+0.494,min,max));
+	var pos=this.valToPos(state,lat,min,max,this.res.lat);
+	var latmin=this.rounddown(this.posToVal(state,pos-0.5,min,max,this.res.lat));
+	var latmax=this.roundup(this.posToVal(state,pos+0.5,min,max,this.res.lat));
 	return {min:latmin,max:latmax};
     }
     this.getLatWhere=function(state,keylat,lat) {
@@ -119,24 +122,24 @@ function Grid() {
 	}
     };
     this.getLats=function(state) {
-	var res=this.getResolution(state,this.resolution);
 	var vals=[];
 	if (this.bdeb) {console.log("Initial area:",JSON.stringify(this.area));};
-	for (var ii=0;ii<res.lat;ii++) {
-	    var lat=this.posToLat(state,res.lat-ii-1);
-	    if (this.bdeb) {console.log("Values _lat:",res.lat,ii,lat)};
+	for (var ii=0;ii<this.res.lat;ii++) {
+	    var lat=this.posToLat(state,this.res.lat-1-ii,this.res.lat);
+	    if (this.bdeb) {console.log("Values _lat:",this.res.lat,ii,lat)};
 	    vals.push(lat);
 	}
+	//console.log("Grid Latitudes:",JSON.stringify(vals),JSON.stringify(this.area),JSON.stringify(this.res));
 	return vals;
     };
     this.getLons=function(state) {
-	var res=this.getResolution(state,this.resolution);
 	var vals=[];
-	for (var ii=0;ii<res.lon;ii++) {
-	    var lon=this.posToLon(state,ii);
-	    if (this.bdeb) {console.log("Values _lon:",res.lon,ii,lon)};
+	for (var ii=0;ii<this.res.lon;ii++) {
+	    var lon=this.posToLon(state,ii,this.res.lon);
+	    if (this.bdeb) {console.log("Values _lon:",this.res.lon,ii,lon)};
 	    vals.push(lon);
 	}
+	//console.log("Grid Longitudes:",JSON.stringify(vals),JSON.stringify(this.area));
 	return vals;
     };
     this.setArea=function(iminlat,imaxlat,iminlon,imaxlon) {

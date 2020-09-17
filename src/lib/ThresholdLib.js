@@ -41,14 +41,14 @@ function Threshold() {
 		    if (thrs[trgkey][trgval] !== undefined) {
 			//if (debug) {console.log("Found:",trgkey,trgval,JSON.stringify(thrs[trgkey][trgval]));};
 			var mlen,jj;
-			if (thrs[trgkey][trgval].par === undefined) { // there is another level
+			if (thrs[trgkey][trgval].key === undefined) { // there is another level
 			    //if (debug) {console.log("   Iterating with:",JSON.stringify(thrs[trgkey][trgval]));};
 			    return this.setThresholds(doc,thrs[trgkey][trgval]);
-			} else if (doc[thrs[trgkey][trgval].par] !== undefined) {
+			} else if (doc[thrs[trgkey][trgval].key] !== undefined) {
 			    var thr = thrs[trgkey][trgval]
 			    //doc.threshold=thr;
 			    var rank;
-			    var val = doc[thr["par"]];
+			    var val = doc[thr["key"]];
 			    var maxs = thr[">"];
 			    var mins = thr["<"];
 			    var doclev=-1; // found thresholds, but will we find a valid level?
@@ -64,12 +64,16 @@ function Threshold() {
 				    }
 				};
 				rank=0; // universal rank
-				if (doclev > -1) {rank= (docmax-Number(maxs[0]))/(Number(maxs[mlen-1])-Number(maxs[0]));};
+				if (doclev > -1) {
+				    rank= doclev+(docmax-Number(maxs[doclev]))/(Number(maxs[mlen-1])-Number(maxs[0]));
+				    //console.log("Doclev:",doclev," max:",docmax,jj,mlen,maxs[doclev],maxs[mlen-1],maxs[0]);
+				};
 				//if (debug) {console.log("Level:",docmax,doclev,JSON.stringify(maxs));}
-				doc.level=doclev;
+				doc.level=String(doclev);
 				doc._rank=rank;
-				doc.lat=doc[thr["lat"]];
-				doc.lon=doc[thr["lon"]];
+				doc.rank=rank;
+				doc.lat=parseFloat(doc[thr["lat"]]);
+				doc.lon=parseFloat(doc[thr["lon"]]);
 				doc._thr={};
 				doc._thr.level=doclev;
 				doc._thr.val=docmax
@@ -91,6 +95,7 @@ function Threshold() {
 				if (doclev > 0) {rank=(Number(mins[0])-docmin)/(Number(mins[0])-Number(mins[mlen-1]));};
 				doc.level=doclev;
 				doc._rank=rank;
+				doc.rank=rank;
 				doc.lat=doc[thr["lat"]];
 				doc.lon=doc[thr["lon"]];
 				doc._thr={};

@@ -38,6 +38,13 @@ function Utils() {
 	}
 	return max;
     };
+    this.unique=function(arr) {
+	function onlyUnique(value, index, self) { 
+	    return self.indexOf(value) === index;
+	}
+	var unique = arr.filter( onlyUnique ); // returns ['a', 1, 2, '1']
+	return unique;
+    };
     this.init=function(par,setup){
 	var url=this.getUrlVars();
 	if (par in url) {
@@ -97,6 +104,9 @@ function Utils() {
 		this.spliceArray(sarr,0,0,tarr[ii]); // first position (table)
 	    }
 	}
+    };
+    this.apArray=function(tarr,sarr) {
+	this.ppArray(sarr,tarr);
     };
     this.addArray=function(sarr,tarr) {
 	this.cpArray(sarr,tarr);
@@ -271,6 +281,10 @@ function Utils() {
 	    if (urlPath ===undefined) {urlPath={};}
 	    urlPath.select=this.cp(state.Path.select);
 	};
+	if (state.Default.hasChanged(state,["Path","tkeys"])) {
+	    if (urlPath ===undefined) {urlPath={};}
+	    urlPath.tkeys=state.Path.tkeys;
+	};
 	if (state.Default.hasChanged(state,["Path","home"])) {
 	    if (urlPath ===undefined) {urlPath={};}
 	    urlPath.home=this.cp(state.Path.home);
@@ -278,6 +292,14 @@ function Utils() {
 	if (state.Default.hasChanged(state,["Path","tooltip"])) {
 	    if (urlPath ===undefined) {urlPath={};}
 	    urlPath.tooltip=this.cp(state.Path.tooltip);
+	};
+	if (state.Default.hasChanged(state,["Path","list"])) {
+	    if (urlPath ===undefined) {urlPath={};}
+	    urlPath.list=this.cp(state.Path.list);
+	};
+	if (state.Default.hasChanged(state,["Path","focus"])) {
+	    if (urlPath ===undefined) {urlPath={};}
+	    urlPath.focus=this.cp(state.Path.focus);
 	};
 	if (state.Default.hasChanged(state,["Path","order"])) {
 	    if (urlPath ===undefined) {urlPath={};}
@@ -298,6 +320,11 @@ function Utils() {
 	    if (urlLayout ===undefined) {urlLayout={};}
 	    urlLayout.state=this.cp(state.Layout.state);
 	};
+	var urlSettings=undefined;
+	if (state.Default.hasChanged(state,["Settings","visible"])) {
+	    if (urlSettings ===undefined) {urlSettings={};}
+	    urlSettings.visible=this.cp(state.Settings.visible);
+	};
 	if (urlDatabase !== undefined) {
 	    url=url + "Database=" + encodeURI(JSON.stringify(urlDatabase)+"&");
 	};
@@ -309,6 +336,9 @@ function Utils() {
 	};
 	if (urlLayout !== undefined) {
 	    url=url + "Layout=" + encodeURI(JSON.stringify(urlLayout)+"&");
+	};
+	if (urlSettings !== undefined) {
+	    url=url + "Settings=" + encodeURI(JSON.stringify(urlSettings)+"&");
 	};
 	//console.log("Setting URL to (",url.length,"):",url);
 	window.history.replaceState("", "js", url);
@@ -608,6 +638,15 @@ function Utils() {
 		window.URL.revokeObjectURL(url);  
             }, 0);
 	};
+    };
+    this.size = function(state) {
+	var obj=state.React.matrix;
+	var size = 0, key;
+	for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+	}
+	console.log("Matrix size:",size);
+	return size;
     };
 };
 export default Utils;

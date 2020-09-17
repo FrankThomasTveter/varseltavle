@@ -1,14 +1,26 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-//import Grid from "@material-ui/core/Grid/Grid";
+import {black_palette} from '../mui/metMuiThemes';  // teal_palette
+
+import Undo         from './UndoComponent';
+import Redo         from './RedoComponent';
+import Mode         from './ModeComponent';
+import View         from './ViewComponent';
+import Key          from './KeyCollectMenuComponent';
+import Reload       from './ReloadComponent';
+import Tooltip      from './TooltipComponent';
+import Order        from './OrderMenuComponent';
+import Home         from './HomeMenuComponent';
+import Film         from './FilmMenuComponent';
+import File         from './FileMenuComponent';
+import Archive      from './ArchiveMenuComponent';
+import Font         from './FontComponent';
+import Focus        from './FocusComponent';
+import FullScreen   from './FullScreenComponent';
+import About        from './AboutComponent';
 
 import Settings from './SettingsComponent';
-import Mode         from './ModeComponent';
-
-import UndoIcon from '@material-ui/icons/Undo';
-import RedoIcon from '@material-ui/icons/Redo';
 
 const styles = theme => ({
     horisontal: {
@@ -18,27 +30,16 @@ const styles = theme => ({
 	alignItems:'right',
     },
     button: {
+	backgroundColor:black_palette.main,
 	color:'white',
 	"&$buttonDisabled": {
             color: theme.palette.primary.main,
 	},
     },
+    buttonInvisible:{},
     buttonDisabled: {},
 });
-function Undo(props) {
-    const {state,classes}=props;
-    var onclick=() => state.Navigate.undo(state);
-    var disundo=! state.Navigate.canUndo(state);
-    var title="Undo";
-    return <Button classes={{root:classes.button,disabled:classes.buttonDisabled}} disabled={disundo} onClick={onclick} title={title}><UndoIcon/></Button>;
-};
-function Redo(props) {
-    const {state,classes}=props;
-    var onclick=() => state.Navigate.redo(state);
-    var disredo=! state.Navigate.canRedo(state);
-    var title="Redo";
-    return <Button classes={{root:classes.button,disabled:classes.buttonDisabled}} disabled={disredo} onClick={onclick} title={title}><RedoIcon/></Button>;
-};
+
 class Config extends Component {
     constructor(props) {
         super(props);
@@ -53,10 +54,23 @@ class Config extends Component {
         const { classes, state } = this.props;
 	//console.log("Rendering Config...");
 	return (<div className={classes.horisontal}>
-		   <Undo state={state} classes={classes}/>
-                   <Redo state={state} classes={classes}/>
-		   <Mode state={state} classes={{button:classes.button}}x/>
-                   <Settings state={state} classes={{button:classes.button}}/>
+		<Undo state={state} classes={classes} visible={false}/>
+                <Redo state={state} classes={classes} visible={false}/>
+		<Mode state={state} classes={{button:classes.button}} visible={false}/>
+		<View state={state} classes={{button:classes.button}} visible={false}/>
+		<Key state={state} classes={{button:classes.button}} visible={false}/>
+		<Reload state={state} classes={{button:classes.button}} visible={false}/>
+		<Tooltip state={state} classes={{button:classes.button}} visible={false}/>
+		<Order state={state} classes={{button:classes.button}} visible={false}/>
+		<Home state={state} classes={{button:classes.button}} visible={false}/>
+		<Film state={state} classes={{button:classes.button}} visible={false}/>
+		<File state={state} classes={{button:classes.button}} visible={false}/>
+		<Archive state={state} classes={{button:classes.button}} visible={false}/>
+		<Font state={state} classes={{button:classes.button}} visible={false}/>
+		<Focus state={state} classes={{button:classes.button}} visible={false}/>
+		<FullScreen state={state} classes={{button:classes.button}} visible={false}/>
+		<About state={state} classes={{button:classes.button}} visible={false}/>
+                <Settings state={state} classes={{button:classes.button}} visible={false}/>
 		</div>);
     }
 }

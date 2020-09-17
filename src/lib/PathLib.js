@@ -1,18 +1,26 @@
 //console.log("Loading PathLib.js");
 
 function Path() {
-    this.keys={path:[], // selected keys
-	       other:[] // keys available for selection
+    this.tkeys=2;
+    this.keys={path:[],  // selected keys
+	       other:[], // keys available for selection
+	       trash:[]  // invisible keys
 	      };
     this.other={table:[], // table keys
-		rest:[]   // keys available for table
+		rest:[],  // keys available for table
+		ignore:[] /// keys to ignore
 	       };
-    this.trash=[];         // remaining valid keys
+    this.trash={found:[],  // keys found in documents
+		rest:[],   // other relevant keys keys
+		ignore:[] /// keys to ignore
+	       };        
+    this.list=[];          // keys in listing...
     this.valid=[];         // list of valid keys
-    this.ignore=["max","min","minlat","minlon","maxlat","maxlon","cnt","level"]; // only visible in 1D and 0D tables
-    this.select={val:{},range:{}};  // current selection criteria
+    this.ignore=["max","min","minlat","minlon","maxlat","maxlon","cnt"];
+    this.numeric=["^max$","^min$","^a\\d*$","^f\\d*$"];
+    this.select={val:{},where:{},cnt:{},range:{}};  // current selection criteria
     this.where={};         // current cache for where expressions
-    this.home={path:[],val:{},range:{}};  // initial home for data...
+    this.home={path:[],val:{},range:{},tkeys:2};  // initial home for data...
     this.film={ index:null, reel:[], play:false, label:"", title:"" } ;// reel={label:"",path:[],val:{},range:{}} 
     this.tooltip={keys:[],   // keys that will be displayed (in addition to row/col-keys)
 		  select:[], // extra level of keys to distinguish reports
@@ -30,9 +38,79 @@ function Path() {
 	item :      {ityp:7, ptyp:"item"}
     };
     this.order={}; // how to order data	    
+    this.sort={key:null,dir:false};
+    this.focus={auto:true,zoom:0,lat:0,lon:0};
+    this.focusChanged=false;
     this.init=function(state){
 	state.Utils.init("Path",this);
     };
+    this.isNumeric=function(key) {
+	var lenn=this.numeric.length;
+	for (var ii=0;ii<lenn;ii++) {
+	    var re = new RegExp(this.numeric[ii], 'g');
+	    var mm = key.match(re);
+	    //console.log("Match:",key,this.numeric[ii],mm);
+	    if (mm!==null) {
+		return true;};
+	}
+	return false;
+    };
+    this.toggleFocus=function(state) {
+	this.focus.auto=!this.focus.auto;
+	//state.Utils.pushUrl(state);
+	state.React.Config.show(state);
+	state.Navigate.store(state);
+    }
+    this.setFocus=function(state,zoom,lat,lon,changed) {
+	state.Path.focus.zoom=zoom;
+	state.Path.focus.lat=lat;
+	state.Path.focus.lon=lon;
+	if (changed!== undefined && changed) {
+	    state.Path.focusChanged=true;
+	} else {
+	    state.Path.focusChanged=false;
+	}
+    };
+    this.inFocus=function(state) {
+	return state.Path.focus.auto;
+    };
+    this.getFocusZoom=function(state) {
+	return state.Path.focus.zoom;
+    };
+    this.getFocusLat=function(state) {
+	return state.Path.focus.lat;
+    };
+    this.getFocusLon=function(state) {
+	return state.Path.focus.lon;
+    };
+    this.getSortKey=function() {
+	return this.sort.key;
+    };
+    this.getSortDir=function() {
+	return this.sort.dir;
+    };
+    this.shouldSort=function() {
+	return (this.sort.key!==null && this.sort.key!== undefined && this.sort.key!=="");
+    };
+    this.sortKey=function(key) {
+	return (this.sort.key===key);
+    }
+    this.sortDirUp=function(key) {
+	return (this.sort.dir);
+    }
+    this.setSortKey=function(key) {
+	//console.log("Clicked:",key);
+	if (this.sort.key===key) {
+	    if (this.sort.dir) {
+		this.sort.dir=false;
+	    } else {
+		this.sort.key=null;
+	    }
+	} else {
+	    this.sort.key=key;
+	    this.sort.dir=true;
+	};
+    }
     this.cleanKeys=function(pkeys,val) {
 	var keys=Object.keys(val);
 	var lenk=keys.length;
@@ -57,6 +135,7 @@ function Path() {
 	state.Path.select.val=state.Utils.cp(state.Path.home.val);
 	state.Path.select.range=state.Utils.cp(state.Path.home.range);
 	state.Path.keys.path=state.Utils.cp(state.Path.home.path);
+	state.Path.tkeys=state.Path.home.tkeys;
 	//console.log(">>>>>> Path.goHome: ",JSON.stringify(state.Path.home),JSON.stringify(state.Path.keys.path));
 	state.Utils.pushUrl(state);
 	state.Navigate.store(state);
@@ -68,26 +147,48 @@ function Path() {
 	this.home.path=state.Utils.cp(state.Path.keys.path);
 	this.home.val=state.Utils.cp(state.Path.select.val);
 	this.home.range=state.Utils.cp(state.Path.select.range);
+	this.home.tkeys=state.Path.tkeys;
 	state.Utils.pushUrl(state);
 	//console.log("Setting home.");
     };
     this.getSnapshort=function(state) { // store state
 	var snap={keys:state.Utils.cp(state.Path.keys),
-		select:state.Utils.cp(state.Path.select)}
+		  select:state.Utils.cp(state.Path.select),
+		  tkeys:state.Path.tkeys
+		 };
+	snap.focus=state.Utils.cp(state.Path.focus);
 	if (snap.keys.path.other !== undefined) {
-	    console.log("Snapshort:",JSON.stringify(snap.keys.path));
+	    //console.log("Snapshort:",JSON.stringify(snap.keys.path));
 	    snap.keys.path.other=state.Utils.clean(snap.keys.path.other,2);
 	};
 	return snap;
     };
-    this.getSnapshot=function(state) { // store state
-	return {keys:state.Utils.cp(state.Path.keys),
-		other:state.Utils.cp(state.Path.other),
-		select:state.Utils.cp(state.Path.select),
-		order:state.Utils.cp(state.Path.order)};
+    this.getSnapshot=function(state,focus) { // store state
+	var snap={keys:state.Utils.cp(state.Path.keys),
+		  other:state.Utils.cp(state.Path.other),
+		  select:state.Utils.cp(state.Path.select),
+		  order:state.Utils.cp(state.Path.order),
+		  tkeys:state.Path.tkeys
+		 };
+	snap.focus=state.Utils.cp(state.Path.focus);
+	if (focus!==undefined) {snap.focus.auto=focus;};
+	return snap;
     };
     this.setSnapshot=function(state,snapshot) { // store state
 	state.Utils.restore(state.Path,snapshot);
+	if (state.Path.keys.trash===undefined) { state.Path.keys.trash=[];};
+	if (snapshot.focus===undefined) {state.Path.focus.auto=false;};
+	//console.log("Snapshot:",
+	//	    JSON.stringify(snapshot.focus),
+	//	    JSON.stringify(state.Path.focus),
+	//	    JSON.stringify(state.Path.focus)
+	//	   );
+    };
+    this.focusHasChanged=function(state) {
+	return (state.Path.focusChanged && ! state.Path.focus.auto);
+    };
+    this.filmIsPlaying=function(state) {
+	return state.Path.film.play;
     };
     this.addFilm=function(state,snapshot) {
 	var film=state.Path.film;
@@ -161,12 +262,14 @@ function Path() {
 	var reel=film.reel;
 	var len=reel.length;
 	if (pos !== undefined && pos < len) {
-	    console.log("Next film",film.play,pos,film.index,len);
+	    //console.log("Next film",film.play,pos,film.index,len);
 	    var snapshot=reel[pos];
 	    this.setSnapshot(state,snapshot);
 	    this.setLabel(state,snapshot.label);
 	    this.setMapTitle(state,snapshot.label);
+	    //console.log("NextFilm A:",JSON.stringify(state.Path.focus));
 	    state.Show.show(state);
+	    //console.log("NextFilm B:",JSON.stringify(state.Path.focus));
 	    return snapshot.label;
 	} else if (pos === undefined && film.play) {
 	    if (film.index === undefined || film.index===null) {
@@ -333,16 +436,16 @@ function Path() {
 	var pathSet=[];
 	if (this.keys.path === undefined) {this.keys.path=[];};
 	if (this.keys.other === undefined) {this.keys.other=[];};
-	if (this.trash === undefined) {this.trash=[];};
+	if (this.keys.trash === undefined) {this.keys.trash=[];};
 	if (this.keys.path.length > 0 ||
 	    this.keys.other.length > 0 ||
-	    this.trash.length > 0) {
+	    this.keys.trash.length > 0) {
 	    // remove duplicates
 	    //console.log("Filtering.");
 	    var olen;
 	    this.keys.path=this.keys.path.filter(this.Unique);
 	    this.keys.other=this.keys.other.filter(this.Unique);
-	    this.trash=this.trash.filter(this.Unique);
+	    this.keys.trash=this.keys.trash.filter(this.Unique);
 	    if (bdeb) {console.log("Remove invalid keys from path.",JSON.stringify(this.keys));};
 	    // remove invalid keys from path
 	    var plen = this.keys.path.length;
@@ -372,40 +475,23 @@ function Path() {
 	    }
 	    if (bdeb) {console.log("Remove invalid keys from trash.",JSON.stringify(this.keys));};
 	    // remove invalid keys from trash
-	    olen = this.trash.length;
+	    olen = this.keys.trash.length;
 	    for (ii = 0; ii < olen; ii++) {
-		key=this.trash[ii];
+		key=this.keys.trash[ii];
 		if (state.Database.keyCnt[key]  === undefined) {
-		    this.trash.splice(ii, 1);
+		    this.keys.trash.splice(ii, 1);
 		    ii=ii-1;
 		    olen=olen-1;
 		}
 	    }
 	    if (bdeb) {console.log("Select:",JSON.stringify(this.select));};
-	    if (bdeb) {console.log("Trash:",JSON.stringify(this.trash),JSON.stringify(this.where));};
+	    if (bdeb) {console.log("Trash:",JSON.stringify(this.keys.trash),JSON.stringify(this.where));};
 	    if (bdeb) {console.log("Updating trash with keys:",JSON.stringify(this.keys));};
 	    // we already have a path, update trash with new keys
 	    if (this.select.val === undefined) { this.select.val={};};
+	    if (this.select.where === undefined) { this.select.where={};};
+	    if (this.select.cnt === undefined) { this.select.cnt={};};
 	    if (this.select.range === undefined) { this.select.range={};};
-	    if (this.keys !== undefined
-		&& this.keys.path !== undefined
-		&& this.keys.other !== undefined
-		&& this.trash !== undefined
-		&& this.where !== undefined) {
-		for (key in state.Database.keyCnt) {
-		    //console.log("Key:",key);
-		    if (this.keys.path.indexOf(key)  === -1 && 
-			this.keys.other.indexOf(key)  === -1 && 
-			this.trash.indexOf(key)  === -1 &&
-			state.Utils.missing(this.ignore,key)) {
-			pathSet[key]="trash";
-			this.select.val[key]=undefined;
-			this.select.range[key]=undefined;
-			this.where[key]="";
-			this.trash.push(key);
-		    };
-		}
-	    }
 	    if (bdeb) {console.log("Updated trash with keys.",JSON.stringify(this.keys));};
 	} else {
 	    // new path...
@@ -418,6 +504,8 @@ function Path() {
 	    this.other.table=[]
 	    this.other.rest=[]
 	    this.select.val={}; // no values are set so far
+	    this.select.where={}; // no values are set so far
+	    this.select.cnt={}; // no values are set so far
 	    this.select.range={}; // no values are set so far
 	    this.where={}
 	    if (bdeb) {console.log("Copy default trash keys.",JSON.stringify(state.Default.current.trash));};
@@ -427,8 +515,8 @@ function Path() {
 		for (ii = 0; ii < tlen; ii++) {
 		    key=state.Default.current.trash[ii];
 		    if (pathSet[key] !== undefined) {
-//			if (state.Utils.missing(this.trash,key)) { 
-//			    this.trash.push(key);
+//			if (state.Utils.missing(this.keys.trash,key)) { 
+//			    this.keys.trash.push(key);
 //			};
 			pathSet[key]=undefined; // ignore key from now on...
 		    }
@@ -436,8 +524,8 @@ function Path() {
 		if (bdeb) {console.log("Pathset:",JSON.stringify(pathSet),JSON.stringify(state.Default.current.trash));};
 	    };
 	    if (bdeb) {console.log("Copy default other keys.",JSON.stringify(this.keys));};
-	    if (bdeb) {console.log("makePath A:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));};
-	    // console.log("Added trash:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));
+	    if (bdeb) {console.log("makePath A:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.keys.trash));};
+	    // console.log("Added trash:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.keys.trash));
 	    // copy default other keys (that are used) to other...
 	    if (state.Default.current.other !== undefined) {
 		var klen = state.Default.current.other.length;
@@ -451,7 +539,7 @@ function Path() {
 		    }
 		}
 	    }
-	    if (bdeb) {console.log("makePath B:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));};
+	    if (bdeb) {console.log("makePath B:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.keys.trash));};
 	    if (bdeb) {console.log("Add missing keys.",JSON.stringify(this.keys));};
 	    // add missing keys to path
 	    for (key in state.Database.keyCnt) {
@@ -481,20 +569,45 @@ function Path() {
 	    // 	return state.Database.values[a].length - state.Database.values[b].length
 	    //     }
 	    // });
-	    if (bdeb) {console.log("makePath C:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));};
+	    if (bdeb) {console.log("makePath C:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.keys.trash));};
 	    if (bdeb) {console.log("Push other keys to table and rest.",JSON.stringify(this.keys));};
 	    var glen = this.keys.other.length;
 	    for (ii = 0; ii < glen; ii++) {
 		key=this.keys.other[ii];
-		if (ii<2) {
+		if (ii<this.tkeys) {
 		    this.other.table.push(key);
 		} else {
 		    this.other.rest.push(key);
 		}
 	    }
 	}
+	// all keys not accounted for are trash..
+	if (this.keys !== undefined
+	    && this.keys.path !== undefined
+	    && this.keys.other !== undefined
+	    && this.keys.trash !== undefined
+	    && this.where !== undefined) {
+	    for (key in state.Database.keyCnt) {
+		//console.log("Key:",key);
+		// && state.Utils.missing(this.ignore,key)
+		if (this.keys.path.indexOf(key)  === -1 && 
+		    this.keys.other.indexOf(key)  === -1 && 
+		    this.keys.trash.indexOf(key)  === -1) {
+		    pathSet[key]="trash";
+		    this.select.val[key]=undefined;
+		    this.select.where[key]=undefined;
+		    this.select.cnt[key]=undefined;
+		    this.select.range[key]=undefined;
+		    this.where[key]="";
+		    this.keys.trash.push(key);
+		};
+	    }
+	}
+	if (this.list.length === 0) {
+	    state.Utils.cpArray(this.list,state.Path.keys.other);
+	};
 	//state.Path.setWhere(state);
-	if (bdeb) {console.log("makePath D:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.trash));};
+	if (bdeb) {console.log("makePath D:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other),JSON.stringify(state.Path.keys.trash));};
 	if (bdeb) {console.log("makePath Where:",JSON.stringify(state.Path.where));};
 	if (bdeb) {console.log("makePath Select:",JSON.stringify(state.Path.keys.path),JSON.stringify(state.Path.select.val));};
 	state.Navigate.reset(state);
@@ -502,7 +615,7 @@ function Path() {
 	//console.log("Before Valid:",JSON.stringify(state.Path.valid),JSON.stringify(state.Path.keys));
 	state.Utils.cpArray(state.Path.valid,state.Path.keys.path);
 	state.Utils.cpArray(state.Path.valid,state.Path.keys.other);
-	state.Utils.cpArray(state.Path.valid,state.Path.trash);
+	state.Utils.cpArray(state.Path.valid,state.Path.keys.trash);
 	//console.log("After Valid:",JSON.stringify(state.Path.valid),JSON.stringify(state.Path.keys));
 	//console.log("Completed makepath.");
     };
@@ -518,16 +631,38 @@ function Path() {
     this.getIndex=function(state,trg) {
 	return this.keys.path.indexOf(trg);
     };
-    this.getVisibleKeys=function(state) {
+    this.getActiveKeys=function(state) {
 	var buff=[];
 	state.Utils.cpArray(buff,state.Path.keys.path);
 	state.Utils.cpArray(buff,state.Path.keys.other);
-	//state.Utils.cpArray(buff,state.Path.trash);
+	//state.Utils.cpArray(buff,state.Path.keys.trash);
 	return buff;
     };
+    this.getVisibleKeys=function(state) {
+	var buff=[];
+	state.Utils.cpArray(buff,state.Path.list);
+	//state.Utils.cpArray(buff,state.Path.keys.path);
+	//state.Utils.cpArray(buff,state.Path.keys.other);
+	//state.Utils.cpArray(buff,state.Path.keys.trash);
+	return buff;
+    };
+    this.toggleVisibleKeys=function(state,key) {
+	var sid=state.Path.list.indexOf(key);
+	if (sid===-1) {
+	    this.list.push(key);
+	} else {
+	    state.Path.list.splice(sid, 1); // remove from path
+	}
+	state.Show.show(state,false);
+    }
+    this.isVisible=function(state,key) {
+	var sid=state.Path.list.indexOf(key);
+	return (sid!==-1)
+    }
     this.exportAllKeys=function(state) { // export keys from "all" to "rest"
 	this.other.table=[];
 	this.other.rest=[];
+	this.other.ignore=[];
 	var jj=0;
 	var key,ii;
 	var delay=false;
@@ -535,40 +670,99 @@ function Path() {
 	    var olen=this.keys.other.length;
 	    for (ii=0;ii<olen;ii++) {
 		key=this.keys.other[ii];
+		//console.log("Processing key:",key,ii);
 		if (key === "") {
 		    if (jj === 0) {
 			delay=true;
-		    } else if (jj < 2) {
+		    } else if (jj < this.tkeys) {
 			jj=jj+1
 		    }
-		} else if (state.Matrix.keyCnt[key] === undefined || state.Matrix.keyCnt[key] === 0) { // do nothing
-		    //console.log("Ignoring key:",key,JSON.stringify(state.Matrix.keyCnt[key]));
+//		} else if (state.Matrix.keyCnt[key] === undefined ||
+//			   state.Matrix.keyCnt[key] === 0) {
+//		    //console.log("Ignoring key:",key,JSON.stringify(state.Matrix.keyCnt[key]));
 		} else {
 		    //console.log("Adding key:",key,JSON.stringify(state.Matrix.keyCnt[key]));
-		    if (jj < 2) {
-			this.other.table.push(key);
-			jj=jj+1;
-			if (delay && jj<2) {jj=jj+1;};
-		    } else if (key !== "") {
-			this.other.rest.push(key);
+		    if (key !== "" & key !== null) {
+			if ((state.Matrix.keyCnt[key] === undefined ||
+			     state.Matrix.keyCnt[key] === 0)) {
+			    this.other.ignore.push(key); // ignore key...
+			} else if (jj < this.tkeys) {
+			    this.other.table.push(key);
+			    jj=jj+1;
+			    if (delay && jj<this.tkeys) {jj=jj+1;};
+			} else  {
+			    this.other.rest.push(key);
+			}
+		    } else {
+			console.log("Strange key:",key,jj,this.tkeys);
 		    }
 		}
 	    };
 	}
+	//console.log("Ignoring:",JSON.stringify(this.other.ignore));
+	// export from trash
+	if (this.keys.trash !== undefined) {
+	    this.trash.found=[];
+	    this.trash.ignore=[];
+	    this.trash.rest=[];
+	    var tlen=this.keys.trash.length;
+	    for (ii=0;ii<tlen;ii++) {
+		key=this.keys.trash[ii];
+		//console.log("Export trash:",key,state.Matrix.keyCnt[key],
+		// state.Utils.missing(this.ignore,key));
+		if (key !== null) {
+		    if (! state.Utils.missing(this.ignore,key)) {
+			this.trash.ignore.push(key);
+		    } else if (state.Matrix.keyCnt[key] === undefined ||
+			       state.Matrix.keyCnt[key].cnt === 0) {
+			this.trash.rest.push(key);
+		    } else {
+			this.trash.found.push(key);
+		    }
+		} else {
+		    console.log("Strange key:",ii,key);
+		}
+	    }
+	};
+	//console.log("Exported:",JSON.stringify(this.trash));
 	// sanity check...
+	//console.log("Keys:",JSON.stringify(this.keys));
 	var vlen=this.valid.length;
 	for (ii=0;ii<vlen;ii++) {
 	    key=this.valid[ii];
 	    if (this.keys.path.indexOf(key)===-1 &&
 		this.keys.other.indexOf(key)===-1 &&
-		this.trash.indexOf(key)===-1) {
+		this.keys.trash.indexOf(key)===-1) {
 		//console.log("**** Path failed sanity check:",
-		//JSON.stringify(this.keys),JSON.stringify(this.trash),key);
-		this.trash.push(key);
+		//JSON.stringify(this.keys),JSON.stringify(this.keys.trash),key);
+		this.keys.trash.push(key);
 	    }
 	}
 	//this.sortTableKeys(state);
-	//console.log("Exported:",JSON.stringify(this.keys),JSON.stringify(this.other),JSON.stringify(this.trash));
+	//console.log("Exported:",
+	//	    JSON.stringify(this.keys),
+	//	    JSON.stringify(this.other),
+	//	    JSON.stringify(this.keys.trash));
+    };
+    this.addTableKeyToPath=function(state,key,val,where,cnt) { // keep abscissa
+	var sid = state.Path.keys.other.indexOf(key);
+	if (sid !== -1) { // key is a table-key...
+	    if (typeof (val)=="object") {
+		state.Path.select.val[key]=val;
+	    } else {
+		state.Path.select.val[key]=[val];
+	    }
+	    state.Path.where[key]=where;
+	    if ( state.Utils.missing(state.Path.keys.path,key)) {
+		//console.log("Adding to path:",JSON.stringify(key));
+		state.Utils.pushKey(state.Path.keys.path,key);
+		//state.Path.keys.path=state.Path.keys.path.concat(key); // last path position
+	    };
+	    return true;
+	} else {
+	    console.log("Missing '",key,"' in other:",JSON.stringify(state.Path.keys));
+	    return false;
+	}
     };
     // move key from table to path
     this.tableKeyToPath=function(state,key,val,where,cnt) { // keep abscissa
@@ -587,10 +781,10 @@ function Path() {
 		state.Utils.pushKey(state.Path.keys.path,src);
 		//state.Path.keys.path=state.Path.keys.path.concat(src); // last path position
 	    };
-	    if (cnt>1 && state.Utils.missing(state.Path.trash,src)) {
+	    if (cnt>1 && state.Utils.missing(state.Path.keys.trash,src)) {
 		//console.log("Adding ",JSON.stringify(src)," to trash.");
-		state.Utils.pushKey(state.Path.trash,src);
-		//state.Path.trash=state.Path.trash.concat(src)
+		state.Utils.pushKey(state.Path.keys.trash,src);
+		//state.Path.keys.trash=state.Path.keys.trash.concat(src)
 	    };
 	    //console.log("Selectkey:",JSON.stringify(setup),JSON.stringify(src));
 	    return true;
@@ -767,8 +961,8 @@ function Path() {
 	}
     };
     this.moveTrash=function(state,ttyp,tin) {
-	state.Utils.spliceArray(this.keys[ttyp],tin, 0, this.trash);
-	this.trash=[];
+	state.Utils.spliceArray(this.keys[ttyp],tin, 0, this.keys.trash);
+	this.keys.trash=[];
     };
     this.moveAllKey=function(state,styp,skey,ttyp,tid) {
 	var lenp=this.keys[styp].length;
@@ -807,6 +1001,12 @@ function Path() {
 	return sin;
     };
     //////////////////////////////// COL/ROW FUNCTIONS ///////////////////////
+    this.getFirstKey=function(state) {
+	return this.other.table[0];
+    };
+    this.getSecondKey=function(state) {
+	return this.other.table[1];
+    };
     this.getColKey=function(state) {
 	var arr=state.Utils.cp(this.other.table);
 	var pri=state.Layout.getPriorityIndex(state,arr);

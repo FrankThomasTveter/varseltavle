@@ -88,7 +88,11 @@ const styles = theme => ({
     paperImage: {
         textAlign: 'center',
         padding: theme.spacing(2),
-    }
+    },
+    dataset:{},
+    button:{},
+    buttonInvisible:{},
+    buttonDisabled:{},
 });
 
 //const mui = createTheme({palette:teal_palette});
@@ -97,20 +101,21 @@ const styles = theme => ({
 //{rowval}
 function DataCell(props) {
     const {classes,state,index,elements,mode,layout,plan,rowindex,rowval,colvalues,...other}=props;
+    var map, cell, label;
     if (elements===undefined) {
 	return <EmptyCell {...other} state={state} plan={plan}/>
     } else if (mode===state.Layout.modes.cell.Sum) {
-	var map=state.Custom.getMap(state,layout);
-	var cell=state.Custom.getCell(state,map,colvalues[index],rowval);
-	var label=state.Custom.getCellLabel(state,cell)||"?";
+	map=state.Custom.getMap(state,layout);
+	cell=state.Custom.getCell(state,map,colvalues[index],rowval);
+	label=state.Custom.getCellLabel(state,cell)||"?";
 	return <SummaryCell {...other} state={state} elements={elements} plan={plan}
 	        index={index} colvalues={colvalues} rowval={rowval} label={label}
 	        layout={layout}/>
 	//return null;
     } else {
-	var map=state.Custom.getMap(state,layout);
-	var cell=state.Custom.getCell(state,map,colvalues[index],rowval);
-	var label=state.Custom.getCellLabel(state,cell)||"?";
+	map=state.Custom.getMap(state,layout);
+	cell=state.Custom.getCell(state,map,colvalues[index],rowval);
+	label=state.Custom.getCellLabel(state,cell)||"?";
 	return <SeriesCell {...other} state={state} elements={elements} plan={plan}
 	        index={index} colvalues={colvalues} rowval={rowval} label={label}
 	        layout={layout}/>
@@ -144,7 +149,7 @@ function renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,ro
 function dataRow(classes,state,colkey,rowkey,colvalues,mode,layout,plans,rowval,rowindex) {
     //console.log("Processing Row:",rowkey,rowval);
     var rowwhere=state.Database.getWhereValue(rowkey,rowval);
-    var onclick=() => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1);}
+    //var onclick=() => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1);}
     var range=[undefined,undefined];
     if (state.React.matrix!==undefined) {
 	range=state.Matrix.getRange(state,state.React.matrix,colvalues,[rowval]);
@@ -178,8 +183,8 @@ function Details(props) {
     const { classes, state } = props; // classes, element
     var colkey = state.Path.getColKey(state)||"";
     var rowkey = state.Path.getRowKey(state)||"";
-    var colvalues = state.Path.filterKeys(state,state.Matrix.values[colkey]||[""]);
-    var rowvalues = state.Path.filterKeys(state,state.Matrix.values[rowkey]||[""]);
+    var colvalues = state.Path.filterKeys(state,state.Matrix.values[colkey]||[""]).sort(function(a, b){return a-b});;
+    var rowvalues = state.Path.filterKeys(state,state.Matrix.values[rowkey]||[""]).sort(function(a, b){return b-a});;
     var layoutMode  = state.Layout.getLayoutMode(state);
     var cellMode  = state.Layout.getCellMode(state);
     //var ncol=colvalues.length + 1;
@@ -192,8 +197,8 @@ function Details(props) {
     //console.log("Plans:",JSON.stringify(plans));
     //console.log("Heights:",window.innerHeight,height,plans.hdr.height,plans.cell.height);
     //console.log("Details => Width/Height:",window.innerWidth,window.innerHeight,plan.cell.width,plan.hdr.height)
-    //console.log("Colkey:",colkey," colval:",JSON.stringify(colvalues));
-    //console.log("Rowkey:",rowkey," rowval:",JSON.stringify(rowvalues));
+    console.log("Colkey:",colkey," colval:",JSON.stringify(colvalues));
+    console.log("Rowkey:",rowkey," rowval:",JSON.stringify(rowvalues));
     if (state.React.matrix === undefined) {
 	var label="Processing..."
 	var plan=state.Layout.makePlan(label,width,height);
@@ -245,7 +250,7 @@ class Custom extends Component {
 	const { classes, state } = this.props;
 	//console.log("##### Rendering Custom.");
 	return (<div ref={el=>{this.element(el)}} className={classes.content}>
-		<Grid container spacing={10}>
+		   <Grid container spacing={0}>
 		      <Grid item xs={12}> 
                          { <Paper className={classes.paper}>
 		              <Details state={state} classes={classes} element={this}/>

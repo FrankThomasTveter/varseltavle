@@ -11,13 +11,7 @@ function createTheme(primary, secondary) {
             }),
             // error: will use the default color
         },
-        spacing: {
-            getMaxWidth: {
-                width: '100%',
-                maxWidth: '1200px',
-                margin: '0px auto',
-            }
-        },
+        spacing: 0,
         overrides:{
             MuiButton: {
                 root: {
@@ -31,3 +25,5 @@ function createTheme(primary, secondary) {
 }
 
 export default (createTheme);
+
+

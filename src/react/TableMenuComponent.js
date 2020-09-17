@@ -11,14 +11,18 @@ import Remove   from './RemoveComponent';
 
 const styles = theme => ({
     config: {
+	border:'0px',
         marginLeft: 'auto',
     },
     tabchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"red",
         borderColor:"blue",
     },
+    button:{},
+    buttonInvisible:{},
+    buttonDisabled:{},
 });
 function renderMenuItem(classes,state,keyitem,keyindex,key,onClose) {
     return (<MenuItem key={keyitem}>
@@ -59,7 +63,7 @@ class TableMenu extends Component {
                         onClose={this.onClose}
 		     >
 		        <MenuItem key="remove" onClose={this.onClose} className={classes.remove}>
-		          <Remove state={state} keyitem={value} onclick={this.remove} onclose={this.onClose}/>
+		<Remove state={state} keyitem={value} onclick={this.remove} onclose={this.onClose} classes={{button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled}}/>
 		       </MenuItem>
 		        {items.map(mapFunction)}
 	             </Menu>

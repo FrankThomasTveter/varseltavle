@@ -6,21 +6,24 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 
 import SettingsIcon from '@material-ui/icons/Settings';
-import FontIcon from '@material-ui/icons/TextFields';
 
-import Reload       from './ReloadComponent';
+import Undo         from './UndoComponent';
+import Redo         from './RedoComponent';
+import Mode         from './ModeComponent';
 import View         from './ViewComponent';
-import Auto         from './AutoComponent';
+import Key          from './KeyCollectMenuComponent';
+import Reload       from './ReloadComponent';
 import Tooltip      from './TooltipComponent';
-import SelectMenu   from './SelectMenuComponent';
-import KeyMenu      from './KeyMenuComponent';
-import OrderMenu    from './OrderMenuComponent';
-import PriorityMenu from './PriorityMenuComponent';
-import HomeMenu     from './HomeMenuComponent';
-import FilmMenu     from './FilmMenuComponent';
-import FileMenu     from './FileMenuComponent';
-import ArchiveMenu  from './ArchiveMenuComponent';
+import Order        from './OrderMenuComponent';
+import Home         from './HomeMenuComponent';
+import Film         from './FilmMenuComponent';
+import File         from './FileMenuComponent';
+import Archive      from './ArchiveMenuComponent';
+import Font         from './FontComponent';
+import Focus        from './FocusComponent';
 import FullScreen   from './FullScreenComponent';
+import SettingsMenu from './SettingsMenuComponent';
+import About        from './AboutComponent';
 
 const styles = theme => ({
     settings: {
@@ -29,12 +32,7 @@ const styles = theme => ({
     },
     button:{color:'white'},
 });
-function Font(props) {
-    const {state,classes}=props;
-    var onclick=() => {state.Layout.changeFont(state);};
-    var title="Change font";
-    return <Button className={classes.button} onClick={onclick} title={title}><FontIcon/></Button>;
-};
+
 class Settings extends Component {
     constructor(props) {
         super(props);
@@ -69,46 +67,55 @@ class Settings extends Component {
                    onClose={this.onClose}
 	          >
 		    <MenuItem key="reload" onClose={this.onClose}>
-		       <Reload state={state} classes={{button:classes.button}}/>
+		       <Reload state={state} classes={{button:classes.button}} visible={true}/>
+		    </MenuItem>
+		    <MenuItem key="undo" onClose={this.onClose}>
+		       <Undo state={state} classes={{button:classes.button}} visible={true}/>
+		    </MenuItem>
+		    <MenuItem key="redo" onClose={this.onClose}>
+		       <Redo state={state} classes={{button:classes.button}} visible={true}/>
+		    </MenuItem>
+		    <MenuItem key="mode" onClose={this.onClose}>
+		       <Mode state={state} classes={{button:classes.button}} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="view" onClose={this.onClose}>
-		       <View state={state} classes={{button:classes.button}}/>
+		       <View state={state} classes={{button:classes.button}} visible={true}/>
 		    </MenuItem>
-		    <MenuItem key="auto" onClose={this.onClose}>
-		       <Auto state={state} classes={{button:classes.button}}/>
+		    <MenuItem key="key" onClose={this.onClose}>
+		       <Key state={state} classes={{button:classes.button}} visible={true}/>
 		    </MenuItem>
-		    <MenuItem key="tooltip" onClose={this.onClose}>
-		       <Tooltip state={state} classes={{button:classes.button}}/>
+		    <MenuItem key="Tooltip" onClose={this.onClose}>
+		       <Tooltip state={state} classes={{button:classes.button}} visible={true}/>
 		    </MenuItem>
-		    <MenuItem key="select" onClose={this.onClose}>
-		       <SelectMenu state={state} classes={{button:classes.button}}/>
+		    <MenuItem key="Order" onClose={this.onClose}>
+		       <Order state={state} classes={{button:classes.button}} visible={true}/>
 		    </MenuItem>
-		    <MenuItem key="order" onClose={this.onClose}>
-		       <OrderMenu state={state} classes={{button:classes.button}}/>
+		    <MenuItem key="Home" onClose={this.onClose}>
+		       <Home state={state} classes={{button:classes.button}} visible={true}/>
 		    </MenuItem>
-		    <MenuItem key="keys" onClose={this.onClose}>
-		       <KeyMenu state={state} classes={{button:classes.button}}/>
-		    </MenuItem>
-		    <MenuItem key="priorities" onClose={this.onClose}>
-		       <PriorityMenu state={state} classes={{button:classes.button}}/>
-		    </MenuItem>
-		    <MenuItem key="home" onClose={this.onClose}>
-		       <HomeMenu state={state} classes={{button:classes.button}}/>
-		    </MenuItem>
-		    <MenuItem key="film" onClose={this.onClose}>
-		       <FilmMenu state={state} classes={{button:classes.button}}/>
-		    </MenuItem>
-		    <MenuItem key="font" onClose={this.onClose}>
-		       <Font state={state} classes={{button:classes.button}}/>
+		    <MenuItem key="Film" onClose={this.onClose}>
+		       <Film state={state} classes={{button:classes.button}} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="file" onClose={this.onClose}>
-		       <FileMenu state={state} classes={{button:classes.button}}/>
+		       <File state={state} classes={{button:classes.button}} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="archive" onClose={this.onClose}>
-		       <ArchiveMenu state={state} classes={{button:classes.button}}/>
+		       <Archive state={state} classes={{button:classes.button}} visible={true}/>
 		    </MenuItem>
-		    <MenuItem key="screen" onClose={this.onClose}>
-		       <FullScreen state={state} classes={{button:classes.button}}/>
+		    <MenuItem key="font" onClose={this.onClose}>
+		       <Font state={state} classes={{button:classes.button}} visible={true}/>
+		    </MenuItem>
+		    <MenuItem key="focus" onClose={this.onClose}>
+		       <Focus state={state} classes={{button:classes.button}} visible={true}/>
+		    </MenuItem>
+		    <MenuItem key="fullscreen" onClose={this.onClose}>
+		       <FullScreen state={state} classes={{button:classes.button}} visible={true}/>
+		    </MenuItem>
+		    <MenuItem key="set" onClose={this.onClose}>
+		       <SettingsMenu state={state} classes={{button:classes.button}} visible={true}/>
+		    </MenuItem>
+		    <MenuItem key="set" onClose={this.onClose}>
+		       <About state={state} classes={{button:classes.button}} visible={true}/>
 		    </MenuItem>
 	          </Menu>
 		</div>

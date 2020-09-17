@@ -10,7 +10,7 @@ const styles = theme => ({
         marginRight: 'auto',
     },
     restchip: {
-        margin: theme.spacing(1),
+        margin: theme.spacing(0),
 	cursor: "pointer",
         color:"blue",
         borderColor:"blue",

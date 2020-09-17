@@ -1,6 +1,8 @@
 //console.log("Loading DatabaseLib.js");
 
-const alasql = window.alasql;
+//import {alasql} from "alasql";
+//const alasql = window.alasql;
+const alasql = require('alasql');
 
 function Database() {
     this.bdeb=false;
@@ -37,6 +39,7 @@ function Database() {
     this.db=null;
     this.newDb=function() {
 	this.db=new alasql.Database();
+	//console.log("Alasql:",JSON.stringify(this.db));
     };
     this.init=function(state,response,callbacks){
         state.Colors.init(state);
@@ -44,8 +47,9 @@ function Database() {
         state.Layout.init(state);
         state.Threshold.init(state);
         state.Custom.init(state);
+        state.Settings.init(state);
 	state.Utils.init("Database",this);
-	console.log("Initial:",this.data);
+	console.log("Data location:",this.data);
 	state.File.next(state,response,callbacks);
     }.bind(this);
     this.updateLoop=function(state) {
@@ -219,7 +223,7 @@ function Database() {
 	    // set home
 	    var len=json.data.length
 	    for (ii=0;ii<len;ii++) {
-		json.data[ii]["cnt"]=ii
+		json.data[ii]["cnt"]=ii;
 	    }
 	    // get modified date
 	    //console.log("Setting time.");
@@ -251,9 +255,11 @@ function Database() {
 		}
             }
 	    //console.log("Home keys:",JSON.stringify(homeKeys)," delayed:",JSON.stringify(delayKeys));
+	    // extract data from json-file and insert into data-array...
 	    var rcnt=this.extractData(state,data,{},"",json.data,homeKeys,home);
 	    console.log("Count:",rcnt);
 	    //console.log("Data:",JSON.stringify(data));
+	    // put data-array into database...
 	    this.dataToDb(state,data);
 	    //var nrec=this.sanityCheck(state)	    // sanity check
 	    //console.log("Initially:",data.length," Extracted:",rcnt,' Database:',nrec);
@@ -280,10 +286,10 @@ function Database() {
     };
     this.updateKeyCnt=function(state,key,val) {
 	if (this.keyCnt[key] === undefined) {
-	    this.keyCnt[key]={cnt:0,type:"num",order:this.nasc};
+	    this.keyCnt[key]={cnt:0,type:"string",order:this.nasc};
 	}
 	this.keyCnt[key].cnt=(this.keyCnt[key].cnt)+1;
-	if (this.keyCnt[key].type  === "num" && isNaN(val)) {
+	if (this.keyCnt[key].type  === "string" && isNaN(val)) {
 	    this.keyCnt[key].type="nan";
 	    this.keyCnt[key].order=this.casc;
 	}
@@ -411,19 +417,17 @@ function Database() {
 	// extract data from db and insert into data-array
 	// var parent={};//{test:{$exists:false}};
 	if (this.processing) {return};
-	var keys=state.Path.getVisibleKeys(state);
-	state.Utils.cpArray(keys,["lat","lon"]);
-	//console.log("Visible keys:",JSON.stringify(keys));
 	var where = this.getWhere(state);
 	//console.log("dbextract Path:",JSON.stringify(state.Path.keys));
-	console.log("dbextract Where:",where)
 	var cntDocs0=this.getDocsCnt(state,where);
 	var nrec= (cntDocs0.length===0?0:cntDocs0[0].cnt);
 	var m={};
 	state.Matrix.cnt=nrec;
+	//console.log("dbextract Where:",where," => ",nrec);
 	if (nrec > state.Matrix.popSeries) { // maintain keyCnt
 	    state.Matrix.initKeyCnt(state);
-	    state.Matrix.makeKeyCntMapAreaSql(state,where,nrec,keys);
+	    state.Matrix.makeKeyCntMapAreaSql(state,where,nrec);
+	    state.Grid.setResolution(state,state.Grid.resolution);
 	    state.Path.exportAllKeys(state); // can not export keys before we have a keyCnt
 	    state.Matrix.sortKeyValues(state);
 	    if (this.bdeb) {console.log("Count:",JSON.stringify(cntDocs0));}
@@ -431,7 +435,8 @@ function Database() {
 	    state.Matrix.addMapAreaKeys(state,this.db.tables.alarm.data); // add lat_/lon_
 	    var colkey=state.Path.getColKey(state);
 	    var rowkey=state.Path.getRowKey(state);
-	    var cntDocs=state.Database.getDocsCnt(state,where,[colkey,rowkey]);
+	    var svgkey=state.Svg.getKey(state);
+	    var cntDocs=state.Database.getDocsCnt(state,where,[colkey,rowkey,svgkey]);
 	    if (this.bdeb) {console.log("dbextract cntDocs:",JSON.stringify(cntDocs));}
 	    state.Matrix.makeMatrixCntMap(state,cntDocs,m);
 	    state.Matrix.makeMapRange(state);
@@ -444,7 +449,8 @@ function Database() {
 	    var docs=this.getDocs(state,where); // get all docs
 	    //console.log(">>>Extraction key (where='",where,"') Docs:",docs.length);
 	    state.Matrix.initKeyCnt(state);
-	    state.Matrix.makeKeyCntMapArea(state,docs,keys);      // makes mapArea
+	    state.Matrix.makeKeyCntMapArea(state,docs);      // makes mapArea
+	    state.Grid.setResolution(state,state.Grid.resolution);
 	    state.Matrix.makeMapRange(state);
 	    state.Matrix.addUndefinedKeyCnt(state,docs); // add "undefined"
 	    state.Matrix.addUndefinedKeyCntValues(state);
@@ -516,7 +522,8 @@ function Database() {
 		} else {
 		    ret=key + "='"+parse+"'";
 		};
-	    } else if (keytrg !== undefined) {
+	    } else if (keytrg !== undefined && val !== "") {
+		//console.log("Key trg:",keytrg,key,val);
 		ret=state.Database.getWhereValue(key,val);
 	    } else {
 		ret=state.Database.getWhereNull(key);
@@ -545,7 +552,7 @@ function Database() {
 	};
     };
     this.getWhereNull=function(key) {
-	return key + ' is NULL';
+	return '"' + key + '" is NULL';
     };
     this.getWhere=function(state,keys,vals,ranges) {
 	var where="";
@@ -576,8 +583,8 @@ function Database() {
 		}
 	    };
 	    if (where !== "") {where=" WHERE "+where;}
-	    //console.log("Where=|"+where+"|")
 	};
+	//console.log("Where=|"+where+"|")
 	return where;
     };
     this.addWhere=function(iwhere,whereKey) {
@@ -643,7 +650,11 @@ function Database() {
 	if (group !== "") {group=" GROUP BY "+group;}
 	return group;
     };
-    this.getCols=function(keys) {
+    this.getCols=function(ikeys) {
+	var onlyUnique=function(value, index, self) { 
+	    return self.indexOf(value) === index;
+	};
+	var keys = ikeys.filter( onlyUnique );
 	var cols="";
 	var plen = keys.length;
 	for (var ii = 0; ii < plen; ii++) {
@@ -691,23 +702,42 @@ function Database() {
 	return (dd===undefined?[]:dd);
     };
     this.getDocsCnt=function(state,where,keys) {
-	var sql,dd;
-	var body="count(*) AS cnt, max(level) AS maxlev, max(rank) AS maxrank, min(level) AS minlev, max(lat) AS maxlat, min(lat) AS minlat, max(lon) AS maxlon, min(lon) AS minlon FROM alarm";
+	var sql,dd, group;
+	//console.log("Docs:",JSON.stringify(this.db.tables.alarm.data));
+	var body='count(*) AS cnt, max(level) AS maxlev, max(rank) AS maxrank, min(level) AS minlev, max(lat) AS maxlat, min(lat) AS minlat, max(lon) AS maxlon, min(lon) AS minlon FROM alarm';
 	if (keys  === undefined) {
+	    group="";
 	    sql="select "+body+where;
 	    //console.log("SQL:",sql,":",body,":",where);
 	    dd=this.query(sql);
 	    //console.log("initial count:",dd[0].cnt,JSON.stringify(dd0));
-	    //console.log("Cnt:",JSON.stringify(dd));
+	    //console.log("Cnt-A:",JSON.stringify(dd));
 	} else {
 	    var cols = this.getCols(keys);
-	    var group = this.getGroup(keys);
+	    group = this.getGroup(keys);
 	    sql="select "+cols+body+where+group;
 	    //console.log("SQL:",sql);
 	    //console.log("Body:",body,":",where,",group:",group,",keys:",JSON.stringify(keys));
 	    dd=this.query(sql);
-	    //console.log("Cnt:",JSON.stringify(dd),",keys:",JSON.stringify(keys));
+	    //console.log("Cnt-B:",JSON.stringify(dd),",keys:",JSON.stringify(keys));
+
 	}
+	//console.log("Running select...");
+	//sql="SELECT * from alarm WHERE rank= ( SELECT MAX(rank) FROM alarm "+group+")";
+	//var dd2=this.query(sql);
+	//console.log("sql:",JSON.stringify(dd2));
+	
+
+
+
+	
+	// )
+	// SELECT * FROM alarm WHERE (level,rank) IN 
+	// ( SELECT level, MAX(rank)
+	//   FROM alarm
+	//   GROUP BY level
+	// )
+
 	return (dd===undefined?[]:dd);
     };
     this.getDocs=function(state,where) {
@@ -767,7 +797,7 @@ function Database() {
 	return s;
     }
     this.sanityCheck=function(state) {
-	var sql="select count(*) AS cnt, max(level) AS lev FROM alarm";
+	var sql='select count(*) AS cnt, max(level) AS lev FROM alarm';
 	var dd0=this.query(sql);
 	var nrec= dd0[0].cnt;
 	return nrec;
