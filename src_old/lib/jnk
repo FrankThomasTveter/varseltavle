@@ -1,7 +1,0 @@
-    this.setupMapX=function(state,docs) {
-	this.makeMapArea(state,docs);
-	this.makeMapRange(state);
-	this.addUndefinedKeyCnt(state,docs); // add "undefined"
-	this.addPathKeyCntValues(state);
-	this.addMapAreaKeys(state,docs);
-    };
