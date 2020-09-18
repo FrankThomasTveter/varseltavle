@@ -330,6 +330,64 @@ function Matrix() {
 	if (this.levCnt[val][lev]  === undefined) { this.levCnt[val][lev]=0;};
 	this.levCnt[val][lev]=this.levCnt[val][lev]+1;
     };
+    this.makeValues=function(state,colval,rowval,restval) {
+	var values=[]
+	if (colval !== undefined) {values.push(colval);};
+	if (rowval !== undefined) {values.push(rowval);};
+	if (restval !== undefined) {state.Utils.cpArray(values,restval);};
+	return values;
+    }
+    this.getColval=function(state,values) {
+	if (values !== undefined && values.length > 0 ) {
+	    return values[0];
+	}
+    }
+    this.getRowval=function(state,values) {
+	if (values !== undefined && values.length > 1 ) {
+	    return values[1];
+	}
+    }
+    this.makeMatrixElement2=function(state,values,matrix) {
+	var leni=values.length;
+	var ii=0;
+	var first=false;
+	var m=matrix;
+	while (ii < leni ) {
+	    var val=values[ii];
+	    if (m[val] === undefined) {first=true;m[val]={};};
+	    m=m[val];
+	};
+	if (first) {
+	    m.values=values;
+	    m.colval=this.getColval(state,values);
+	    m.rowval=this.getRowval(state,values);
+	}
+	return m;
+    };
+    this.getMatrixElement2=function(state,values,matrix,def) {
+	var leni=values.length;
+	var ii=0;
+	var m=matrix;
+	var first=false;
+	while (ii < leni ) {
+	    var val=values[ii];
+	    if (m[val] === undefined) {
+		if (def!==undefined) {
+		    first=true;m[val]={};
+		} else {
+		    return;
+		};
+	    };
+	    m=m[val];
+	};
+	if (def!==undefined && first) {
+	    m.values=values;
+	    m.colval=this.getColval(state,values);
+	    m.rowval=this.getRowval(state,values);
+	}
+	return m;
+    };
+/////////////////////
     this.makeMatrixElement=function(state,colval,rowval,matrix) {
 	var first=false;
 	if (matrix[colval] === undefined) {first=true;matrix[colval]={};};
@@ -369,34 +427,83 @@ function Matrix() {
 	//    };
 	//};
     };
-    this.getMatrixDocs=function(matrix,skeys) {
-	var lens=skeys.length;
+    // this.getMatrixDocs=function(matrix,skeys) {
+    // 	var lens=skeys.length;
+    // 	var ret=[];
+    // 	for (var irow in matrix) {
+    // 	    if (matrix.hasOwnProperty(irow)) {
+    // 		var cols=matrix[irow];
+    // 		for (var icol in cols) {
+    // 		    if (cols.hasOwnProperty(icol)) {
+    // 			var docs=cols[icol].docs;
+    // 			console.log("Found docs:",JSON.stringify(docs));
+    // 			for (var idoc in docs) {
+    // 			    if (docs.hasOwnProperty(idoc)) {
+    // 				var doc=docs[idoc];
+    // 				var dd={};
+    // 				for (var i = 0; i < lens; i++) {
+    // 				    var key=skeys[i];
+    // 				    if (doc[key] !== undefined) {
+    // 					dd[key] = doc[key];
+    // 				    }
+    // 				}
+    // 				ret.push(dd);
+    // 			    }
+    // 			}
+    // 		    }
+    // 		}
+    // 	    }
+    // 	}
+    // 	return ret;
+    // };
+    this.getColValues2=function(matrix,icolvalues,iindex,istep) {
+	var colvalues= (icolvalues === undefined ? undefined : icolvalues.slice());
+	var index=iindex;
+	var step=istep;
+	var elements=undefined;
+	if (colvalues === undefined) { // all colvalues
+	    colvalues=Object.keys(matrix);
+	    index=0;
+	    step=colvalues.length;
+	};
 	var ret=[];
-	for (var irow in matrix) {
-	    if (matrix.hasOwnProperty(irow)) {
-		var cols=matrix[irow];
-		for (var icol in cols) {
-		    if (cols.hasOwnProperty(icol)) {
-			var docs=cols[icol].docs;
-			console.log("Found docs:",JSON.stringify(docs));
-			for (var idoc in docs) {
-			    if (docs.hasOwnProperty(idoc)) {
-				var doc=docs[idoc];
-				var dd={};
-				for (var i = 0; i < lens; i++) {
-				    var key=skeys[i];
-				    if (doc[key] !== undefined) {
-					dd[key] = doc[key];
-				    }
-				}
-				ret.push(dd);
-			    }
-			}
-		    }
-		}
+	var clen=colvalues.length;
+	if (matrix!==undefined && matrix !== null) {
+	    for (var kk=index;kk<Math.min(clen,index+step);kk++) {
+		var colval=colvalues[kk];
+		ret.push(colval);
 	    }
-	}
+	};
 	return ret;
+    };
+    this.getMatrixElements2=function(state,matrix,values,index) {
+	if (index===undefined) {index=0;}
+	var lenv=values.length;
+	if (index >= lenv) {return;};
+	var els=[];
+	var vals=values[index];
+	if (Array.isArray(vals)) {
+	    var lens=vals.length;
+	    for (var ii=0; ii< lens; ii++) {
+		var val=vals[ii]
+		var m=matrix[val];
+		if (m !== undefined) {
+		    if (index+1 === lenv) {
+			els.push(m);
+		    } else {
+			var lel=this.getMatrixElements2(state,m,values,index+1);
+			if (lel !== undefined) {els.push(lel);};
+		    };
+		};
+	    };
+	} else {
+	    var m=matrix[vals];
+	    if (m !== undefined) {
+		var lel=this.getMatrixElements2(state,m,values,index+1);
+		if (lel !== undefined) {els.push(lel);};
+	    };
+	};
+	return els;
     };
     this.getMatrixElements=function(icolvalues,irowval,matrix,iindex,istep) {
 	var colvalues= (icolvalues === undefined ? undefined : icolvalues.slice());
@@ -436,24 +543,24 @@ function Matrix() {
 	}
 	return elements;
     };
-    this.getMatrixRowElements=function(colval,rowvalues,matrix,index,step) {
-	var rlen=rowvalues.length;
-	var elements=undefined;
-	if (matrix!==undefined) {
-            for (var kk=index;kk<Math.min(rlen,index+step);kk++) {
-		var element=this.getMatrixElement(colval,rowvalues[kk],matrix);
-		if (element === undefined) {
-		} else {
-                    //console.log("getMatrixElements Found:",kk,rowvalues[kk],colval);
-                    if (elements===undefined) {elements=[];};
-                    elements.push(element);
-		}
-            };               
-	} else {
-	    console.log("No matrix available.");
-	}
-	return elements;
-    };
+    // this.getMatrixRowElements=function(colval,rowvalues,matrix,index,step) {
+    // 	var rlen=rowvalues.length;
+    // 	var elements=undefined;
+    // 	if (matrix!==undefined) {
+    //         for (var kk=index;kk<Math.min(rlen,index+step);kk++) {
+    // 		var element=this.getMatrixElement(colval,rowvalues[kk],matrix);
+    // 		if (element === undefined) {
+    // 		} else {
+    //                 //console.log("getMatrixRowElements Found:",kk,rowvalues[kk],colval);
+    //                 if (elements===undefined) {elements=[];};
+    //                 elements.push(element);
+    // 		}
+    //         };               
+    // 	} else {
+    // 	    console.log("No matrix available.");
+    // 	}
+    // 	return elements;
+    // };
     this.getDocVal=function(state,doc,key) {
 	if (key === undefined || key === null) { return null; };
 	var val = doc[key];if (val  === undefined) {val="";};return val;

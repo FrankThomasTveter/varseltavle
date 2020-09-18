@@ -183,8 +183,8 @@ function Details(props) {
     const { classes, state } = props; // classes, element
     var colkey = state.Path.getColKey(state)||"";
     var rowkey = state.Path.getRowKey(state)||"";
-    var colvalues = state.Path.filterKeys(state,state.Matrix.values[colkey]||[""]).sort(function(a, b){return a-b});;
-    var rowvalues = state.Path.filterKeys(state,state.Matrix.values[rowkey]||[""]).sort(function(a, b){return b-a});;
+    var colvalues = state.Path.getValues(state,colkey).sort(function(a, b){return a-b});;
+    var rowvalues = state.Path.getValues(state,rowkey).sort(function(a, b){return b-a});;
     var layoutMode  = state.Layout.getLayoutMode(state);
     var cellMode  = state.Layout.getCellMode(state);
     //var ncol=colvalues.length + 1;

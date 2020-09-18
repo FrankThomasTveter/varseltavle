@@ -265,8 +265,8 @@ function Details(props) {
     const { classes, state } = props; // classes, element
     var colkey = state.Path.getColKey(state)||"";
     var rowkey = state.Path.getRowKey(state)||"";
-    var colvalues = state.Path.filterKeys(state,state.Matrix.values[colkey]||[null]);
-    var rowvalues = state.Path.filterKeys(state,state.Matrix.values[rowkey]||[null]);
+    var colvalues = state.Path.getValues(state,colkey,[null]);
+    var rowvalues = state.Path.getValues(state,rowkey,[null]);
     var cellMode  = state.Layout.getCellMode(state);
     //var ncol=colvalues.length + 1;
     //var nrow=rowvalues.length + 1;

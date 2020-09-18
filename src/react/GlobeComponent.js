@@ -144,8 +144,8 @@ class EarthMap extends Component {
 	    state.Matrix.printElements(matrix);
 	    var colkey = state.Path.getColKey(state)||"";
 	    var rowkey = state.Path.getRowKey(state)||"";
-	    var colvalues = state.Path.filterKeys(state,state.Matrix.values[colkey]||[""]);
-	    var rowvalues = state.Path.filterKeys(state,state.Matrix.values[rowkey]||[""]);
+	    var colvalues = state.Path.getValues(state,colkey);
+	    var rowvalues = state.Path.getValues(state,rowkey);
 	    //console.log("Matrix:",colkey,JSON.stringify(matrix));
 	    //console.log("Colvalues:",colkey,JSON.stringify(colvalues));
 	    //console.log("Rowvalues:",rowkey,JSON.stringify(rowvalues));

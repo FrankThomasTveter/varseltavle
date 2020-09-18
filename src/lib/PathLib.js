@@ -1007,31 +1007,51 @@ function Path() {
     this.getSecondKey=function(state) {
 	return this.other.table[1];
     };
+    this.getColIndex=function(state) { // only called for table or list...
+	var pri=state.Layout.getPriorityIndex(state,this.other.table);
+	if (pri[this.other.table[0]] < pri[this.other.table[1]]) {
+	    return 1;
+	} else {
+	    return 0;
+	}
+    };
+    this.getRowIndex=function(state) { // only called for table or list...
+	var pri=state.Layout.getPriorityIndex(state,this.other.table);
+	if (pri[this.other.table[0]] < pri[this.other.table[1]]) {
+	    return 0;
+	} else {
+	    return 1;
+	}
+    };
+    this.getValues=function(state,key,def) {
+	if (def===undefined) {def=[""];}
+	return this.filterKeys(state,state.Matrix.values[key]||def);
+    };
     this.getColKey=function(state) {
-	var arr=state.Utils.cp(this.other.table);
-	var pri=state.Layout.getPriorityIndex(state,arr);
 	var mode=state.Layout.getLayoutMode(state);
 	if (mode !== state.Layout.modes.layout.Table &&
 	    mode !== state.Layout.modes.layout.List) { // Map or Custom
 	    return "_lon";
-	} else if (pri[this.other.table[0]] < pri[this.other.table[1]]) {
-	    return this.other.table[1];
 	} else {
-	    return this.other.table[0];
+	    return this.other.table[this.getColIndex(state)];
 	}
     };
     this.getRowKey=function(state) {
-	var arr=state.Utils.cp(this.other.table);
-	var pri=state.Layout.getPriorityIndex(state,arr);
 	var mode=state.Layout.getLayoutMode(state);
 	if (mode !== state.Layout.modes.layout.Table &&
 	    mode !== state.Layout.modes.layout.List) { // Map or Custom
 	    return "_lat";
-	} else if (pri[this.other.table[0]] < pri[this.other.table[1]]) {
-	    return this.other.table[0];
 	} else {
-	    return this.other.table[1];
+	    return this.other.table[this.getRowIndex(state)];
 	}
+    };
+    this.getRestKeys=function(state) {
+	var keys=[];
+	var leni=Math.min(this.tkeys-2,this.other.rest.length);
+	for (var ii=0;ii<leni;ii++) {
+	    keys.push(this.other.rest[ii]);
+	}
+	return keys;
     };
     this.pushKey=function(state,typ,key,ind) {
 	if (key !== undefined && key !== "") {
