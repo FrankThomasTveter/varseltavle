@@ -4,8 +4,8 @@ import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import createTheme from '../mui/createTheme'
 import {black_palette, teal_palette} from '../mui/metMuiThemes'
 import PropTypes from "prop-types";
-import Header   from    "./Header";
-import Footer   from    "./Footer";
+import Header   from    "./HeaderComponent";
+import Footer   from    "./FooterComponent";
 import BackGroundImage from "../images/waves.png";
 //import {BrowserRouter, Switch, Route} from 'react-router-dom';
 
@@ -23,6 +23,7 @@ import Path from '../lib/PathLib';
 import Auto from '../lib/AutoLib';
 import Show from '../lib/ShowLib';
 import Svg from '../lib/SvgLib';
+import Cell from '../lib/CellLib';
 import Threshold from '../lib/ThresholdLib';
 import Settings from '../lib/SettingsLib';
 import Utils from '../lib/UtilsLib';
@@ -33,9 +34,30 @@ import { SnackbarProvider, withSnackbar } from 'notistack';
 //        flex: '1 0 auto',
 //
 
-const footheight="30px";
+const footheight="70px";
 const headerheight="70px";
-const footAndHeaderheight = "100px";
+
+const layout = {
+    header:{
+	width:'100%',
+	height:'calc(2% + '+headerheight+')',
+    },
+    dataset:{
+	width:'92%',
+	height:'calc(100% - '+headerheight+' - '+footheight+' - 5px)',
+	content:{
+	    width:'calc(98% - 5px)',
+	    height:'98%',
+	}
+    },
+    footer:{
+	width:'100%',
+	banner: {
+	    width:'100%',
+	    height:'calc('+footheight+' - 20px)',
+	}
+    }
+};
 
 const styles = theme => ({
     root: {
@@ -49,42 +71,41 @@ const styles = theme => ({
         display: 'flex',
         flexDirection: 'column',
         backgroundImage: `url(${BackGroundImage})`,
- 	border:  '1px solid green',
+ 	//border:  '1px solid green',
     },
     header: {
 	backgroundColor:teal_palette.main,
 	position:'fixed',
-	height: 'calc('+headerheight+' + 2%)',
+	height:layout.header.height, //'calc(2% + '+headerheight+')',
+	width: layout.header.width,//'100%',
 	maxHeight: headerheight,
-	width: '100%',
 	paddingRight:'5px',
-//	border:  '1px solid green',
     },
     dataset: {
 	position:'fixed',
 	marginLeft:'5%',
 	top: '75px',
 	bottom: '30px',
-	height: 'calc(95% - '+footAndHeaderheight+')',
-//	padding: '10px',
-	width: '92%',
-//	border:  '1px solid green',
+	height: layout.dataset.height,//'calc(100% - '+headerheight+' - '+footheight+' - 5px)',
+	width: layout.dataset.width, //'92%',
         overflowY: 'auto',
 	maxHeight: '100%',
 	maxWidth: '99%',
+	//border:  '1px solid red',	
+
     },
     content: {
-	border:  '10px solid red',
-///	height: '100%',
-	width: 'calc(98% - 5px)',
+	//border:  '1px solid red',
+	height: layout.dataset.content.height,//'98%',
+	width: layout.dataset.content.width,//'calc(98% - 5px)',
     },
     footer: {
-	backgroundColor:teal_palette.main,
 	position:'fixed',
-	height: 'calc('+footheight+' + 3%)',
-	width: '100%',
+	width: layout.footer.width,//'100%',
+	bannerheight:layout.footer.banner.height,//'calc('+footheight+' - 20px)',
 	left:0,
 	bottom:0,
+	//border:  '1px solid green',	
     },
     button: {
 	backgroundColor:black_palette.main,
@@ -100,8 +121,7 @@ const styles = theme => ({
     buttonDisabled: {},
 });
 
-//        backgroundColor: theme.palette.primary.main,
-//        color: '#FFF',
+//	border:  '1px solid green',
 
 /**
  * The entire app get generated from this container.
@@ -125,6 +145,7 @@ class App extends Component {
 	    File:      new File()      ,
 	    Database:  new Database()  ,
 	    Svg:       new Svg()       ,
+	    Cell:      new Cell()       ,
 	    Threshold: new Threshold() ,
 	    Custom:    new Custom()    ,
 	    Grid:      new Grid()      ,
@@ -160,6 +181,7 @@ class App extends Component {
 				  [state.Default.processDefault,
 				   state.Default.makeStart,
 				   state.Database.init,
+				   state.Default.checkState,
 				   state.Database.updateLoop]
 				 );
     };
@@ -179,45 +201,22 @@ class App extends Component {
     render() {
         const { classes } = this.props;
 	const state       = this.state;
+	var hcls={header:classes.header};
+	var dcls={dataset:classes.dataset,content:classes.content,button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled};
+	var fcls={footer:classes.footer};
         return (<div className={classes.root}>
                   <MuiThemeProvider theme={createTheme(teal_palette, black_palette)}>
-                            <Header  state={state} classes={{header:classes.header}}/>
-                <Dataset state={state} classes={{dataset:classes.dataset,content:classes.content,button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled}}/>
-                            <Footer  state={state} classes={{footer:classes.footer}}/>
+                            <Header  state={state} classes={hcls}/>
+                            <Dataset state={state} classes={dcls}
+		                                   layout={layout}/>
+                            <Footer  state={state} classes={fcls}/>
                         </MuiThemeProvider>
                 </div>
         );
     }
 }
 
-
-// messes up the tables...
-
-
-
-//		<Switch>
-//                   <Route exact={true} path={this.path[1]} render={() => (
-//             <BrowserRouter  className={classes.root}>
-//                    )}/>
-//                   <Route exact={true} path={this.path[2]} render={() => (
-//                        <MuiThemeProvider theme={createTheme(teal_palette, black_palette)}>
-//                            <Header  state={state} classes={{header:classes.header}}/>
-//                            <Dataset state={state} classes={{dataset:classes.dataset,content:classes.content}}/>
-//                            <Footer  state={state} classes={{footer:classes.footer}}/>
-//                        </MuiThemeProvider>
-//                    )}/>
-//		</Switch>
-//            </BrowserRouter>
-
-//                            <div className={classes.content}>
-//                            </div>
-
-
-//           <SnackbarProvider maxSnack={3}>
-//          </SnackbarProvider>
-
 App.propTypes = {
-//    classes: PropTypes.object.isRequired,
     enqueueSnackbar: PropTypes.func.isRequired,
 };
 
@@ -227,7 +226,7 @@ const MyApp = withStyles(styles)(withSnackbar( App));
 
 function IntegrationNotistack() {
   return (
-    <SnackbarProvider maxSnack={3}>
+    <SnackbarProvider maxSnack={3} anchorOrigin={{vertical: 'bottom',horizontal: 'right',}}>
       <MyApp />
     </SnackbarProvider>
   );

@@ -45,25 +45,49 @@ function Utils() {
 	var unique = arr.filter( onlyUnique ); // returns ['a', 1, 2, '1']
 	return unique;
     };
+    this.equal=function(o1,o2) {
+	return JSON.stringify(o1)===JSON.stringify(o2);
+    };
+    this.smear=function(setup,newsetup) { // both must be object
+	//console.log("Processing:",JSON.stringify(newsetup))
+	if (typeof newsetup === 'object' && newsetup !== null) {
+	    for (var ss in newsetup) {
+		var v=newsetup[ss];
+		if (v===undefined) {
+		    //do nothing
+		} else if (typeof v === 'object' && ! Array.isArray(v) && v !== null) {
+		    if (setup[ss] === undefined) {setup[ss]={};}
+		    //console.log("Sub-process:",ss);
+		    this.smear(setup[ss],v)
+		} else {
+		    setup[ss]=v;
+		}
+	    }
+	} else {
+	    console.log("Invalid setup...");
+	}
+    };
     this.init=function(par,setup){
 	var url=this.getUrlVars();
 	if (par in url) {
+	    if (par==="Path") {
+		console.log("Path start:", JSON.stringify(setup.select));
+	    }
 	    //console.log(par,url);
-	    var code=decodeURIComponent(url[par]);
-	    //console.log("Processing url:",par,code);
+	    var code;
 	    try {
+		code=decodeURIComponent(url[par]);
+		//console.log("Processing url:",par,JSON.stringify(newsetup));
 		var newsetup=JSON.parse(code);
-		for (var ss in newsetup) {
-		    if (newsetup[ss] !== undefined) {
-			setup[ss]=newsetup[ss];
-		    }
-		}
-	    } catch (e) {
+		this.smear(setup,newsetup);
+	    } catch (e) { // is a value, not json
 		setup[par]=url[par];
 	    }
-	    //console.log("new setup:",JSON.stringify(setup));
+	    if (par==="Path") {
+		console.log("Path after:", JSON.stringify(setup.select));
+	    }
 	} else {
-	    //console.log("No '"+par+"' in URL.",JSON.stringify(url));
+	    console.log("No '"+par+"' in URL.",JSON.stringify(Object.keys(url||{})));
 	}
 
     };
@@ -71,8 +95,11 @@ function Utils() {
 	if (max === undefined) {max=0;};
 	//console.log("Arr:",JSON.stringify(arr),max);
 	for (var ii=max;ii<arr.length;ii++) {
-	    if (arr[ii]===null || arr[ii]==="") {
+	    if (arr[ii]===undefined || arr[ii]===null || arr[ii]==="") {
+		//console.log("Removing:",arr[ii]);
 		arr.splice(ii, 1);
+	    } else {
+		//console.log("Keeping:",arr[ii]);
 	    }
 	}
 	return arr;
@@ -85,11 +112,22 @@ function Utils() {
 	    this.spliceArray(arr,itrg,0,csrc);
 	}
     };
-    this.cpArray=function(sarr,tarr) {
-	if (tarr !== undefined) {
-	    var lent=tarr.length;
-	    for (var ii=0;ii<lent;ii++) {
-		var ind=sarr.indexOf(tarr[ii]);
+    this.cpArray=function(sarr,tarr,iarr) {
+	var lent,ind,indx,ii;
+	if (tarr !== undefined && iarr !== undefined) {
+	    lent=tarr.length;
+	    for (ii=0;ii<lent;ii++) {
+		ind=sarr.indexOf(tarr[ii]);
+		indx=iarr.indexOf(tarr[ii]);
+		//console.log("Debug:",JSON.stringify(tarr),JSON.stringify(iarr));
+		if (ind===-1 && indx === -1) {
+		    sarr.push(tarr[ii]);
+		}
+	    }
+	} else if (tarr !== undefined) {
+	    lent=tarr.length;
+	    for (ii=0;ii<lent;ii++) {
+		ind=sarr.indexOf(tarr[ii]);
 		if (ind===-1) {
 		    sarr.push(tarr[ii]);
 		}
@@ -200,7 +238,7 @@ function Utils() {
 	return temp;
     }.bind(this);
     this.getStatusString=function(state) {
-	return this.numberWithCommas(state.Database.cnt)+ " in database, "
+	return this.numberWithCommas(state.Database.dbcnt)+ " in database, "
 	    + this.numberWithCommas(state.Matrix.cnt)+" in table"
 	    + " ["+state.Database.loaded + "]";
     };
@@ -235,18 +273,22 @@ function Utils() {
 	for (var ee=0;ee<elen;ee++) {   // loop over elements
 	    var el=elements[ee];
 	    var docs=el.docs;
-	    var dlen=docs.length;
-	    if (val==="") {
-		cnt=cnt+dlen;
+	    if (docs === undefined) {
+		console.log("Corrupt element:",JSON.stringify(el));
 	    } else {
-		for (var jj=0;jj<dlen;jj++) {   // loop over segments in each element
-		    var d=docs[jj];
-		    var thr=d._thr;
-		    //console.log("cntDocs:",key,d[key],val,dlen);
-		    if (d[key]===val) {
-			if (thr.val !== undefined) {
-			    cnt=cnt+1;
-			};
+		var dlen=docs.length;
+		if (val==="") {
+		    cnt=cnt+dlen;
+		} else {
+		    for (var jj=0;jj<dlen;jj++) {   // loop over segments in each element
+			var d=docs[jj];
+			var thr=d._thr;
+			//console.log("cntDocs:",key,d[key],val,dlen);
+			if (d[key]===val) {
+			    if (thr.val !== undefined) {
+				cnt=cnt+1;
+			    };
+			}
 		    }
 		}
 	    }
@@ -262,87 +304,97 @@ function Utils() {
 	//console.log( page );
 	var url=page+"?setup="+state.Default.setup+"&";
 	//console.log("Actual Keys:",JSON.stringify(state.Path.keys));
-	var urlDatabase=undefined;
-	if (state.Default.hasChanged(state,["Database","data"]) && state.Database.data!==undefined) {
-	    if (urlDatabase ===undefined) {urlDatabase={};}
-	    urlDatabase.data=this.cp(state.Database.data);
+	var uri=state.Default.pushUrl(state)
+	for (var key of Object.keys(uri)) {
+	    var val=uri[key];
+	    //console.log("KV:",key,val);
+	    if (val !== undefined) {
+		var str=encodeURI(JSON.stringify(val)+"&");
+		url=url + key + "=" + str;
+	    }
 	};
-	var urlColors=undefined;
-	if (state.Default.hasChanged(state,["Colors","colors"])) {
-	    if (urlColors ===undefined) {urlColors={};}
-	    urlColors.colors=this.cp(state.Colors.colors);
-	};
-	var urlPath=undefined;
-	if (state.Default.hasChanged(state,["Path","keys"])) {
-	    if (urlPath ===undefined) {urlPath={};}
-	    urlPath.keys=this.cp(state.Path.keys);
-	};
-	if (state.Default.hasChanged(state,["Path","select"])) {
-	    if (urlPath ===undefined) {urlPath={};}
-	    urlPath.select=this.cp(state.Path.select);
-	};
-	if (state.Default.hasChanged(state,["Path","tkeys"])) {
-	    if (urlPath ===undefined) {urlPath={};}
-	    urlPath.tkeys=state.Path.tkeys;
-	};
-	if (state.Default.hasChanged(state,["Path","home"])) {
-	    if (urlPath ===undefined) {urlPath={};}
-	    urlPath.home=this.cp(state.Path.home);
-	};
-	if (state.Default.hasChanged(state,["Path","tooltip"])) {
-	    if (urlPath ===undefined) {urlPath={};}
-	    urlPath.tooltip=this.cp(state.Path.tooltip);
-	};
-	if (state.Default.hasChanged(state,["Path","list"])) {
-	    if (urlPath ===undefined) {urlPath={};}
-	    urlPath.list=this.cp(state.Path.list);
-	};
-	if (state.Default.hasChanged(state,["Path","focus"])) {
-	    if (urlPath ===undefined) {urlPath={};}
-	    urlPath.focus=this.cp(state.Path.focus);
-	};
-	if (state.Default.hasChanged(state,["Path","order"])) {
-	    if (urlPath ===undefined) {urlPath={};}
-	    urlPath.order=this.cp(state.Path.order);
-	};
-	if (state.Default.hasChanged(state,["Path","film"])) {
-	    if (urlPath ===undefined) {urlPath={};}
-	    urlPath.film=this.cp(state.Path.film);
-	    //console.log("Film:",JSON.stringify(urlPath.film));
-	};
-	//console.log("URL Keys:",JSON.stringify(urlPath.keys));
-	var urlLayout=undefined;
-	if (state.Default.hasChanged(state,["Layout","priority"])) {
-	    if (urlLayout ===undefined) {urlLayout={};}
-	    urlLayout.priority=state.Layout.getPriority(state);
-	};
-	if (state.Default.hasChanged(state,["Layout","state"])) {
-	    if (urlLayout ===undefined) {urlLayout={};}
-	    urlLayout.state=this.cp(state.Layout.state);
-	};
-	var urlSettings=undefined;
-	if (state.Default.hasChanged(state,["Settings","visible"])) {
-	    if (urlSettings ===undefined) {urlSettings={};}
-	    urlSettings.visible=this.cp(state.Settings.visible);
-	};
-	if (urlDatabase !== undefined) {
-	    url=url + "Database=" + encodeURI(JSON.stringify(urlDatabase)+"&");
-	};
-	if (urlPath !== undefined) {
-	    url=url + "Path=" + encodeURI(JSON.stringify(urlPath)+"&");
-	};
-	if (urlColors !== undefined) {
-	    url=url + "Colors=" + encodeURI(JSON.stringify(urlColors)+"&");
-	};
-	if (urlLayout !== undefined) {
-	    url=url + "Layout=" + encodeURI(JSON.stringify(urlLayout)+"&");
-	};
-	if (urlSettings !== undefined) {
-	    url=url + "Settings=" + encodeURI(JSON.stringify(urlSettings)+"&");
-	};
-	//console.log("Setting URL to (",url.length,"):",url);
+	//console.log("Setting URL to: (",url.length,"):",decodeURI(url));
+	//console.log("New URL: (",url.length,"):",this.prettyJson(uri));
 	window.history.replaceState("", "js", url);
-    }.bind(this);
+    };
+	// var urlDatabase=undefined;
+	// if (state.Default.hasChanged(state,["Database","data"]) && state.Database.data!==undefined) {
+	//     if (urlDatabase ===undefined) {urlDatabase={};}
+	//     urlDatabase.data=this.cp(state.Database.data);
+	// };
+	// var urlColors=undefined;
+	// if (state.Default.hasChanged(state,["Colors","colors"]) && false) {
+	//     if (urlColors ===undefined) {urlColors={};}
+	//     urlColors.colors=this.cp(state.Colors.colors);
+	// };
+	// var urlPath=undefined;
+	// if (state.Default.hasChanged(state,["Path","keys"]) && false) {
+	//     if (urlPath ===undefined) {urlPath={};}
+	//     urlPath.keys=this.cp(state.Path.keys);
+	// };
+	// if (state.Default.hasChanged(state,["Path","select"]) && false) {
+	//     if (urlPath ===undefined) {urlPath={};}
+	//     urlPath.select=this.cp(state.Path.select);
+	// };
+	// if (state.Default.hasChanged(state,["Path","tkeys"]) && false) {
+	//     if (urlPath ===undefined) {urlPath={};}
+	//     urlPath.ntarget=state.Path.table.ntarget;
+	// };
+	// if (state.Default.hasChanged(state,["Path","home"]) && false) {
+	//     if (urlPath ===undefined) {urlPath={};}
+	//     urlPath.home=this.cp(state.Path.home);
+	// };
+	// if (state.Default.hasChanged(state,["Path","tooltip"]) && false) {
+	//     if (urlPath ===undefined) {urlPath={};}
+	//     urlPath.tooltip=this.cp(state.Path.tooltip);
+	// };
+	// if (state.Default.hasChanged(state,["Path","list"]) && false) {
+	//     if (urlPath ===undefined) {urlPath={};}
+	//     urlPath.list=this.cp(state.Path.list);
+	// };
+	// if (state.Default.hasChanged(state,["Path","focus"]) && false) {
+	//     if (urlPath ===undefined) {urlPath={};}
+	//     urlPath.focus=this.cp(state.Path.focus);
+	// };
+	// if (state.Default.hasChanged(state,["Path","order"]) && false) {
+	//     if (urlPath ===undefined) {urlPath={};}
+	//     urlPath.order=this.cp(state.Path.order);
+	// };
+	// if (state.Default.hasChanged(state,["Path","film"]) && false) {
+	//     if (urlPath ===undefined) {urlPath={};}
+	//     urlPath.film=this.cp(state.Path.film);
+	//     //console.log("Film:",JSON.stringify(urlPath.film));
+	// };
+	// //console.log("URL Keys:",JSON.stringify(urlPath.keys));
+	// var urlLayout=undefined;
+	// if (state.Default.hasChanged(state,["Layout","priority"]) && false) {
+	//     if (urlLayout ===undefined) {urlLayout={};}
+	//     urlLayout.priority=state.Layout.getPriority(state);
+	// };
+	// if (state.Default.hasChanged(state,["Layout","state"]) && false) {
+	//     if (urlLayout ===undefined) {urlLayout={};}
+	//     urlLayout.state=this.cp(state.Layout.state);
+	// };
+	// var urlSettings=undefined;
+	// if (state.Default.hasChanged(state,["Settings","visible"])) {
+	//     if (urlSettings ===undefined) {urlSettings={};}
+	//     urlSettings.visible=this.cp(state.Settings.visible);
+	// };
+	// if (urlDatabase !== undefined) {
+	//     url=url + "Database=" + encodeURI(JSON.stringify(urlDatabase)+"&");
+	// };
+	// if (urlPath !== undefined) {
+	//     url=url + "Path=" + encodeURI(JSON.stringify(urlPath)+"&");
+	// };
+	// if (urlColors !== undefined) {
+	//     url=url + "Colors=" + encodeURI(JSON.stringify(urlColors)+"&");
+	// };
+	// if (urlLayout !== undefined) {
+	//     url=url + "Layout=" + encodeURI(JSON.stringify(urlLayout)+"&");
+	// };
+	// if (urlSettings !== undefined) {
+	//     url=url + "Settings=" + encodeURI(JSON.stringify(urlSettings)+"&");
+	// };
     this.getUrlVars=function(state) {
 	var vars = {};
 	window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
@@ -472,157 +524,30 @@ function Utils() {
 	    return 0;
 	}
     }
-    this.getItem=function(state,s,src) {
-	var ss=src;
-	var ll=s.length;
-	for (var ii=0;ii<ll;ii++) {
-	    if (ss===undefined) { return ss};
-	    ss=ss[s[ii]];
-	}
-	return ss;
-    }
-    this.setForce=function(state,t,trg,ss) {
-	var ll=t.length;
-	if (trg===undefined) { 
-	    return;
-	} else if (ll===0) {
-	    trg=ss;
-	    return trg;
-	} else {
-	    var tt=trg;
-	    for (var ii=0;ii<ll-1;ii++) {
-		if (tt[t[ii]]===undefined) { tt[t[ii]]={} };
-		tt=tt[t[ii]];
-	    }
-	    tt[t[ll-1]]=state.Utils.cp(ss)
-	    //console.log("Force copied:",JSON.stringify(t),JSON.stringify(tt[t[ll-1]]));
-	    return tt[t[ll-1]];
-	}
-    }
-    this.setFill=function(state,t,trg,ss) {
-	var ll=t.length;
-	if (trg===undefined) { 
-	    return;
-	} else if (ll===0) {
-	    trg=ss;
-	    return trg;
-	} else {
-	    //console.log("Trg:",JSON.stringify(t),":",JSON.stringify(trg),":",JSON.stringify(ss));
-	    var tt=trg;
-	    for (var ii=0;ii<ll-1;ii++) {
-		if (tt[t[ii]]===undefined) { tt[t[ii]]={} };
-		tt=tt[t[ii]];
-	    }
-	    if (this.isEmpty(state,tt[t[ll-1]])) {
-		tt[t[ll-1]]=state.Utils.cp(ss);
-	    }
-	    return tt[t[ll-1]];
-	}
-    }
-    this.cpForce=function(state,t,s,trg,src) {
-	var ss=this.getItem(state,s,src);
-	this.setForce(state,t,trg,ss);
-    }
-    this.cpFill=function(state,t,s,trg,src) {
-	var ss=this.getItem(state,s,src);
-	//console.log("Filling:",s,'->',t,! this.isEmpty(state,ss),JSON.stringify());
-	//if (! this.isEmpty(state,ss) ) {
-        if (ss !== undefined) {
-	    this.setFill(state,t,trg,ss);
-	}
-    };
-    // map src onto target always
-    this.copyForce=function(state,src,trg,map) {
-	if (src===undefined) {
-	    console.log("ERROR: MapForce with no src.");
-	} else if (trg===undefined) {
-	    console.log("ERROR: MapForce with no trg.");
-	} else if (map===undefined) {
-	    console.log("ERROR: MapForce with no map.");
-	} else {
-	    var len=map.length
-	    for (var ii=0;ii<len;ii++){
-		var t=map[ii][0];
-		var s=map[ii][1];
-		this.cpForce(state,t,s,trg,src)
-	    }
-	}
-    };
-    // map src onto target if target is empty and src is not
-    this.copyFill=function(state,src,trg,map) {
-	if (src===undefined) {
-	    console.log("ERROR: MapFill with no src.");
-	} else if (trg===undefined) {
-	    console.log("ERROR: MapFill with no trg.");
-	} else if (map===undefined) {
-	    console.log("ERROR: MapFill with no map.");
-	} else {
-	    var len=map.length
-	    for (var ii=0;ii<len;ii++){
-		var t=map[ii][0];
-		var s=map[ii][1];
-		this.cpFill(state,t,s,trg,src)
-	    }
-	}
-    };
-    this.invert=function(map) {
-	var ret=[];
-	var len=map.length;
-	for (var ii=0;ii<len;ii++){
-	    var t=map[ii][0];
-	    var s=map[ii][1];
-	    ret.push([s,t]);
-	}
-	return ret;
-    }
-    this.isEmpty=function(state,obj) { // check if obj has any string/number children
-	var ret=true;
-	var k;
-	if (obj===undefined) {
-	    ret=true;
-	} else {
-	    var typ=typeof obj;
-	    if (typ === "Array") { // check array children
-		for (k in obj) {
-		    if (! state.Utils.isEmpty(state,obj[k])) {
-			ret=false;
-			//console.log("    =",typ,ret,k,JSON.stringify(obj[k]));
-			break;
-		    }
-		}
-	    } else if (typ === "object") { // check hash children
-		for (k in obj) {
-		    if (obj.hasOwnProperty(k)) {
-			if (! state.Utils.isEmpty(state,obj[k])) { 
-			    ret=false;
-			    //console.log("    =",typ,ret,k,JSON.stringify(obj[k]));
-			    break;
-			}
-		    }
-		}
-	    } else {
-		ret=false;
-	    }
-	}
-	//console.log("Type:",ret,JSON.stringify(obj));
-	return ret;
-    };
-    this.prettyJson=function(obj) {
+    this.prettyJson=function(obj,key) {
 	var f=function(k,v){
-	    if (Array.isArray(v)) {
+	    if (Array.isArray(v) && (key ===undefined || k !== key)) {
 		return JSON.stringify(v);
+	    } else if (typeof v === "string") {
+		var s=v.replace(/"/g,'@"');
+		return s;
+	    } else {
+		return v;
 	    };
-	    return v;
 	};
 	var json=JSON.stringify(obj,f,"  ");
 	json=json.replace(/"\[/g,'[');
 	json=json.replace(/\]"/g,']');
 	json=json.replace(/\\"/g,'"');
+	json=json.replace(/@"/g,'\\"');
 	//console.log("Replaced:",json);
+	//console.log("Original:",JSON.stringify(obj));
 	return json;
     };
     this.save=function(data, filename, type) {
-	console.log("Saving file:",filename);
+	//console.log("Saving data:",data);
+	//console.log("Saving file:",filename);
+	//return;
 	var file = new Blob([data], {type: type});
 	if (window.navigator.msSaveOrOpenBlob) // IE10+
             window.navigator.msSaveOrOpenBlob(file, filename);

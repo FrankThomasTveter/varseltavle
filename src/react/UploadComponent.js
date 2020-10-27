@@ -16,7 +16,9 @@ class Load extends Component {
 	    const content = fileReader.result;
 	    state.Default.resetSetup(state,content);
 	}
-	const handleFileChosen = (file) => {
+	const handleFileChosen = (target) => {
+	    let file=target.files[0];
+	    state.Html.broadcast(state,"User uploaded "+file.name);
 	    fileReader = new FileReader();
 	    fileReader.onloadend = handleFileRead;
 	    fileReader.readAsText(file);
@@ -25,7 +27,7 @@ class Load extends Component {
 	return (
 		<div className={classes.load}>
    	  	   <input type='file' id='file'
-	              onChange={e=>handleFileChosen(e.target.files[0])}/>
+	              onChange={e=>handleFileChosen(e.target)}/>
 		</div>
 	);
     }

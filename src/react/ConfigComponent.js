@@ -3,22 +3,23 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import {black_palette} from '../mui/metMuiThemes';  // teal_palette
 
-import Undo         from './UndoComponent';
-import Redo         from './RedoComponent';
-import Mode         from './ModeComponent';
-import View         from './ViewComponent';
-import Key          from './KeyCollectMenuComponent';
-import Reload       from './ReloadComponent';
-import Tooltip      from './TooltipComponent';
-import Order        from './OrderMenuComponent';
-import Home         from './HomeMenuComponent';
-import Film         from './FilmMenuComponent';
-import File         from './FileMenuComponent';
-import Archive      from './ArchiveMenuComponent';
-import Font         from './FontComponent';
-import Focus        from './FocusComponent';
-import FullScreen   from './FullScreenComponent';
-import About        from './AboutComponent';
+import Undo         from './ConfigUndoComponent';
+import Redo         from './ConfigRedoComponent';
+import Mode         from './ConfigModeComponent';
+import View         from './ConfigViewPathComponent';
+import Collect      from './ConfigCollectComponent';
+import Reload       from './ConfigReloadComponent';
+import Tooltip      from './ConfigTooltipComponent';
+import Order        from './ConfigOrderComponent';
+import Home         from './ConfigHomeComponent';
+import Film         from './ConfigFilmComponent';
+import File         from './ConfigFileComponent';
+import Archive      from './ConfigArchiveComponent';
+import Font         from './ConfigFontComponent';
+import Dims         from './ConfigDimComponent';
+import Focus        from './ConfigFocusComponent';
+import FullScreen   from './ConfigFullScreenComponent';
+import About        from './ConfigAboutComponent';
 
 import Settings from './SettingsComponent';
 
@@ -53,24 +54,26 @@ class Config extends Component {
     render() {
         const { classes, state } = this.props;
 	//console.log("Rendering Config...");
+	var cls={button:classes.button};
 	return (<div className={classes.horisontal}>
 		<Undo state={state} classes={classes} visible={false}/>
                 <Redo state={state} classes={classes} visible={false}/>
-		<Mode state={state} classes={{button:classes.button}} visible={false}/>
-		<View state={state} classes={{button:classes.button}} visible={false}/>
-		<Key state={state} classes={{button:classes.button}} visible={false}/>
-		<Reload state={state} classes={{button:classes.button}} visible={false}/>
-		<Tooltip state={state} classes={{button:classes.button}} visible={false}/>
-		<Order state={state} classes={{button:classes.button}} visible={false}/>
-		<Home state={state} classes={{button:classes.button}} visible={false}/>
-		<Film state={state} classes={{button:classes.button}} visible={false}/>
-		<File state={state} classes={{button:classes.button}} visible={false}/>
-		<Archive state={state} classes={{button:classes.button}} visible={false}/>
-		<Font state={state} classes={{button:classes.button}} visible={false}/>
-		<Focus state={state} classes={{button:classes.button}} visible={false}/>
-		<FullScreen state={state} classes={{button:classes.button}} visible={false}/>
-		<About state={state} classes={{button:classes.button}} visible={false}/>
-                <Settings state={state} classes={{button:classes.button}} visible={false}/>
+		<Mode state={state} classes={cls} visible={false}/>
+		<View state={state} classes={cls} visible={false}/>
+		<Collect state={state} classes={cls} visible={false}/>
+		<Reload state={state} classes={cls} visible={false}/>
+		<Tooltip state={state} classes={cls} visible={false}/>
+		<Order state={state} classes={cls} visible={false}/>
+		<Home state={state} classes={cls} visible={false}/>
+		<Film state={state} classes={cls} visible={false}/>
+		<File state={state} classes={cls} visible={false}/>
+		<Archive state={state} classes={cls} visible={false}/>
+		<Font state={state} classes={cls} visible={false}/>
+		<Dims state={state} classes={cls} visible={false}/>
+		<Focus state={state} classes={cls} visible={false}/>
+		<FullScreen state={state} classes={cls} visible={false}/>
+		<About state={state} classes={cls} visible={false}/>
+                <Settings state={state} classes={cls} visible={false}/>
 		</div>);
     }
 }

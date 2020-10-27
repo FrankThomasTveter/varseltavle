@@ -11,6 +11,7 @@ import OtherEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import TrashFullIcon from '@material-ui/icons/Delete';
 import TrashEmptyIcon from '@material-ui/icons/DeleteOutline';
 import TrashIgnoreIcon from '@material-ui/icons/DeleteForever';
+import {teal_palette} from '../mui/metMuiThemes';
 
 const styles = theme => ({
     key: {
@@ -20,55 +21,118 @@ const styles = theme => ({
     selectchip: {
         margin: theme.spacing(0),
 	cursor: "pointer",
-        color:"red",
+        color:"black",
         borderColor:"blue",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
     tablechip: {
         margin: theme.spacing(0),
 	cursor: "pointer",
-        color:"green",
+        color:"black",
         borderColor:"blue",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
     restchip: {
         margin: theme.spacing(0),
 	cursor: "pointer",
         color:"blue",
         borderColor:"blue",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
     otherfullchip: {
         margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
     otheremptychip: {
         margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
     trashfullchip: {
         margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
     trashemptychip: {
         margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
     trashignorechip: {
         margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
     othchip: {
         margin: theme.spacing(0),
         color:"red",
         borderColor:"red",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
 });
 function getChipClass(classes,keytype,keyactive) {

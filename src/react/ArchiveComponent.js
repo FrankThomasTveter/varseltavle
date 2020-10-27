@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 import SelIcon from '@material-ui/icons/Done';
+import {teal_palette} from '../mui/metMuiThemes';
 
 const styles = theme => ({
     key: {
@@ -14,12 +15,26 @@ const styles = theme => ({
 	cursor: "pointer",
         color:"red",
         borderColor:"green",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
     restchip: {
         margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
 });
 function getChipClass(classes,active) {

@@ -4,13 +4,11 @@ import { withStyles } from '@material-ui/core/styles';
 
 import ReactGlobe from '../globe/ReactGlobe';
 
-import Tooltip from './Tooltip'
-import MapInfo from './MapInfo'
+import Tooltip from './TooltipDataComponent'
+import MapInfo from './MapInfoComponent'
 import markerRenderer from './markerRenderer';
 
 import './styles.css';
-
-const footAndHeaderheight = "100px";
 
 const styles = theme => ({
     root: {
@@ -19,6 +17,7 @@ const styles = theme => ({
 	margin:0,
 	border: '0px solid red'
     },
+    content: {},
     dataset: {},
     map: {
 	overflow: 'hidden',
@@ -43,7 +42,10 @@ function MapGlobe(props) {
 	if (state.Layout.state.tooltip===2) {
 	    return null;
 	} else {
-	    return <Tooltip state={marker.state} data={marker} update={update}/>;
+	    var el=marker.element;
+	    var vals=state.Matrix.getVals(el);
+	    var data={keys:el.keys,vals:vals,id:marker.id};
+	    return <Tooltip state={marker.state} data={data} update={update}/>;
 	}
     }
     function updateLoop(props) {
@@ -109,15 +111,7 @@ class EarthMap extends Component {
     onClickMarker(marker, markerObject, event) {
 	//console.log("Clicked marker...",marker.id)
 	var state=marker.state;
-	var colkey=marker.colrangekey;
-	var colrange=marker.colrange;
-	var colwhere=marker.colwhere;
-	var rowkey=marker.rowrangekey;
-	var rowrange=marker.rowrange;
-	var rowwhere=marker.rowwhere;
-	var cnt=marker.cnt;
-	//console.log("Clicked marker...",marker.id);
-	state.Navigate.selectItemRange(state,colkey,rowkey,colrange,rowrange,colwhere,rowwhere,cnt,1);
+	state.Navigate.selectElement(state,marker.element);
     };
     showMap(state,force) {
 	// dont re-render the globe... - only change the markers
@@ -141,88 +135,80 @@ class EarthMap extends Component {
 	var first=true;
 	var sum={x2:0,y2:0,z2:0,x:0,y:0,z:0,cnt:0};
 	if (matrix !== undefined) {
-	    state.Matrix.printElements(matrix);
-	    var colkey = state.Path.getColKey(state)||"";
-	    var rowkey = state.Path.getRowKey(state)||"";
-	    var colvalues = state.Path.getValues(state,colkey);
-	    var rowvalues = state.Path.getValues(state,rowkey);
-	    //console.log("Matrix:",colkey,JSON.stringify(matrix));
-	    //console.log("Colvalues:",colkey,JSON.stringify(colvalues));
-	    //console.log("Rowvalues:",rowkey,JSON.stringify(rowvalues));
-            // make markers
-	    console.log("Rows:",rowvalues.length);
-            var rlen=rowvalues.length;
-            for(var ii=0; ii<rlen; ii++) {
-		var rowval=rowvalues[ii];
-		var rowrange=state.Grid.getLatRange(state,rowvalues[ii]);
-		var rowwhere = state.Grid.getLatWhere(state,"lat",rowvalues[ii]);
-		var clen=colvalues.length;
-		for(var jj=0; jj<clen; jj++) {
-		    var colval=colvalues[jj];
-		    var colrange=state.Grid.getLonRange(state,colvalues[jj]);
-		    var colwhere = state.Grid.getLonWhere(state,"lon",colvalues[jj]);
-		    var element=state.Matrix.getMatrixElement(colval,rowval,matrix);
-		    if (element !== undefined) {
-			var lon=element.colval;
-			var lat=element.rowval;
-			var lev=element.maxlev;
-			var bgcolor=state.Colors.getLevelBgColor(lev);
-			var fgcolor=state.Colors.getLevelFgColor(lev);
-			var cnt=element.cnt;
-			tcnt=tcnt+1;
-			var rlat=lat*Math.PI/180;
-			var rlon=lon*Math.PI/180;
-			var clat=Math.cos(rlat);
-			var slat=Math.sin(rlat);
-			var clon=Math.cos(rlon);
-			var slon=Math.sin(rlon);
-			var pos={x:clat*clon,y:clat*slon,z:slat};
-			sum.cnt=sum.cnt+1;
-			sum.x=sum.x+pos.x;
-			sum.y=sum.y+pos.y;
-			sum.z=sum.z+pos.z;
-			sum.x2=sum.x2+pos.x*pos.x;
-			sum.y2=sum.y2+pos.y*pos.y;
-			sum.z2=sum.z2+pos.z*pos.z;
-			var fact=4;
-			//console.log("mapComponent:",colkey,colval,rowkey,rowval);
-			//console.log("Colors:",tcnt,lev,bgcolor);
-			var size={width : (colrange.max-colrange.min)*clat*fact,
-				  depth : (rowrange.max-rowrange.min)*fact,
-				  height: 1};
-			var mark={id:tcnt,
-				  coordinates:[lat,lon],
-				  city:"Test",
-				  value:5,
-				  size:size,
-				  element:element,
-				  bgcolor:bgcolor,
-				  fgcolor:fgcolor,
-				  state:state,
-				  colkey:"_lon",
-				  colvalues:[colval],
-				  step:1,
-				  index:0,
-				  colrangekey:"lon",
-				  colrange:colrange,
-				  colwhere:colwhere,
-				  rowkey:"_lat",
-				  rowval:rowval,
-				  rowrangekey:"lat",
-				  rowrange:rowrange,
-				  rowwhere:rowwhere,
-				  map:true,
-				  cnt:cnt
-				 };
-			if (first) {
-			    first=false;
-			    //console.log("row=",rowval,"(",rowwhere,") col=",colval,"(",colwhere,") ",JSON.stringify(element));
-			}
-			markers.push(mark);
-			//this.config.markers.push(mark);
+	    var elements=state.Matrix.getMatrixElements(state,matrix);
+	    elements.forEach(element => {
+		if (element !== undefined) {
+		    var lon=element.lon;
+		    var lat=element.lat;
+		    var lev=element.maxlev;
+		    var latRange=element.latRange;
+		    var lonRange=element.lonRange;
+                    //var lonWhere = state.Grid.getLonWhere(state,"lon",lonRange);
+                    //var latWhere = state.Grid.getLatWhere(state,"lat",latRange);
+		    var bgcolor=state.Colors.getLevelBgColor(lev);
+		    var fgcolor=state.Colors.getLevelFgColor(lev);
+		    var cnt=element.cnt;
+		    tcnt=tcnt+1;
+		    var rlat=lat*Math.PI/180;
+		    var rlon=lon*Math.PI/180;
+		    var clat=Math.cos(rlat);
+		    var slat=Math.sin(rlat);
+		    var clon=Math.cos(rlon);
+		    var slon=Math.sin(rlon);
+		    var pos={x:clat*clon,y:clat*slon,z:slat};
+		    sum.cnt=sum.cnt+1;
+		    sum.x=sum.x+pos.x;
+		    sum.y=sum.y+pos.y;
+		    sum.z=sum.z+pos.z;
+		    sum.x2=sum.x2+pos.x*pos.x;
+		    sum.y2=sum.y2+pos.y*pos.y;
+		    sum.z2=sum.z2+pos.z*pos.z;
+		    var fact=4;
+		    //console.log("mapComponent:",colkey,colval,rowkey,rowval);
+		    //console.log("Colors:",tcnt,lev,bgcolor);
+		    var size;
+		    if (latRange !== undefined && lonRange !== undefined) {
+			size={width : (lonRange.max-lonRange.min)*clat*fact,
+			      depth : (latRange.max-latRange.min)*fact,
+			      height: 1};
+		    } else {
+			size={width : (0.2)*clat*fact,
+			      depth : (0.2)*fact,
+			      height: 50};
 		    }
+		    var mark={id:tcnt,
+			      coordinates:[lat,lon],
+			      city:"Test",
+			      value:5,
+			      size:size,
+			      element:element,
+			      bgcolor:bgcolor,
+			      fgcolor:fgcolor,
+			      // location:{
+			      // 	  colkey:"_lon",
+			      // 	  step:1,
+			      // 	  index:0,
+			      // 	  colrangekey:"lon",
+			      // 	  colrange:lonRange,
+			      // 	  colwhere:lonWhere,
+			      // 	  rowkey:"_lat",
+			      // 	  rowrangekey:"lat",
+			      // 	  rowrange:latRange,
+			      // 	  rowwhere:latWhere
+			      // },
+			      state:state,
+			      map:true,
+			      cnt:cnt
+			     };
+		    if (first) {
+			first=false;
+			//console.log("Marker:",JSON.stringify(mark.location));
+			//console.log("row=",rowval,"(",rowwhere,") col=",colval,"(",colwhere,") ",JSON.stringify(element));
+		    }
+		    markers.push(mark);
+		    //this.config.markers.push(mark);
 		}
-	    }
+	    });
 	} else {
 	    console.log("No matrix available...");
 	}
@@ -246,8 +232,8 @@ class EarthMap extends Component {
 		cen.z=0;
 	    }
 	    ll=Math.sqrt(cen.x*cen.x+cen.y*cen.y);
-	    clat=Math.acos(ll) * 180/Math.PI;
-	    clon=Math.atan2(cen.y,cen.x) * 180/Math.PI;
+	    var clat=Math.acos(ll) * 180/Math.PI;
+	    var clon=Math.atan2(cen.y,cen.x) * 180/Math.PI;
 	    //console.log("Center:",clon,clat,dist);
 	    this.config.dist=dist;
 	    this.config.focus=[clat,clon];
@@ -268,7 +254,8 @@ class EarthMap extends Component {
 	const { classes,state  } = this.props;//, state
 	//console.log("Rendering map...");
 	//this.setMarkers(state);
-	var height='calc(95% - '+footAndHeaderheight+')';
+	var height='calc(100% - 70px - 70px - 5px)';
+	var cls={map:classes.map};
 	return (<div className={classes.root}
 	        style={{position:'fixed',
 			marginLeft:'0%',
@@ -279,7 +266,7 @@ class EarthMap extends Component {
 		<MapGlobe onClickMarker={this.onClickMarker}
 		          config={this.config}
 		          update={this.update}
-		          classes={{map:classes.map}}/>
+		          classes={cls}/>
 	      </div>
 	     );
     }

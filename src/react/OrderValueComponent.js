@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
+import {teal_palette} from '../mui/metMuiThemes';
 
 const styles = theme => ({
     value: {
@@ -13,12 +14,26 @@ const styles = theme => ({
 	cursor: "pointer",
         color:"blue",
         borderColor:"blue",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
     trashchip: {
         margin: theme.spacing(0),
 	cursor: "pointer",
         color:"gray",
         borderColor:"gray",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
   },
 });
 class Value extends Component {

@@ -6,12 +6,15 @@ function Auto() {
     this.toggle=function(state) {
 	console.log("Pressed toggle");
 	state.Auto.complete=!state.Auto.complete;
-	if (! state.Auto.complete) { state.Path.tkeys=2;}
+	if (! state.Auto.complete) {
+	    state.Path.table.ntarget=2;
+	    if (state.Path.table.nmanual !== undefined) {state.Path.table.ntarget=Math.min(state.Path.table.ntarget,state.Path.table.nmanual);}
+	}
 	state.Show.showConfig(state);
     };
     // re-arrange path...
     this.setKeyNumber=function(state) {
-	state.Path.tkeys=2;
+	state.Path.table.ntarget=2;
 	if (state.Auto.complete) { // test 2 keys...
 	    state.Path.exportAllKeys(state);
 	    var first=state.Path.getFirstKey(state);
@@ -44,7 +47,7 @@ function Auto() {
     };
     // select given table key...
     this.selectTableKey=function(state,key,keyval,keywhere,keycnt,keep) { // keep abscissa
-	if(this.debug){console.log("selectTableKey Entering:",key,keyval,keywhere,keycnt,JSON.stringify(state.Path.keys));};
+	if(this.debug){console.log("selectTableKey Entering:",key,keyval,keywhere,keycnt,JSON.stringify(state.Path.other));};
 	var ret=false;
 	var sid = state.Path.keys.other.indexOf(key);
 	//console.log("SelectTableKey:",key,sid,JSON.stringify(state.Path.keys.other));
@@ -54,29 +57,45 @@ function Auto() {
 	    // You need to check the table keys again. 
 	    // We duplicate the target key into the table array and then remove both copies. 
 	    // This brings the old table keys back again, making them subject to a redundancy check.
-	    var keys=state.Path.other.rest;
-	    var lenk=keys.length;
-	    var colkey=state.Path.getColKey(state);
-	    var rowkey=state.Path.getRowKey(state);
-	    if(this.debug){console.log("Autopath or not?:",lenk,colkey,rowkey,sid,state.Auto.complete);};
+	    var othkeys=state.Path.getOtherTableKeys(state);
+	    var restkeys=state.Path.getRestTableKeys(state);
+	    var leno=othkeys.length;
+	    var lenr=restkeys.length;
 	    if (keep !== undefined & keep) { // only move key, no auto select
-		ret = state.Path.addTableKeyToPath(state,key,keyval,keywhere,keycnt);
-	    } else if (lenk===0 || colkey===undefined || rowkey===undefined || ! state.Auto.complete ) { // nothing to consider
+		if(this.debug){console.log("Move-key");};
+		ret = state.Path.addTableKeyToPath(state,key,keyval,keywhere);
+	    } else if (lenr===0 || leno===0 || ! state.Auto.complete ) { // nothing to consider
+		if(this.debug){console.log("Single-select");};
 		ret = state.Path.tableKeyToPath(state,key,keyval,keywhere,keycnt);
-	    } else if (key !== colkey && key !== rowkey) { // plain select...
+	    } else if (!state.Path.isTableKey(state,key)) { // plain select...
+		if(this.debug){console.log("Plain-select");};
 		ret = state.Path.tableKeyToPath(state,key,keyval,keywhere,keycnt);
 	    } else { // auto-select
-		state.Path.moveOther2Table(state,key);   // move target key to front of array
-		state.Path.duplicateTableKey(state,key); // make duplicate
-		state.Path.exportAllKeys(state);
+		if(this.debug){console.log("Auto-select:",JSON.stringify(state.Path.other));}
 		//if(this.debug){console.log("Before:",JSON.stringify(state.Path.keys));};
+                state.Path.moveOther2Table(state,key);   // move target key to front of array
+                state.Path.exportAllKeys(state);
 		ret = state.Auto.tableKeyToPath(state,key,keyval,keywhere,keycnt);
 		state.Path.exportAllKeys(state);
-		ret = state.Auto.tableKeyToPath(state,key,keyval,keywhere,keycnt); // remove duplicate
+                //state.Path.duplicateTableKey(state,key); // make duplicate
+		//ret = state.Auto.tableKeyToPath(state,key,keyval,keywhere,keycnt); // remove duplicate
 	    }
 	};
 	if (ret) {state.Path.exportAllKeys(state);};
 	if(this.debug){console.log("selectTableKey Done:",JSON.stringify(state.Path.keys),JSON.stringify(ret));};
+	return ret;
+    };
+    this.tableKeyToPath=function (state,key,keyval,keywhere,keycnt) {
+	if(this.debug){console.log("tableKeyToPath Entering:",key,keyval,keywhere,JSON.stringify(state.Path.other));};
+	// look for table-key candidates in the rest-stack
+	var analysis=this.analyse(state,key,keywhere);
+	// move the key
+	var ret=state.Path.tableKeyToPath(state,key,keyval,keywhere,keycnt);
+	//state.Path.exportAllKeys(state);
+	this.applyAnalysis(state,analysis);
+	if(this.debug){console.log("Analysis:",JSON.stringify(analysis));};
+	if(this.debug){console.log("tableKeyToPath Path:",JSON.stringify(state.Path.keys));};
+	if(this.debug){console.log("tableKeyToPath Done:",JSON.stringify(ret));};
 	return ret;
     };
     this.applyAnalysis=function(state,analysis) {
@@ -100,73 +119,62 @@ function Auto() {
 	    rest=state.Utils.clean(analysis.rest);
 	}
 	if (analysis.tblkey !== "") {
-	    state.Path.tkeys=2;
-	    state.Path.keys.other=state.Utils.clean([analysis.othkey,analysis.tblkey].concat(rest).concat(ignore));
-	} else if (analysis.othkey !== undefined) {
-	    state.Path.tkeys=1;
-	    state.Path.keys.other=state.Utils.clean([analysis.othkey].concat(rest).concat(ignore));
+	    state.Path.table.ntarget=1+analysis.othkeys.length
+	    state.Path.keys.other=state.Utils.clean([analysis.tblkey].concat(analysis.othkeys).concat(rest).concat(ignore));
+            if(this.debug){console.log("Table key present:",JSON.stringify(state.Path.keys.other),state.Path.table.nkeys);};
+	} else if (analysis.othkeys !== undefined) {
+	    state.Path.table.ntarget=analysis.othkeys.length;
+	    state.Path.keys.other=state.Utils.clean(analysis.othkeys.concat(rest).concat(ignore));
+            if(this.debug){console.log("Other key present:",JSON.stringify(state.Path.keys.other),state.Path.table.nkeys);};
 	} else {
-	    state.Path.tkeys=1;
+	    state.Path.table.ntarget=1;
 	    state.Path.keys.other=state.Utils.clean([].concat(rest).concat(ignore));
+            if(this.debug){console.log("No key present:",JSON.stringify(state.Path.keys.other),state.Path.table.nkeys);};
 	};
-    };
-    this.tableKeyToPath=function (state,key,keyval,keywhere,keycnt) {
-	//if(this.debug){console.log("tableKeyToPath Entering:",key,keyval,keywhere,keycnt);};
-	// look for table-key candidates in the rest-stack
-	var analysis=this.analyse(state,key,keywhere);
-	// move the key
-	var ret=state.Path.tableKeyToPath(state,key,keyval,keywhere,keycnt);
-	this.applyAnalysis(state,analysis);
-	if(this.debug){console.log("Analysis:",JSON.stringify(analysis));};
-	if(this.debug){console.log("tableKeyToPath Path:",JSON.stringify(state.Path.keys));};
-	if(this.debug){console.log("tableKeyToPath Done:",JSON.stringify(ret));};
-	return ret;
+	if (state.Path.table.nmanual !== undefined) {state.Path.table.ntarget=Math.min(state.Path.table.ntarget,state.Path.table.nmanual);}
+	//console.log("Cleaning:",JSON.stringify(state.Path.keys.other));
     };
     this.analyse=function(state,trgkey,trgwhere) {
-	if(this.debug){console.log("analyseOther Entering:",JSON.stringify(state.Path.other));};
+        if(this.debug){console.log("analyseOther Entering:",JSON.stringify(state.Path.other));};
+	//console.log("path-other:",JSON.stringify(state.Path.other));
 	//other key
-	var keys;
 	var where=state.Database.getWhere(state);
-	var othkey;
 	var soft=false;
 	if (trgkey===undefined) {
 	    soft=true;
-	    othkey=state.Path.getFirstKey(state);
 	    trgkey="";
 	    trgwhere="";
-	    if (state.Path.tkeys===2) {
-		keys=[state.Path.getSecondKey(state)].concat(state.Path.other.rest);
-	    } else {
-		keys=state.Path.other.rest;
-	    };
-	} else {
-	    var colkey=state.Path.getColKey(state);
-	    var rowkey=state.Path.getRowKey(state);
-	    othkey=(trgkey===colkey?rowkey:colkey); // the other key
-	    keys=state.Path.other.rest;
 	};
+	var othkeys=state.Path.getOtherTableKeys(state,trgkey);
+	var restkeys=state.Path.getRestTableKeys(state,trgkey);
+	//if(this.debug){console.log(">>>Key:",trgkey," Other:",JSON.stringify(othkeys),
+	//			   " Rest=",JSON.stringify(restkeys));};
 	var sel=[]; // selected
 	var val=[]; // values
 	var rest=[]; //rest
 	var tblkey=""; // target key
-	var lenk=keys.length;
+	var lenk=restkeys.length;
 	var keywhere=state.Database.addWhere(where,trgwhere);
 	// redundant keys => selected
 	// insignificant keys => pushed back
 	// control keys => used in table
 	for (var ii = 0; ii< lenk; ii++) {
 	    // first key dependencies
-	    var testkey=keys[ii];
-	    if(this.debug){console.log(">>>Checking:",testkey, " vs Table:(",trgkey,",",othkey,") where=",where,trgwhere);};
-	    var othtable=[othkey,testkey];
-	    var othdep=this.getDependancy(state,keywhere,othtable);
-	    if(this.debug){console.log("        Other:   ",othkey,testkey,JSON.stringify(othdep));};
+	    var testkey=restkeys[ii];
+	    var testtable=othkeys.concat([testkey]);
+	    if(this.debug){console.log(">>> Checking:",testkey,":",JSON.stringify(testtable),
+				       " vs Table:(",JSON.stringify(restkeys),
+				       ") where=",where,trgwhere);};
+	    var testdep=this.getDependancy(state,keywhere,testtable);
+	    if(this.debug){console.log("        Dependency:   ",JSON.stringify(othkeys),testkey,":",JSON.stringify(testdep));};
 	    // in case there are no targets
-	    if (othdep.intprt[othkey]==="insignificant" || othdep.intprt[testkey]==="insignificant" || tblkey !== "") {    // ignore insignificant testkey
+	    if (this.hasAnyDependancy(state,testdep,testtable,"insignificant") ||
+		testdep.intprt[testkey]==="insignificant" || tblkey !== "") {
 		rest.push(testkey);
-		if(this.debug){console.log("****  Postpone:",testkey,JSON.stringify(sel),JSON.stringify(rest),tblkey);};
-	    } else if (othdep.intprt[testkey]==="redundant") { // select redundant testkey
-		var testval=othdep.val[testkey];
+		if(this.debug){console.log("****  Postpone:",testkey,":",
+					   JSON.stringify(sel),JSON.stringify(rest),tblkey);};
+	    } else if (testdep.intprt[testkey]==="redundant") { // select redundant testkey
+		var testval=testdep.val[testkey];
 		var sid=-1;
 		if (soft) {// force move
 		    sid = state.Path.keys.path.indexOf(testkey);
@@ -175,22 +183,40 @@ function Auto() {
 		if (testval !== null & sid===-1) { // single value & "not" in path
 		    sel.push(testkey);
 		    val.push(testval);
-		    if(this.debug){console.log("****  Select:",testkey,JSON.stringify(sel),JSON.stringify(rest),tblkey,JSON.stringify(othdep),where);};
+		    if(this.debug){console.log("****  Select:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey,JSON.stringify(testdep),where);};
 		} else {
 		    rest.push(testkey);
-		    if(this.debug){console.log("****  Rest:",testkey,JSON.stringify(sel),JSON.stringify(rest),tblkey,JSON.stringify(othdep),where);};
+		    if(this.debug){console.log("****  Rest:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey,JSON.stringify(testdep),where);};
 		}
 	    } else { // control key
 		tblkey=testkey;                    // we have found a good candidate
-		if(this.debug){console.log("****  Target:",testkey,JSON.stringify(sel),JSON.stringify(rest),tblkey);};
+		if(this.debug){console.log("****  Control:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey);};
 	    }
 	}
 	//if(this.debug){console.log("Sel/Val:",JSON.stringify(sel),JSON.stringify(val));};
-	var ret={sel:sel,val:val,rest:rest,tblkey:tblkey,othkey:othkey};
+	var ret={sel:sel,val:val,rest:rest,tblkey:tblkey,othkeys:othkeys};
 	if(this.debug){console.log("analyse Done:",JSON.stringify(ret));};
 	return ret;
     };
     // check if keys are inter-dependent, ("common", "unique", "dependent", "unknown") 
+    this.hasAnyDependancy=function(state,dep,keys,str) {
+	var ret=false;
+	var lenk=keys.length;
+	for (var ii=0;ii<lenk;ii++) {
+	    var key=keys[ii];
+	    if (dep.intprt[key]===str) {ret=true;}
+	}
+	return ret;
+    }
+    this.hasAllDependancy=function(state,dep,keys,str) {
+	var ret=true;
+	var lenk=keys.length;
+	for (var ii=0;ii<lenk;ii++) {
+	    var key=keys[ii];
+	    if (dep.intprt[key]!==key) {ret=false;}
+	}
+	return ret;
+    };
     this.getDependancy=function(state,where,keys) {
 	//if(this.debug){console.log("getDependancy Entering:",where,JSON.stringify(keys));};
 	var key;

@@ -1,14 +1,12 @@
 import React, {Component} from "react";
 import {withStyles} from "@material-ui/core";
 import PropTypes from  "prop-types";
-import Path      from  "./PathComponent";
 import Table     from  "./TableComponent";
 import List      from  "./ListComponent";
 import Globe     from  "./GlobeComponent";
-//import Chart     from  "./Test";
 import Chart     from  "./ChartComponent";
 import Custom    from  "./CustomComponent";
-import Progress  from './Progress';
+import Progress  from './ProgressComponent';
 
 //console.log("Inside Dataset.")
 
@@ -27,7 +25,7 @@ const styles = theme => ({
 //        maxWidth: theme.spacing.getMaxWidth.maxWidth,
 
 function Switcher(props) {
-    const { state, classes, progress } = props;
+    const { state, classes, progress, layout } = props;
     //var skeys=state.Matrix.sortedKeys(state,state.Matrix.keyCnt);
     //var dim        = state.Layout.getDim(state)
     var mode       = state.Layout.getLayoutMode(props.state);
@@ -43,9 +41,9 @@ function Switcher(props) {
 	          <Progress/>
 	       </div>);
     } else if (mode === state.Layout.modes.layout.Table) {
-	return (<Table state={state}   classes={classes}/>);
+	return (<Table state={state}  classes={classes} layout={layout}/>);
     } else if (mode === state.Layout.modes.layout.List) {
-	return (<List  state={state}   classes={classes}/>);
+	return (<List  state={state}  classes={classes}/>);
     } else {
 	return (<Custom state={state} classes={classes}/>);
     }
@@ -78,15 +76,14 @@ class Dataset extends Component {
 	}
     };
     render() {
-        const { classes, state } = this.props;
+        const { classes, state, layout } = this.props;
+	var cls={dataset:classes.dataset,
+		 content:classes.content,
+		 button:classes.button,
+		 buttonDisabled:classes.buttonDisabled};
         return (
             <div className={classes.dataset}>
-                <Path     state={state}  classes={{dataset:classes.path,
-						   button:classes.button,
-						   buttonDisabled:classes.buttonDisabled}} />
-		<Switcher state={state} classes={{dataset:classes.dataset,
-						  button:classes.button,
-						  buttonDisabled:classes.buttonDisabled}}
+		<Switcher state={state} classes={cls} layout={layout}
 	                   progress={this.state.progress}/>
             </div>
         );

@@ -1,84 +1,52 @@
-import React, {Component} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-
-import About         from './About';
-
-import InfoIcon from '@material-ui/icons/Info';
+import Typography from "@material-ui/core/Typography/Typography";
+import Grid from "@material-ui/core/Grid/Grid";
 
 const styles = theme => ({
-    order: {
-	display: 'inline-block',
-        marginRight: 'auto',
-	height:'100%',
+    root: {
+        backgroundColor: theme.palette.primary.main,
+        marginTop: theme.spacing(8),
+        bottom: 0,
+        padding: theme.spacing(6),
+        color: '#FFF'
     },
-    tableOrder: {
-	display: 'inline-block',
-        marginRight: 'auto',
-    },
-    button:{
-	color:'white'
-    },
-    buttonInvisible:{
-	color:'gray'
+
+    text: {
+	maxWidth: "100%",
+	margin: "1%",
     },
 });
 
-class AboutMenu extends Component {
-    show(state) {
-	//console.log("Called Config.show...");
-	this.forceUpdate();
-    };
-    state={anchor:null};
-    render() {
-        const { classes, state,visible } = this.props;
-	var onclick, title;
-	if (visible !== undefined && ! visible && state.Settings.isInvisible(state,"About")) {
-	    return null;
-	} else if (visible !== undefined) {
-	    this.onClick = event => {this.setState({ anchor: event.currentTarget });};
-	    this.onClose = () => {this.setState({ anchor: null });};
-	    title="About";
-	    return (<div className={classes.tableOrder}>
-		   <Button
-                      className={classes.button}
-                      aria-owns={this.state.anchor ? 'tablecollects-menu' : undefined}
-                      aria-haspopup="true"
-                      onClick={this.onClick}
-	              title={title}
-		   >
-	  	       {<InfoIcon state={state}/>}
-                     </Button>
-		     <Menu
-	                className={classes.tableOrder}
-                        id="tablecollects-menu"
-	                anchorEl={this.state.anchor}
-                        open={Boolean(this.state.anchor)}
-                        onClose={this.onClose}
-		     >
-		    <MenuItem className={classes.order} key="auto" onClose={this.onClose}>
-		       <About state={state} classes={{button:classes.button}}/>
-		    </MenuItem>
-	             </Menu>
-		</div>
-		   );
-	} else {
-	    onclick=() => {state.Settings.toggle(state,"About");};
-	    title="Show about";
-	    if (state.Settings.isInvisible(state,"About")) {
-		return <Button key="about" className={classes.buttonInvisible} onClick={onclick} title={title}><InfoIcon/></Button>;
-	    } else {
-		return <Button key="about" className={classes.button} onClick={onclick} title={title}><InfoIcon/></Button>;
-	    };
-	};
-    }
+const { REACT_APP_DATE } = process.env;
+
+//text        maxWidth: theme.spacing.getMaxWidth.maxWidth,
+//text        margin: theme.spacing.getMaxWidth.margin,
+
+function About(props) {
+    // const { classes } = props;
+    return (
+
+            <Grid item xs={12} sm={12}>
+             <Typography color={"inherit"}>
+            WARNING BOARD
+             </Typography>
+             <Typography color={"inherit"}>
+               Created {REACT_APP_DATE} by <a href="https://met.no"> met.no </a>
+             </Typography>
+             <Typography color={"inherit"}>
+	    This is one of many tools provided to the on-duty forecasters.
+             </Typography>
+             <Typography color={"inherit"}>
+            Colors are not the official warning level colors.
+             </Typography>
+            </Grid>
+    );
 }
 
-AboutMenu.propTypes = {
+About.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(AboutMenu);
+export default withStyles(styles)(About);

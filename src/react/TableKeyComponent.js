@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 import SelIcon from '@material-ui/icons/Done';
+import {teal_palette} from '../mui/metMuiThemes';
 
 const styles = theme => ({
     config: {},
@@ -15,12 +16,19 @@ const styles = theme => ({
 	cursor: "pointer",
         color:"blue",
         borderColor:"blue",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	}
     },
 });
 class TableKey extends Component {
     render() {
         const { classes, state, keyitem, target, onclose } = this.props;
-	var onclick=() => {state.Navigate.onClickTablePath(state,keyitem,target);onclose();};
+	var onclick=() => {state.Navigate.replaceTableKey(state,keyitem,target);onclose();};
 	//console.log("TableKey:",tpos,keyitem,JSON.stringify(state.Path.keys.other));
 	var chip=classes.restchip;
 	if (state.Path.keys.path.indexOf(keyitem) === -1) {

@@ -43,15 +43,16 @@ function UpwardReel(props) {
 };
 function renderMenuItem(classes,state,keyitem,keyindex,onRemove,onUpward) {
     var onclick=() => {state.Path.nextFilm(state,keyindex);};
+    var cls={button:classes.button};
     if (keyindex===0) { // remove
 	return ( <MenuItem className={classes.order} key={"film_" + keyindex}>
-		<RemoveReel state={state} classes={{button:classes.button}} index={keyindex} onRemove={onRemove}/>
+		<RemoveReel state={state} classes={cls} index={keyindex} onRemove={onRemove}/>
 		<Chip icon={null} label={keyitem.label} onClick={onclick}/>
 		</MenuItem>
 	       );
     } else {
 	return (<MenuItem className={classes.order} key={"film_" + keyindex}>
-		<UpwardReel state={state} classes={{button:classes.button}} index={keyindex} onUpward={onUpward}/>
+		<UpwardReel state={state} classes={cls} index={keyindex} onUpward={onUpward}/>
 		<Chip icon={null} onClick={onclick} label={keyitem.label}/>
 		</MenuItem>
 	       );
@@ -94,9 +95,10 @@ class ReelMenu extends Component {
 			    {items.map(mapFunction)}
 	             </Menu>
 	};
+	var cls={root:classes.button,disabled:classes.buttonDisabled};
 	return (<div className={classes.tableReel}>
 		   <Button
-                      classes={{root:classes.button,disabled:classes.buttonDisabled}}
+                      classes={cls}
                       aria-owns={this.state.anchor ? 'reel-menu' : undefined}
                       aria-haspopup="true"
                       onClick={this.onClick}

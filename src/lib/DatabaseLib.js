@@ -11,7 +11,6 @@ function Database() {
     this.files=["1.json"];                  // json data file
     this.loaded="";
     this.index=0;
-    this.cnt=0;
     this.keyCnt={};
     this.values= {};
     this.epoch0=0;
@@ -24,9 +23,11 @@ function Database() {
     this.cdes=1; // key is sorted descending
     this.nasc=2; // key is sorted ascending
     this.ndes=3; // key is sorted descending
-    this.delay=10*1000;  // polling period in ms (film + server-polling loop)
-    this.step=60;        // server-polling step
+    this.delay=10*1000;  // step length in ms (film reel)
+    this.step=60;        // steps between each server polling
     this.stepCnt=0;      // current step count
+    this.loadcnt=0;      // polling count
+    this.dbcnt=0;        // records in database
     this.ready=true;     // can we poll server or is another poll running
     this.log="";
     this.mod="";
@@ -66,7 +67,7 @@ function Database() {
 	},state.Database.delay); //state.Database.delay
     }.bind(this);
     this.load=function(state) {
-	console.log("Database load number:",++this.cnt);
+	console.log("Database load number:",++this.loadcnt);
 	if (state.Database.index === 0) {
 	    state.Database.loadRegister(state,"",
 					       [state.Database.processRegister,
@@ -79,7 +80,7 @@ function Database() {
 	var prefix=(state.Database.data||"data") + "/";
 	//console.log("Using register-prefix:",prefix);
 	var path=prefix + state.Database.regfile;
-	console.log("Database loadRegister:",path);
+	if (this.loadcnt === 1) {console.log("Database loadRegister:",path);}
 	state.File.load(state,path,callbacks);
     };
     this.processRegister=function(state,response,callbacks) {
@@ -92,6 +93,7 @@ function Database() {
     this.loadData=function(state, file, callbacks ) {
 	//console.log("Database loadData:",JSON.stringify(file));
 	if (file !== state.Database.loaded) { // load new data
+	    state.Html.broadcast(state,"Loading "+file);
 	    state.Database.setLoaded(state,file);
 	    // console.log("Files:",JSON.stringify(state.Database.files));
 	    var prefix=(state.Database.data||"data") + "/";
@@ -135,6 +137,35 @@ function Database() {
     };
     this.saveDb=function(state) {
 	state.Utils.save(state.Utils.prettyJson(this.jsonOrg),this.loaded,"json");
+    };
+    this.saveSelectedDb=function(state) {
+	var sub=state.Matrix.hasSelected(state);
+	var json={};
+	if (this.jsonOrg !== undefined) {
+	    var keys=Object.keys(this.jsonOrg);
+	    var lenk=keys.length;
+	    for (var ii=0;ii<lenk;ii++) {
+		var key=keys[ii];
+		if (key === "data" && sub) {
+		    var docs=this.jsonOrg[key];
+		    var ret=[];
+		    var lend=docs.length;
+		    for (var jj=0;jj<lend;jj++) {
+			var doc=docs[jj];
+			if (state.Matrix.checkSelected(state,doc,true)) {
+			    ret.push(state.Utils.cp(doc));
+			}
+		    }
+		    json[key]=ret;
+		    console.log("Selected ",ret.length," from ",lend);
+		} else {
+		    json[key]=this.jsonOrg[key];
+		}
+	    };
+	};
+	var pjson=state.Utils.prettyJson(json,"data");
+	//console.log("Json:",pjson);
+	state.Utils.save(pjson,this.loaded,"json");
     };
     this.resetDb=function(state,response,callbacks) {
 	state.Database.index=-1;
@@ -221,10 +252,13 @@ function Database() {
 	var ii,key;
 	try {
 	    // set home
-	    var len=json.data.length
+	    var docs=json.data;
+	    var len=docs.length
 	    for (ii=0;ii<len;ii++) {
-		json.data[ii]["cnt"]=ii;
-	    }
+		var doc=docs[ii];
+		doc["cnt"]=ii;
+		state.Threshold.setEssentials(state,doc);
+	    };
 	    // get modified date
 	    //console.log("Setting time.");
 	    this.jsonOrg=state.Utils.cp(json);
@@ -234,7 +268,7 @@ function Database() {
 	    // make database for raw data
 	    this.makeTable(state);
 	    // reset key counts and range
-	    this.cnt=0;
+	    this.dbcnt=0;
 	    this.keyCnt={}; // reset key-count
 	    // put data into databse
 	    //console.log("inserting");
@@ -256,8 +290,9 @@ function Database() {
             }
 	    //console.log("Home keys:",JSON.stringify(homeKeys)," delayed:",JSON.stringify(delayKeys));
 	    // extract data from json-file and insert into data-array...
-	    var rcnt=this.extractData(state,data,{},"",json.data,homeKeys,home);
-	    console.log("Count:",rcnt);
+	    // var rcnt=
+	    this.extractData(state,data,{},"",json.data,homeKeys,home);
+	    //console.log("Database count:",rcnt);
 	    //console.log("Data:",JSON.stringify(data));
 	    // put data-array into database...
 	    this.dataToDb(state,data);
@@ -268,7 +303,7 @@ function Database() {
 	    if (delayKeys.length > 0) {// delayed home selection (MAX() and MIN())
 		this.makeWhere(state,delayKeys,home);
 		var where=this.getWhere(state,delayKeys,home);
-		var docs=this.getDocs(state,where);
+		docs=this.getDocs(state,where);
 		this.dataToDb(state,docs)
 		this.postProcess(state); // update distinct Database.values[key]
 	    };
@@ -278,10 +313,11 @@ function Database() {
 	    this.dbindex(state,state.Path.other.table); // make indexes
 	    this.dbindex(state,state.Path.other.rest); // make indexes
 	    //state.Path.checkTableKeys(state);
-	    state.Html.broadcast(state,"Database is ready.");
+	    state.Html.broadcast(state,"Loaded "+this.dbcnt+" records into database");
 	    //console.log("Database is ready.");
 	} catch (e) {
 	    alert("Db-insert error:"+e);
+	    throw (e);
 	};
     };
     this.updateKeyCnt=function(state,key,val) {
@@ -398,10 +434,9 @@ function Database() {
 		};
 		//console.log(">>> Inserting:",state.Utils.toString(doc));
 		rcnt=rcnt+1;
-		this.cnt=this.cnt+1;
-		state.Threshold.setThresholds(doc);
+		state.Threshold.setThresholds(state,doc);
 		doc._title=state.Layout.makeDocTitle(state,doc);
-		//if (this.cnt < 10) { // debug purposes
+		//if (this.dbcnt < 10) { // debug purposes
 		//for (key in keys) {
 		//this.updateKeyCnt(state,key,doc[key]);
 		//};
@@ -410,6 +445,7 @@ function Database() {
 		//console.log("Ignoring:",lenh,JSON.stringify(hkeys),JSON.stringify(home),JSON.stringify(doc));
 	    }
 	}
+	this.dbcnt=rcnt;
 	return rcnt;
     };
     this.dbextract=function(state,showFunc) { // extract data from db and show
@@ -423,6 +459,7 @@ function Database() {
 	var nrec= (cntDocs0.length===0?0:cntDocs0[0].cnt);
 	var m={};
 	state.Matrix.cnt=nrec;
+	//console.log("Database:",JSON.stringify(this.db.tables.alarm.data));
 	//console.log("dbextract Where:",where," => ",nrec);
 	if (nrec > state.Matrix.popSeries) { // maintain keyCnt
 	    state.Matrix.initKeyCnt(state);
@@ -433,10 +470,11 @@ function Database() {
 	    if (this.bdeb) {console.log("Count:",JSON.stringify(cntDocs0));}
 	    // add "undefined" range of keys that are not present in every doc...
 	    state.Matrix.addMapAreaKeys(state,this.db.tables.alarm.data); // add lat_/lon_
-	    var colkey=state.Path.getColKey(state);
-	    var rowkey=state.Path.getRowKey(state);
 	    var svgkey=state.Svg.getKey(state);
-	    var cntDocs=state.Database.getDocsCnt(state,where,[colkey,rowkey,svgkey]);
+	    var keys=state.Path.getTableKeys(state);
+	    keys.push(svgkey);
+	    var cntDocs=state.Database.getDocsCnt(state,where,keys);
+	    state.Matrix.setCntLatLon(state,cntDocs,this.db.tables.alarm.data);
 	    if (this.bdeb) {console.log("dbextract cntDocs:",JSON.stringify(cntDocs));}
 	    state.Matrix.makeMatrixCntMap(state,cntDocs,m);
 	    state.Matrix.makeMapRange(state);
@@ -475,11 +513,15 @@ function Database() {
     this.getTitleDynamic=function(state,key,val) {
 	var ret,parse;
 	if (state.Database.values[key] === undefined) {
-	    ret=val;
+	    if (val === "null" || val==="") {
+		ret= "!"+key;
+	    } else {
+		ret=val;
+	    }
 	} else {
 	    var keytrg=this.getKeytrg(state,key,val);
-	    if (val === "null") {
-		ret=key + " is NULL";
+	    if (val === "null" || val === "") {
+		ret="!"+key;
 	    } else if (keytrg === this.keytrg.Max) { // this is a function
 		parse=state.Utils.getMax(state.Database.values[key]);
 		if (parse === undefined) {
@@ -552,7 +594,7 @@ function Database() {
 	};
     };
     this.getWhereNull=function(key) {
-	return '"' + key + '" is NULL';
+	return key + ' is NULL';
     };
     this.getWhere=function(state,keys,vals,ranges) {
 	var where="";
@@ -598,15 +640,6 @@ function Database() {
 		where = " WHERE ("+ whereKey+")";
 	    }
 	}
-	return where;
-    };
-    this.getColWhere=function(key,values,index,step) {
-	var clen=values.length;
-	var where="";
-        for (var kk=index;kk<Math.min(clen,index+step);kk++) {
-	    if (where !== "") {where=where + " or ";}
-	    where=where + this.getWhereValue(key,values[kk]);
-        };               
 	return where;
     };
     this.makeWhere=function(state,keys,vals) {
@@ -704,7 +737,9 @@ function Database() {
     this.getDocsCnt=function(state,where,keys) {
 	var sql,dd, group;
 	//console.log("Docs:",JSON.stringify(this.db.tables.alarm.data));
-	var body='count(*) AS cnt, max(level) AS maxlev, max(rank) AS maxrank, min(level) AS minlev, max(lat) AS maxlat, min(lat) AS minlat, max(lon) AS maxlon, min(lon) AS minlon FROM alarm';
+	var body='count(*) AS cnt, max(level) AS maxlev, max(rank) AS maxrank, min(level) AS minlev, '
+            +'max(lat) AS maxlat, min(lat) AS minlat, max(lon) AS maxlon, min(lon) AS minlon, avg(lat) as lat, avg(lon) as lon '
+	    +'FROM alarm';
 	if (keys  === undefined) {
 	    group="";
 	    sql="select "+body+where;
@@ -722,14 +757,11 @@ function Database() {
 	    //console.log("Cnt-B:",JSON.stringify(dd),",keys:",JSON.stringify(keys));
 
 	}
+	//console.log("sql:",JSON.stringify(sql));
 	//console.log("Running select...");
 	//sql="SELECT * from alarm WHERE rank= ( SELECT MAX(rank) FROM alarm "+group+")";
 	//var dd2=this.query(sql);
 	//console.log("sql:",JSON.stringify(dd2));
-	
-
-
-
 	
 	// )
 	// SELECT * FROM alarm WHERE (level,rank) IN 

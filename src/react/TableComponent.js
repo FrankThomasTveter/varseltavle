@@ -7,24 +7,17 @@ import {teal_palette} from '../mui/metMuiThemes';
 //import Paper from '@material-ui/core/Paper';
 //import Grid from '@material-ui/core/Grid';
 
-import SummaryCell from './SummaryCell';
-import SeriesCell  from './SeriesCell';
+import SummaryCell from './SummaryCellComponent';
+import SeriesCell  from './SeriesCellComponent';
 import CanvasText  from './CanvasTextComponent';
-import TooltipContainer  from './TooltipContainer';
-
-//const footheight="30px";
-//const headerheight="70px";
-//const footAndHeaderheight = "100px";
+import TooltipFixedComponent  from './TooltipFixedComponent';
 
 const styles = theme => ({
     dataset:{},
     tooltip:{width:'70%'},
     content: {
-//	border:  '10px solid red',
-///	height: '100%',
 	width: 'calc(98% - 5px)',
 	border: '0px',
-//	background:'green',
     },
     divHdrLeft : {
 	display: 'inline-block',
@@ -111,7 +104,7 @@ function FirstDataCell (props) {
     if (colkey==="" && rowkey==="") {
 	data=null;
     } else {
-	data=JSON.stringify({colkey:colkey,rowkey:rowkey,rowval:rowval}); 
+	data=JSON.stringify({keys:[rowkey,colkey],vals:[[rowval],[]]}); 
     };
     if (rowindex%2 === 1) {
 	return (<div className={cursor} onClick={onclick} style={{backgroundColor:'#DDD'}}
@@ -127,7 +120,7 @@ function FirstDataCell (props) {
 }
 function DataCell(props) {
     const {classes,state,elements,mode,plan,rowindex,...other}=props;
-    if (elements===undefined) {
+    if (elements.length===0) {
 	if (rowindex%2===1) {
 	    return <div className={classes.divTableCell} style={{backgroundColor:'#EEE'}}/>
 	} else {
@@ -149,13 +142,15 @@ function renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,ro
 	//console.log("Processing:",val,colvalues[index],plan.step);
 	var matrix=state.React.matrix;
 	//console.log("Matrix:",JSON.stringify(matrix));
-	var elements=state.Matrix.getMatrixElements(colvalues,rowval,matrix,index,plan.step);
-	//console.log("Elements:",JSON.stringify(colvalues),":",rowval,typeof(rowval),rowval==null,":",index,' =>',JSON.stringify(elements));
+	var elements=state.Cell.getElements(state,matrix,colkey,rowkey,
+					    colvalues,rowval,index,plan.step);
+	//console.log("Elements:",colkey,"=",JSON.stringify(colvalues),":",rowkey,"=",rowval,":",index,plan.step,' =>',JSON.stringify(elements.length));
 	// get count and colwhere
-        var cnt = Math.min(colvalues.length,index+plan.step)-index;
-        var colwhere = state.Database.getColWhere(colkey,colvalues,index,plan.step);
+        // var cnt = Math.min(colvalues.length,index+plan.step)-index;
+        var colwhere = state.Cell.getColWhere(state,colkey,colvalues,index,plan.step);
 	// make onclick
-	var onclick=() => state.Navigate.selectItem(state,colkey,rowkey,colvalues[index],rowval,colwhere,rowwhere,cnt,1);
+	//var onclick=() => state.Navigate.selectItem(state,colkey,rowkey,colvalues[index],rowval,colwhere,rowwhere,cnt,1);
+	var onclick=() => state.Navigate.selectElements(state,elements);
 
 	//var info=state.Matrix.getInfo(state,elements);
 	//var color=state.Colors.getLevelBgColor(info.maxlev);
@@ -167,17 +162,20 @@ function renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,ro
     } else {
 	return null;
     }
-}
+};
 function dataRow(classes,state,colkey,rowkey,colvalues,mode,plans,rowval,rowindex) {
     var rowwhere=state.Database.getWhereValue(rowkey,rowval);
-    var onclick=() => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1);}
+    var rowrange;
+    var onclick=() => {state.Navigate.selectKeys(state,rowkey,rowval,rowrange,rowwhere,1);}
     var range=[undefined,undefined];
     if (state.React.matrix!==undefined) {
-	range=state.Matrix.getRange(state,state.React.matrix,colvalues,[rowval]);
+	var keys=[colkey,rowkey];
+	var vals=[colvalues,[rowval]];
+	range=state.Matrix.getRanges(state,state.React.matrix,keys,vals);
     };
     //console.log("Making data cols.",rowval,colkey,JSON.stringify(colvalues));
     //console.log("We have a matrix(",rowval,") with range:",JSON.stringify(range));
-    var mapFunction= (val,index)=>{return renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,rowwhere,range,mode,plans.cell,val,index);};
+    var mapFunction= (val,index)=>{return renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,rowwhere,range,mode,plans.celc,val,index);};
     //console.log("Colvalue:",val,index);
     return (<div className={classes.divTableRow} key={rowindex.toString()}>
 	    <FirstDataCell classes={classes} state={state} key={'0'} colkey={colkey} rowkey={rowkey} rowval={rowval} onclick={onclick} 
@@ -214,8 +212,11 @@ function FirstHdrCell (props) {
     if (colkey==="" && rowkey==="") {
 	data=null;
     } else {
-	data=JSON.stringify({colkey:colkey,rowkey:rowkey}); 
+	data=JSON.stringify({keys:[rowkey,colkey],vals:[[],[]]}); 
     };
+    
+    //console.log("Hdr:",JSON.stringify(plans.hdr),JSON.stringify(plans.hd2),JSON.stringify(plans.hd1));
+    
     return (<div style={{width:plans.hdr.width}}>
 	       <div className={classes.divHdrRight} width={plans.hd2.width} onClick={onclickRow} data-for='cell' data-tip={data}>
 	          <CanvasText state={state} label={rowkey} plan={plans.hd2} color={'white'}/>
@@ -230,9 +231,11 @@ function FirstHdrCell (props) {
 function renderHdrCell(classes,state,colkey,colvalues,rowkey,plan,val,index) {
     if (index%plan.step === 0) {
 	//console.log("HdrCell:",index,plan.step);
-        var cnt = Math.min(colvalues.length,index+plan.step)-index;
-        var colwhere = state.Database.getColWhere(colkey,colvalues,index,plan.step);
-	var onclick=() => state.Navigate.selectKey(state,colkey,colvalues[index],colwhere,cnt);
+	var cnt = Math.min(colvalues.length,index+plan.step)-index;
+        var colwhere = state.Cell.getColWhere(state,colkey,colvalues,index,plan.step);
+	var colrange;
+	var vals=state.Cell.selectValues(colvalues,index,plan.step);
+	var onclick=() => state.Navigate.selectKeys(state,colkey,vals,colrange,colwhere,cnt);
 	var cursor=classes.divTableCell;
 	if (onclick !== undefined) {
 	    cursor=classes.divTableCellCursor;
@@ -242,7 +245,7 @@ function renderHdrCell(classes,state,colkey,colvalues,rowkey,plan,val,index) {
 	if (colkey==="" && rowkey==="") {
 	    data=null;
 	} else {
-	    data=JSON.stringify({colkey:colkey,rowkey:rowkey,colvalues:colvalues,index:index,step:plan.step}); 
+	    data=JSON.stringify({keys:[rowkey,colkey],vals:[[],vals]}); 
 	};
 	return (<div className={cursor} onClick={onclick} style={{backgroundColor:'#DDD'}} key={`col-${index}`}  data-for='cell' data-tip={data}>
 		   <CanvasText state={state} index={index} plan={plan} label={val}/>
@@ -262,7 +265,8 @@ function HdrRow(props) {
 }
 // ---------------- Details
 function Details(props) {
-    const { classes, state } = props; // classes, element
+    const { classes, state, element } = props; // classes, element
+    //console.log("TableComponent table A:",JSON.stringify(state.Path.other.table));
     var colkey = state.Path.getColKey(state)||"";
     var rowkey = state.Path.getRowKey(state)||"";
     var colvalues = state.Path.getValues(state,colkey,[null]);
@@ -272,13 +276,20 @@ function Details(props) {
     //var nrow=rowvalues.length + 1;
     //DOM.style.font
     var border=0;
-    if (cellMode===state.Layout.modes.cell.Sum) {
-	border=2;
-    };
-    var width=0.95*window.innerWidth-5;
-    var height=0.97*window.innerHeight - 100;
+    var width=0.92*element.width;//window.innerWidth;
+    var height=0.98*element.height - 70 - 50 - 5; //window.innerHeight
+    //console.log("height:",JSON.stringify(classes.dataset),height,width);
     var plans=state.Layout.makePlans(colkey,rowkey,colvalues,rowvalues,width,height,border);
+
+    //if (cellMode===state.Layout.modes.cell.Sum) {
+    //};
+    //plans.cell.height=plans.cell.height-2;
+    //plans.cell.width=plans.cell.width-2;
+    //plans.celc.height=plans.cell.height-2;
+    //plans.celc.width=plans.cell.width-2;
+
     //console.log("Table Plans:",JSON.stringify(plans));
+
     //console.log("Heights:",window.innerHeight,height,plans.hdr.height,plans.cell.height);
     //console.log("Details => Width/Height:",window.innerWidth,window.innerHeight,plan.cell.width,plan.hdr.height)
     //console.log("Colkey:",colkey," colval:",JSON.stringify(colvalues));
@@ -303,6 +314,8 @@ class Table extends Component {
 	super(props);
 	const {state} = props;
 	state.React.Table=this;
+        this.width= window.innerWidth;
+	this.height=window.innerHeight;
 	this._ismounted=false;
     };
     showTable() {
@@ -333,24 +346,14 @@ class Table extends Component {
     };
     render() {
 	const { classes, state } = this.props;
+	var cls={button:classes.button};
 	//console.log("##### Rendering Table.");
 	return (<div className={classes.content} ref={el=>{this.element(el)}}>
-		   <Details state={state} classes={classes} element={this}/>
-		   <TooltipContainer state={state} classes={{button:classes.button}} element={this} type={'cell'}/>
+		<Details state={state} classes={classes} element={this}/>
+		   <TooltipFixedComponent state={state} classes={cls} element={this} type={'cell'}/>
 	        </div>);
     }
 }
-
-
-
-//		   <Grid container spacing={00}>
-//		      <Grid item xs={12} > 
-//                         { <Paper className={classes.paper}>
-//                           </Paper>}
-//                      </Grid>
-//                   </Grid>
-
-
 
 Table.propTypes = {
     classes: PropTypes.object.isRequired,

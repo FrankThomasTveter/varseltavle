@@ -1,0 +1,1 @@
+./create.pl  -f world500Kb.json -f world3Mb.json -f world20Mb.json -c Norway Sweden Denmark Finland -o custom_world.js

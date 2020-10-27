@@ -71,7 +71,7 @@ function Grid() {
 	var min=this.area.minlat;
 	var max=this.area.maxlat;
 	return this.posToVal(state,pos,min,max,this.res.lat)
-	};
+    };
     this.getRes=function (min,max) {
 	var dlat=Math.max(this.eps,(max-min)/this.resolution);
 	var res=Math.max(1,Math.floor(0.5+((max-min)/dlat)))
@@ -93,8 +93,8 @@ function Grid() {
 	//console.log("GetLonRange:",min,max,lon,"->",pos," (->",this.posToVal(state,pos,min,max,this.res.lon),") result:",lonmin,lonmax);
 	return {min:lonmin,max:lonmax};
     }
-    this.getLonWhere=function(state,keylon,lon) {
-	var range=this.getLonRange(state,lon,this.res.lon);
+    this.getLonWhere=function(state,keylon,range) {
+	if (range===undefined) {return "";};
 	var lonmin=range.min;
 	var lonmax=range.max;
 	if (parseFloat(lonmin) < parseFloat(lonmax)) {
@@ -111,8 +111,8 @@ function Grid() {
 	var latmax=this.roundup(this.posToVal(state,pos+0.5,min,max,this.res.lat));
 	return {min:latmin,max:latmax};
     }
-    this.getLatWhere=function(state,keylat,lat) {
-	var range=this.getLatRange(state,lat);
+    this.getLatWhere=function(state,keylat,range) {
+	if (range===undefined) {return "";};
 	var latmin=range.min;
 	var latmax=range.max;
 	if (parseFloat(latmin) < parseFloat(latmax)) {
@@ -159,6 +159,17 @@ function Grid() {
 	};
 	this.area={minlat:minlat,maxlat:maxlat,minlon:minlon,maxlon:maxlon};
 	//console.log("setArea:",JSON.stringify(this.area),iminlat,imaxlat,iminlon,imaxlon);
+    }
+    this.combineRange=function(r1,r2) {
+	if (r1===undefined && r2!==undefined) {
+	    return r2;
+	} else if (r1!==undefined && r2===undefined) {
+	    return r1;
+	} else if (r1!==undefined && r2!==undefined) {
+	    return [Math.min(r1[0],r2[0]),Math.max(r1[1],r2[1])];
+	} else {
+	    return;
+	}
     }
     this.setRange=function(range,val) {
 	//console.log("SetRange Start:",JSON.stringify(range),val);

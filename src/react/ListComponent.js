@@ -13,6 +13,7 @@ import Grid from '@material-ui/core/Grid';
 
 const styles = theme => ({
     dataset: {},
+    content: {},
     root: {
 	height: '100%',
     },
@@ -69,7 +70,8 @@ function renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index){
     } else {
 	var val=doc[skey];
 	var where=state.Database.getWhereValue(skey,val);
-	var onClick=()=>{state.Navigate.selectKey(state,skey,val,where,1);};
+	var range;
+	var onClick=()=>{state.Navigate.selectKeys(state,skey,val,range,where,1);};
 	if (val === undefined) {val="";};
 	//console.log("Key:",skey," Val:",JSON.stringify(val),JSON.stringify(doc[skey]));
 	return (
@@ -96,26 +98,14 @@ function getDataRowList(classes,state,skeys,plans) {
     var matrix=state.React.matrix;
     //var ret=null;
     if (matrix!==undefined) {
-	var colvalues=Object.keys(matrix);
-	var clen=colvalues.length;
-        for (let kk=0;kk<clen;kk++) {
-	    var colval=colvalues[kk];
-	    var list=matrix[colval];
-	    if (list !== undefined) {
-		var rowvalues=Object.keys(list);
-		var rlen=rowvalues.length;
-		for (let ll=0;ll<rlen;ll++) {
-		    var rowval=rowvalues[ll];
-		    var element=state.Matrix.getMatrixElement(colval,rowval,matrix);
-		    //console.log("We have a matrix with range:",JSON.stringify(range));
-		    if (element !== undefined && element.docs !== undefined) {
-			let lev=element.maxlev;
-			element.docs.forEach((doc)=>{doc.__lev=lev;});
-			docs.push.apply(docs,element.docs);
-		    };
-		};
-	    }
-	}
+	var elements=state.Matrix.getMatrixElements(state,matrix);
+	elements.forEach( element => {
+	    if (element !== undefined && element.docs !== undefined) {
+		let lev=element.maxlev;
+		element.docs.forEach((doc)=>{doc.__lev=lev;});
+		docs.push.apply(docs,element.docs);
+	    };
+	});
     };
     // sort
     if (state.Path.shouldSort()) {

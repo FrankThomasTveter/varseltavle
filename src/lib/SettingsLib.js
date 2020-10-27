@@ -4,7 +4,7 @@ function Settings() {
     // list of all controls (visible and invisible)
     this.controls=["Undo","Redo","Mode","Path",
 		   "Reload","Home","Film","Key",
-		   "Order","Tooltip","Font","File",
+		   "Order","Tooltip","Font","Dim","File",
 		   "Archive","Focus","FullScreen","About"];
     // list of visible controls...
     this.visible=[];//["Undo","Redo","Mode","Path"];

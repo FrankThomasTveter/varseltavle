@@ -28,10 +28,14 @@ function Svg() {
 	    str=this.config.svgs[id]
 	};
 	//console.log("Id:",id," str:",str,this.def);
-	var str2=str.replace(/fg/g,fg);
-	var str3=str2.replace(/bg/g,bg);
-	var str4=str3.replace(/Size/g,size);
-	return str4;
+	if (id !== undefined) {
+	    var str2=str.replace(/fg/g,fg);
+	    var str3=str2.replace(/bg/g,bg);
+	    var str4=str3.replace(/Size/g,size);
+	    return str4;
+	} else {
+	    return this.def;
+	}
     }
 };
 export default Svg;

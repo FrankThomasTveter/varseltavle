@@ -4,9 +4,10 @@ import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
     canvas: {
+	overflow:"hidden",
 	width:"100%",
 	height:"100%",
-	overflow:"hidden",
+	//border: '1px dotted red',
     },
     pointer: {
 	cursor:"pointer",
@@ -29,6 +30,7 @@ function drawMarker(ctx,height,offset,width) {
 function updateCanvas(item) {
     const {label,plan,color} = item.props;
     const cnv=item.refs.text;
+    if (cnv === undefined) {return;}
     const ctx = cnv.getContext('2d');
     var ilabel=label||"";
     //var cnvheight = cnv.height;
@@ -55,6 +57,7 @@ function updateCanvas(item) {
     };
     if (plan.rotate !== undefined && plan.rotate) {
 	ctx.textAlign = "left"; //left right center
+	//console.log("XXX:",item.width,plan.border,plan.xoffset,th);
 	ctx.translate(item.width-plan.border-plan.xoffset,item.height-plan.border-plan.yoffset);
 	ctx.rotate(-Math.PI/2);
 	ctx.fillText(ilabel, 0, 0); // labelXposition
@@ -62,12 +65,15 @@ function updateCanvas(item) {
 	ctx.textAlign = "right"; //left right center
 	ctx.fillText(ilabel, plan.width-plan.border+plan.xoffset, item.height-plan.border-plan.yoffset); // labelXposition
     } else if (plan.align === "center") {
+	ctx.fillStyle='#FFF';
 	ctx.textAlign = "center"; //left right center
-	ctx.fillText(ilabel, plan.width-plan.border+plan.xoffset, item.height-plan.border-plan.yoffset); // labelXposition
+	//console.log("Center:",ilabel,item.width, plan.border, plan.xoffset,item.width-plan.border+plan.xoffset);
+	ctx.fillText(ilabel, item.width/2+plan.border+plan.xoffset, item.height-plan.border-plan.yoffset); // labelXposition
     } else {
-	ctx.fillText(ilabel, plan.border+plan.xoffset, item.height-plan.border-plan.yoffset); // labelXposition
+	ctx.fillText(ilabel, plan.border+plan.border+plan.xoffset, item.height-plan.border-plan.yoffset); // labelXposition
     };
     ctx.restore();
+    
     //ctx.rect(0,0,item.width,item.height);
     //ctx.stroke();
     //console.log("Label:",ilabel,item.width,item.height, plan.border,plan.xoffset);
@@ -91,9 +97,10 @@ class CanvasTextComponent extends Component {
 	this.height=plan.height;
 	this.invalid=invalid;
 	this.color=color;
+	//console.log("Text plan:",JSON.stringify(plan));
         return (
 		<canvas {...other} className={classes.canvas} classes={classes} onClick={onclick} title={title} 
-	            plan={plan} width={plan.width} height={plan.height} ref="text" />
+	            plan={plan} width={plan.width} height={plan.height-1} ref="text" />
         );
     }
 }
@@ -113,13 +120,3 @@ export default withStyles(styles)(CanvasTextComponent);
 //     }
 //     return getTextWidth.ctx.measureText(txt).width;
 // };
-// function getTextHeight(fontname, fontsize){
-//     if(getTextHeight.c === undefined){
-//         getTextHeight.c=document.createElement('canvas');
-//         getTextHeight.ctx=getTextHeight.c.getContext('2d');
-//     }
-//     if (fontname !== undefined) {
-// 	getTextHeight.ctx.font = fontsize + ' ' + fontname;
-//     }
-//     return getTextHeight.ctx.measureText('M').width;
-// }

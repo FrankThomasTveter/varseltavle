@@ -5,22 +5,23 @@ import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 
-import Undo         from './UndoComponent';
-import Redo         from './RedoComponent';
-import Mode         from './ModeComponent';
-import View         from './ViewComponent';
-import Key          from './KeyCollectMenuComponent';
-import Reload       from './ReloadComponent';
-import Tooltip      from './TooltipComponent';
-import Order        from './OrderMenuComponent';
-import Home         from './HomeMenuComponent';
-import Film         from './FilmMenuComponent';
-import File         from './FileMenuComponent';
-import Archive      from './ArchiveMenuComponent';
-import Font         from './FontComponent';
-import Focus        from './FocusComponent';
-import FullScreen   from './FullScreenComponent';
-import About        from './AboutComponent';
+import Undo         from './ConfigUndoComponent';
+import Redo         from './ConfigRedoComponent';
+import Mode         from './ConfigModeComponent';
+import View         from './ConfigViewPathComponent';
+import Collect      from './ConfigCollectComponent';
+import Reload       from './ConfigReloadComponent';
+import Tooltip      from './ConfigTooltipComponent';
+import Order        from './ConfigOrderComponent';
+import Home         from './ConfigHomeComponent';
+import Film         from './ConfigFilmComponent';
+import File         from './ConfigFileComponent';
+import Archive      from './ConfigArchiveComponent';
+import Font         from './ConfigFontComponent';
+import Dims         from './ConfigDimComponent';
+import Focus        from './ConfigFocusComponent';
+import FullScreen   from './ConfigFullScreenComponent';
+import About        from './ConfigAboutComponent';
 
 import SettingsIcon from '@material-ui/icons/Visibility';
 
@@ -54,6 +55,7 @@ class SettingsMenu extends Component {
         const { classes, state } = this.props;
 	this.onClick = event => {this.setState({ anchor: event.currentTarget });};
 	this.onClose = () => {this.setState({ anchor: null });};
+	var cls={button:classes.button};
 	return (<div className={classes.tableOrder}>
 		   <Button
                       className={classes.button}
@@ -72,52 +74,55 @@ class SettingsMenu extends Component {
                         onClose={this.onClose}
 		     >
 		    <MenuItem className={classes.order} key="undo" onClose={this.onClose}>
-		       <Undo state={state} classes={{button:classes.button}}/>
+		       <Undo state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="redo" onClose={this.onClose}>
-		       <Redo state={state} classes={{button:classes.button}}/>
+		       <Redo state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="mode" onClose={this.onClose}>
-		       <Mode state={state} classes={{button:classes.button}}/>
+		       <Mode state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="path" onClose={this.onClose}>
-		       <View state={state} classes={{button:classes.button}}/>
+		       <View state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="key" onClose={this.onClose}>
-		       <Key state={state} classes={{button:classes.button}}/>
+		       <Collect state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="reload" onClose={this.onClose}>
-		       <Reload state={state} classes={{button:classes.button}}/>
+		       <Reload state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="tooltip" onClose={this.onClose}>
-		       <Tooltip state={state} classes={{button:classes.button}}/>
+		       <Tooltip state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="order" onClose={this.onClose}>
-		       <Order state={state} classes={{button:classes.button}}/>
+		       <Order state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="home" onClose={this.onClose}>
-		       <Home state={state} classes={{button:classes.button}}/>
+		       <Home state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="film" onClose={this.onClose}>
-		       <Film state={state} classes={{button:classes.button}}/>
+		       <Film state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="file" onClose={this.onClose}>
-		       <File state={state} classes={{button:classes.button}}/>
+		       <File state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="archive" onClose={this.onClose}>
-		       <Archive state={state} classes={{button:classes.button}}/>
+		       <Archive state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="font" onClose={this.onClose}>
-		       <Font state={state} classes={{button:classes.button}}/>
+		       <Font state={state} classes={cls}/>
+		    </MenuItem>
+		    <MenuItem className={classes.order} key="dims" onClose={this.onClose}>
+		       <Dims state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="focus" onClose={this.onClose}>
-		       <Focus state={state} classes={{button:classes.button}}/>
+		       <Focus state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="fullscreen" onClose={this.onClose}>
-		       <FullScreen state={state} classes={{button:classes.button}}/>
+		       <FullScreen state={state} classes={cls}/>
 		    </MenuItem>
-		    <MenuItem className={classes.order} key="fullscreen" onClose={this.onClose}>
-		       <About state={state} classes={{button:classes.button}}/>
+		    <MenuItem className={classes.order} key="about" onClose={this.onClose}>
+		       <About state={state} classes={cls}/>
 		    </MenuItem>
 	             </Menu>
 		</div>

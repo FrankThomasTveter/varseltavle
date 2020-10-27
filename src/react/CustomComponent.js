@@ -7,11 +7,11 @@ import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 
-import EmptyCell   from './EmptyCell';
-import SummaryCell from './SummaryCell';
-import SeriesCell  from './SeriesCell';
+import EmptyCell   from './EmptyCellComponent';
+import SummaryCell from './SummaryCellComponent';
+import SeriesCell  from './SeriesCellComponent';
 import CanvasText  from './CanvasTextComponent';
-import Tooltip  from './TooltipContainer';
+import Tooltip  from './TooltipFixedComponent';
 
 const styles = theme => ({
     content:{
@@ -128,15 +128,12 @@ function renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,ro
 	// get elements and range
 	//console.log("Processing DataCell:",colkey,val,colvalues[index],plan.step);
 	var matrix=state.React.matrix;
-	var elements=state.Matrix.getMatrixElements(colvalues,rowval,matrix,index,plan.step);
+	var elements=state.Cell.getElements(state,matrix,colkey,rowkey,
+					    colvalues,rowval,index,plan.step);
 	//console.log("Elements:",rowval,index,' =>',JSON.stringify(elements));
-	// get count and colwhere
-        var cnt = Math.min(colvalues.length,index+plan.step)-index;
-        var colwhere = state.Database.getColWhere(colkey,colvalues,index,plan.step);
 	// make onclick
-	var onclick=() => state.Navigate.selectCustom(state,layout,colkey,rowkey,
-						      colvalues[index],rowval,
-						      colwhere,rowwhere,cnt,1);
+	var onclick=() => state.Navigate.selectElements(state,elements);
+        var colwhere = state.Cell.getColWhere(state,colkey,colvalues,index,plan.step);
 	return (<DataCell classes={classes} state={state} key={`col-${index}`} rowindex={rowindex} index={index} onclick={onclick}
 		colkey={colkey} rowkey={rowkey} colvalues={colvalues} rowval={rowval} colwhere={colwhere} rowwhere={rowwhere} 
 		elements={elements} mode={mode} layout={layout} plan={plan} range={range}
@@ -152,7 +149,9 @@ function dataRow(classes,state,colkey,rowkey,colvalues,mode,layout,plans,rowval,
     //var onclick=() => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1);}
     var range=[undefined,undefined];
     if (state.React.matrix!==undefined) {
-	range=state.Matrix.getRange(state,state.React.matrix,colvalues,[rowval]);
+	var keys=[colkey,rowkey];
+	var vals=[colvalues,[rowval]];
+	range=state.Matrix.getRanges(state,state.React.matrix,keys,vals);
     };
     //console.log("Making data cols.",rowval,colkey,JSON.stringify(colvalues));
     //console.log("We have a matrix(",rowval,") with range:",JSON.stringify(range));
@@ -249,6 +248,7 @@ class Custom extends Component {
     render() {
 	const { classes, state } = this.props;
 	//console.log("##### Rendering Custom.");
+	var cls={button:classes.button};
 	return (<div ref={el=>{this.element(el)}} className={classes.content}>
 		   <Grid container spacing={0}>
 		      <Grid item xs={12}> 
@@ -257,7 +257,7 @@ class Custom extends Component {
                            </Paper>}
                       </Grid>
                    </Grid>
-		   <Tooltip state={state} classes={{button:classes.button}} element={this} type={'cell'}/>
+		   <Tooltip state={state} classes={cls} element={this} type={'cell'}/>
 	        </div>);
     }
 }

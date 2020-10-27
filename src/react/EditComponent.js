@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = theme => ({
     input: {},
@@ -11,7 +12,7 @@ const styles = theme => ({
 class Edit extends Component {
     state={range:null};
     render() {
-	const {label, index, range, setvalue }=this.props;
+	const {classes, label, index, range, setvalue, onclose }=this.props;
 	//state, classes, onclick, onclose, 
 	this.setState={range:range};
 	this.handleChange=function(event) {
@@ -21,7 +22,11 @@ class Edit extends Component {
 	if (range === undefined) {
 	    return null;
 	} else {
-	    return (<div>{label}<input type="text" name={label} value={range[index]} onChange={this.handleChange} /></div>);
+	    return (
+	            <MenuItem key={label} onClose={onclose} className={classes.edit}>
+		    <div>{label}<input type="text" name={label} value={range[index]} onChange={this.handleChange} /></div>
+		    </MenuItem>
+	    );
 	}
     }
 }

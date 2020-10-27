@@ -7,23 +7,24 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import SettingsIcon from '@material-ui/icons/Settings';
 
-import Undo         from './UndoComponent';
-import Redo         from './RedoComponent';
-import Mode         from './ModeComponent';
-import View         from './ViewComponent';
-import Key          from './KeyCollectMenuComponent';
-import Reload       from './ReloadComponent';
-import Tooltip      from './TooltipComponent';
-import Order        from './OrderMenuComponent';
-import Home         from './HomeMenuComponent';
-import Film         from './FilmMenuComponent';
-import File         from './FileMenuComponent';
-import Archive      from './ArchiveMenuComponent';
-import Font         from './FontComponent';
-import Focus        from './FocusComponent';
-import FullScreen   from './FullScreenComponent';
+import Undo         from './ConfigUndoComponent';
+import Redo         from './ConfigRedoComponent';
+import Mode         from './ConfigModeComponent';
+import View         from './ConfigViewPathComponent';
+import Collect      from './ConfigCollectComponent';
+import Reload       from './ConfigReloadComponent';
+import Tooltip      from './ConfigTooltipComponent';
+import Order        from './ConfigOrderComponent';
+import Home         from './ConfigHomeComponent';
+import Film         from './ConfigFilmComponent';
+import File         from './ConfigFileComponent';
+import Archive      from './ConfigArchiveComponent';
+import Font         from './ConfigFontComponent';
+import Dims         from './ConfigDimComponent';
+import Focus        from './ConfigFocusComponent';
+import FullScreen   from './ConfigFullScreenComponent';
 import SettingsMenu from './SettingsMenuComponent';
-import About        from './AboutComponent';
+import About        from './ConfigAboutComponent';
 
 const styles = theme => ({
     settings: {
@@ -46,9 +47,10 @@ class Settings extends Component {
     state = {anchor: null,};
     render() {
         const { state,classes } = this.props;
-	//console.log("Rendering Settings...");
+	//console.log("Rendering Settings...",JSON.stringify(state.Path.other));
 	this.onClose = () => {this.setState({ anchor: null });};
 	this.onClick = (event) => {this.setState({ anchor: event.currentTarget });};
+	var cls={button:classes.button};
 	return (<div>
 		  <Button
 		    className={classes.button}
@@ -67,57 +69,60 @@ class Settings extends Component {
                    onClose={this.onClose}
 	          >
 		    <MenuItem key="reload" onClose={this.onClose}>
-		       <Reload state={state} classes={{button:classes.button}} visible={true}/>
+		       <Reload state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="undo" onClose={this.onClose}>
-		       <Undo state={state} classes={{button:classes.button}} visible={true}/>
+		       <Undo state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="redo" onClose={this.onClose}>
-		       <Redo state={state} classes={{button:classes.button}} visible={true}/>
+		       <Redo state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="mode" onClose={this.onClose}>
-		       <Mode state={state} classes={{button:classes.button}} visible={true}/>
+		       <Mode state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="view" onClose={this.onClose}>
-		       <View state={state} classes={{button:classes.button}} visible={true}/>
+		       <View state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="key" onClose={this.onClose}>
-		       <Key state={state} classes={{button:classes.button}} visible={true}/>
+		       <Collect state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="Tooltip" onClose={this.onClose}>
-		       <Tooltip state={state} classes={{button:classes.button}} visible={true}/>
+		       <Tooltip state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="Order" onClose={this.onClose}>
-		       <Order state={state} classes={{button:classes.button}} visible={true}/>
+		       <Order state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="Home" onClose={this.onClose}>
-		       <Home state={state} classes={{button:classes.button}} visible={true}/>
+		       <Home state={state} classes={cls} visible={true}/>
 		    </MenuItem>
-		    <MenuItem key="Film" onClose={this.onClose}>
-		       <Film state={state} classes={{button:classes.button}} visible={true}/>
+                    <MenuItem key="Film" onClose={this.onClose}>
+		       <Film state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="file" onClose={this.onClose}>
-		       <File state={state} classes={{button:classes.button}} visible={true}/>
+		       <File state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="archive" onClose={this.onClose}>
-		       <Archive state={state} classes={{button:classes.button}} visible={true}/>
+		       <Archive state={state} classes={cls} visible={true}/>
 		    </MenuItem>
-		    <MenuItem key="font" onClose={this.onClose}>
-		       <Font state={state} classes={{button:classes.button}} visible={true}/>
+                    <MenuItem key="font" onClose={this.onClose}>
+		       <Font state={state} classes={cls} visible={true}/>
+		    </MenuItem>
+                    <MenuItem key="dims" onClose={this.onClose}>
+		       <Dims state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="focus" onClose={this.onClose}>
-		       <Focus state={state} classes={{button:classes.button}} visible={true}/>
+		       <Focus state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="fullscreen" onClose={this.onClose}>
-		       <FullScreen state={state} classes={{button:classes.button}} visible={true}/>
+		       <FullScreen state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="set" onClose={this.onClose}>
-		       <SettingsMenu state={state} classes={{button:classes.button}} visible={true}/>
+		       <SettingsMenu state={state} classes={cls} visible={true}/>
 		    </MenuItem>
-		    <MenuItem key="set" onClose={this.onClose}>
-		       <About state={state} classes={{button:classes.button}} visible={true}/>
+		    <MenuItem key="about" onClose={this.onClose}>
+		        <About state={state} classes={cls} visible={true}/>
 		    </MenuItem>
-	          </Menu>
+		</Menu>
 		</div>
 	       );
     }

@@ -55,8 +55,9 @@ class ReelAdd extends Component {
 	//this.state.label=label;
 	//var items=state.Path.getReels(state);
 	const input=<input type={"search"} value={this.state.label} onChange={this.handleChange} />;
+	var cls={button:classes.button};
 	return (<div>
-		<AddReel state={state} classes={{button:classes.button}} onadd={this.onAdd}/>
+		<AddReel state={state} classes={cls} onadd={this.onAdd}/>
 		<Chip icon={null} label={input}  onClick={onclick}/>
 		</div>
 	       );

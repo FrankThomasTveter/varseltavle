@@ -26,12 +26,19 @@ const styles = theme => ({
 	width: '100%',
     },
     divTableRow:  {
-	backgroundColor:teal_palette.main,
+	backgroundColor:teal_palette.light,
 	border: '1px solid #000',
 	display: 'table-row',
 	padding: '5px',
     },
     divTableHdr:{
+	border: '1px solid #000',
+	display: 'table-cell',
+	padding: '5px',
+	backgroundColor:teal_palette.light,
+	color:'black',
+    },
+    divTableKeyHdr:{
 	border: '1px solid #000',
 	display: 'table-cell',
 	padding: '5px',
@@ -58,45 +65,52 @@ const styles = theme => ({
 
 // ---------------- DATA
 function FirstDataCell (props) {
-    const { classes, rowval} = props;//,state, rowindex
-    return (<div className={classes.divTableHdr}>
-	    {rowval}
-	    </div>);
+    const { classes, rowval, tkeys} = props;//,state, rowindex
+    if (tkeys.indexOf(rowval) === -1) {
+	return (<div className={classes.divTableHdr}>
+		{rowval}
+		</div>);
+    } else {
+	return (<div className={classes.divTableKeyHdr}>
+		{rowval}
+		</div>);
+    };
 }
 //{rowval}
 function DataCell(props) {
-    const {classes,val,onclick,fgcolor,bgcolor}=props;//state,rowindex,
+    const {classes,val,onclick,fgcolor,bgcolor,title}=props;//state,rowindex,
     var rval=val;
     if (isNaN(rval)) {
 	rval=val;
     } else {
 	rval=parseFloat(rval,0).toFixed(2);
-    };
-    return <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} style={{color:fgcolor,backgroundColor:bgcolor}} onClick={onclick}>{rval}</div>
+    };// title="test"
+    return <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} style={{color:fgcolor,backgroundColor:bgcolor}} onClick={onclick} title={title}>{rval}</div>
 }
-function renderDataCell(classes,state,key,click,sub,rowindex,colindex) {
+function renderDataCell(classes,state,key,ckeys,tkeys,sub,rowindex,colindex) {
     var maxlev=sub["level"]||0;
     var bgcolor=state.Colors.getLevelBgColor(maxlev);
     var fgcolor=state.Colors.getLevelFgColor(maxlev);
     var rowkey=key;
     var rowval=sub[key];
     var rowwhere=state.Database.getWhereValue(rowkey,rowval);
-    var onclick=(click.indexOf(rowkey)===-1?undefined: () => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1)});
-    return (<DataCell classes={classes} state={state} key={`${rowindex}-${colindex}`} val={sub[key]} rowindex={rowindex} fgcolor={fgcolor} bgcolor={bgcolor} onclick={onclick}/>);
+    var title=state.Matrix.getTooltipTitle(state,sub,key);
+    var onclick=(ckeys.indexOf(rowkey)===-1?undefined: () => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1)});
+    return (<DataCell classes={classes} state={state} key={`${rowindex}-${colindex}`} val={sub[key]} rowindex={rowindex} fgcolor={fgcolor} bgcolor={bgcolor} onclick={onclick} title={title}/>);
 }
 //{{rowkey:'test1',colkey:'test2',title:title}}
-function dataRow(classes,state,key,click,subs,rowindex) {
+function dataRow(classes,state,key,ckeys,tkeys,subs,rowindex) {
     //return null; // no entries, ignore row...
-    var mapFunction= (sub,colindex)=>renderDataCell(classes,state,key,click,sub,rowindex,colindex);
+    var mapFunction= (sub,colindex)=>renderDataCell(classes,state,key,ckeys,tkeys,sub,rowindex,colindex);
     return (<div className={classes.divTableRow} key={rowindex.toString()}>
-	    <FirstDataCell classes={classes} state={state} key={'k-'+rowindex} rowval={key}/>
+	    <FirstDataCell classes={classes} state={state} key={'k-'+rowindex} rowval={key} tkeys={tkeys}/>
 	    {subs.map(mapFunction)}
 	    </div>);
 };
 // ---------------- Details
 function Details(props) {
-    const { classes, state, keys, click, subs } = props; // classes, element
-    var mapFunction= (key,rowindex)=>dataRow(classes,state,key,click,subs,rowindex);
+    const { classes, state, keys, ckeys, tkeys, subs } = props; // classes, element
+    var mapFunction= (key,rowindex)=>dataRow(classes,state,key,ckeys,tkeys,subs,rowindex);
     return (<div className={classes.divTable}>
 	       <div className={classes.divTableBody}>
 	          {keys.map(mapFunction)}
@@ -121,11 +135,15 @@ class TooltipTable extends Component {
 	};
     };
     render() {
-	const { state, classes, keys, click, subs } = this.props;
+	const { state, classes, keys, ckeys, tkeys, subs } = this.props;
 	//console.log("##### Rendering TooltipTable.");
-	return (<div ref={el=>{this.element(el)}} className={classes.root}  style={{width: '100%', height: '100%'}}>
-		   <Details state={state} classes={classes} element={this} keys={keys} click={click} subs={subs}/>
-	        </div>);
+	if (tkeys===undefined || ckeys===undefined) {
+	    return null;
+	} else {
+	    return (<div ref={el=>{this.element(el)}} className={classes.root}  style={{width: '100%', height: '100%'}}>
+		    <Details state={state} classes={classes} element={this} keys={keys} ckeys={ckeys} tkeys={tkeys} subs={subs}/>
+	            </div>);
+	};
     }
 }
 

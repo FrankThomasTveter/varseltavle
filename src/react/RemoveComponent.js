@@ -20,7 +20,7 @@ class Remove extends Component {
 		   <Button
 	              className={classes.button}
                       onClick={onclick}
-	              title={"Remove table"}
+	              title={"Remove key"}
 		    >
 	  	       {<RemoveIcon state={state}/>}
                     </Button>

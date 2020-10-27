@@ -35,13 +35,13 @@ function Layout() {
 		       }
 	       };
     this.toggleTooltip=function(state) {
-	this.state.tooltip=(this.state.tooltip+1)%3;
+	state.Layout.state.tooltip=(state.Layout.state.tooltip+1)%3;
 	//console.log("Tooltip:",this.state.tooltip);
 	state.Utils.pushUrl(state);
 	state.Show.show(state,true);
     };
     this.changeFont=function(state) {
-	this.state.cfont=((this.state.cfont +1) % this.fonts.length);
+	state.Layout.state.cfont=((state.Layout.state.cfont +1) % state.Layout.fonts.length);
 	state.Utils.pushUrl(state);
 	state.Show.show(state,false);
     };
@@ -57,6 +57,7 @@ function Layout() {
 	state.Show.showConfig(state);
     };
     this.toggleMode=function(state,layoutMode,cellMode) {
+	//console.log("Layout table A:",JSON.stringify(state.Path.other.table));
 	//console.log("ToggleMode:",layoutMode,cellMode);
 	//var reload=(layoutMode !== state.Layout.state.layoutMode);
 	var newismap = (layoutMode===state.Layout.modes.layout.Chart ||
@@ -128,8 +129,8 @@ function Layout() {
     };
     this.getCellMode=function(state) {
 	var mode=this.state.cellMode;
-	if (mode  === this.modes.cell.Single && state.Matrix.cnt > state.Matrix.popSingle) {
-	    mode=this.modes.cell.Series;
+	if (mode  === this.modes.layout.List && state.Matrix.cnt > state.Matrix.popSingle) {
+	    mode=this.modes.cell.Sum;
 	}
 	if (mode  === this.modes.cell.Series && state.Matrix.cnt > state.Matrix.popSeries) {
 	    mode=this.modes.cell.Sum;
@@ -335,32 +336,28 @@ function Layout() {
 	    plan[key]=val;
 	};
     };
-    this.getTextWidth=function(txt, fontname, fontsize){
-	if(this.getTextWidth.c === undefined){
-            this.getTextWidth.c=document.createElement('canvas');
-            this.getTextWidth.ctx=this.getTextWidth.c.getContext('2d');
-	}
-	if (fontname !== undefined) {
-	    this.getTextWidth.ctx.font = fontsize + ' ' + fontname;
-	} else {
-	    this.getTextWidth.ctx.font = this.getFont();
+    this.getTextWidth=function(txt){
+	var font=this.getFont();
+	if (this.getTextWidth.font === undefined ||
+	    this.getTextWidth.font !== font) {
+            var c=document.createElement('canvas');
+            this.getTextWidth.ctx=c.getContext('2d');
+	    this.getTextWidth.ctx.font =font
 	}
 	return this.getTextWidth.ctx.measureText(txt).width;
     };
-    this.getTextHeight=function(fontname, fontsize){
-	if(this.getTextHeight.c === undefined){
-            this.getTextHeight.c=document.createElement('canvas');
-            this.getTextHeight.ctx=this.getTextHeight.c.getContext('2d');
+    this.getTextHeight=function(){
+	var font=this.getFont();
+	if (this.getTextHeight.font === undefined ||
+	    this.getTextHeight.font !== this.getFont()) {
+            var c=document.createElement('canvas');
+            this.getTextHeight.ctx=c.getContext('2d');
+	    this.getTextHeight.ctx.font =font
 	}
-	if (fontname !== undefined) {
-	    this.getTextHeight.ctx.font = fontsize + ' ' + fontname;
-	} else {
-	    this.getTextHeight.ctx.font = this.getFont();
-	}
-	return this.getTextHeight.ctx.measureText('M').width;
+	return this.getTextHeight.ctx.measureText('M').width*0.8;
     };
-    this.getDescender=function(fontname,fontsize) {
-	return this.getTextHeight(fontname,fontsize)*0.3;
+    this.getDescender=function() {
+	return this.getTextHeight()*0.3;
     }
     this.maxWidth=function(values,border) {
 	var swidth=0;
@@ -438,18 +435,19 @@ function Layout() {
     this.makePlans=function(colkey,rowkey,colvalues,rowvalues,iwidth,iheight,border) {
 	var descender=this.getDescender();
 	if (border===null) {border=0;}
-	iheight=iheight-15;
+	iheight=iheight-17;
 	border=border+1; // descender
 	// text boundaries
-	var mheight=this.getTextHeight() + 2 * (descender+1);       //props.theme.spacing.unit;
+	var mheight=this.getTextHeight() + (descender+1);       //props.theme.spacing.unit;
 	var plans={cell:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()}, 
+		   celc:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()}, 
 		   hdr:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()},
 		   hd1:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()},
 		   hd2:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()},
 		   row:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()},
 		   col:{rotate:false,step:1,border:border,width:mheight*2,height:mheight,xoffset:0,yoffset:0,font:this.getFont()}};
 	if (iwidth <= 0) { return plans;};
-	var hdrHeight, hdrWidth, cellHeight, cellWidth, hdr1Width, hdr2Width, hx, rot, stp,lenr,lenc, cheight;
+	var hdrHeight, hdrWidth, cellHeight, cellWidth, hdr1Width, hdr2Width, hx, hy, ry, cy, rot, stp,lenr,lenc, cheight, cnt;
 	lenc=colvalues.length;
 	lenr=rowvalues.length;
 	//console.log("Height:",iheight,lenr,border);
@@ -467,6 +465,9 @@ function Layout() {
 	    cellHeight=cheight/lenr - 2*border-5;
 	    //console.log("CellHeight:",cellHeight,height,lenr,border);
 	    cellWidth=width/lenc - 2*border;
+	    hy=0;
+	    ry=0;
+	    cy=0;
 	    //console.log("Keys:",colkey, rowkey, lenc, lenr, cellWidth, cellHeight, iwidth,iheight,border);
 	    //console.log("Keys col:",colkey, JSON.stringify(colvalues), lenc, iwidth, cellWidth);
 	    //console.log("Keys row:",rowkey, JSON.stringify(rowvalues), lenr, iheight, cellHeight);
@@ -487,23 +488,25 @@ function Layout() {
 	    if (mwidth*lenc < width) { // horisontal
 		rot=false;
 		stp=1
-		cellWidth=width/lenc;
-		hdrHeight=mheight;
+		cellWidth=(width/lenc)-2*border;
+		hdrHeight=mheight*2;
 		hx=(cellWidth-mwidth)/2;
 		//console.log("Plan (normal):",JSON.stringify(plans));
 	    } else if (mheight*lenc < width) { // rotate
 		rot=true;
 		stp=1
-		cellWidth=width/lenc;
+		cellWidth=(width/lenc)-2*border;
 		hdrHeight=mwidth;
 		hx=(cellWidth-mheight)/2;
 		//console.log("Plan (rot):",JSON.stringify(plans),lenc,cellWidth*lenc);
 	    } else { // rotate and use steps
 		rot=true;
 		stp=Math.ceil(lenc*mheight/width);
-		cellWidth=stp*width/lenc;
+		cnt=Math.ceil(lenc/stp);
+		cellWidth=(width/cnt)-2*border;
 		hdrHeight=mwidth;
-		hx=(cellWidth-mheight)/2;
+		hx=(cellWidth-mheight)/2 + border;
+		console.log("Plan (rot+step):",lenc/stp,cnt,cellWidth,stp,width,lenc,mheight,hx);
 		//console.log("Plan (rot+step):",JSON.stringify(plans),stp,cellWidth,hdrHeight,hx);
 	    }
 	    // calculate cell height
@@ -511,22 +514,26 @@ function Layout() {
 	    //height=iheight-hdrHeight-((lenr+1)*border)-15;
 	    //console.log("Height:",iheight,cheight,mheight*lenr);
 	    if (mheight*lenr < cheight) { // 
-		cellHeight=Math.min(mheight*10,cheight/lenr)-2*border-3;
+		cellHeight=Math.max(mheight*1.3,Math.min(mheight*10,cheight/lenr)-2*border-6);
 	    } else {
-		cellHeight=mheight - 2*border-3;
+		cellHeight=mheight*1.3;
 	    }
+	    hy=Math.min(Math.max(0,hdrHeight-descender-mheight),Math.max((hdrHeight-descender-mheight)/2,descender));
+	    if (rot) {ry=0;} else {ry=hy};
+	    cy=Math.min(Math.max(0,cellHeight-descender-mheight),Math.max((cellHeight-descender-mheight)/2,descender));
 	    hdrWidth=hwidth;
 	    //console.log("Cells:",hdrHeight,cellHeight,iheight,lenr,mheight);
 	    var dw=(hdrWidth-zwidth1-zwidth2)/2;
 	    hdr1Width=zwidth1+dw;
 	    hdr2Width=zwidth2+dw;
 	}
-	this.setPlan(plans.cell,{width:cellWidth, height:cellHeight, step:stp, font:this.getFont()});
-	this.setPlan(plans.hdr, {width:hdrWidth,  height:hdrHeight,  font:this.getFont()});
-	this.setPlan(plans.hd1, {width:hdr1Width, height:hdrHeight,  align:"right", font:this.getFont()});
-	this.setPlan(plans.hd2, {width:hdr2Width, height:hdrHeight,  font:this.getFont()});
-	this.setPlan(plans.col, {width:cellWidth, height:hdrHeight,  xoffset:hx, step:stp,rotate:rot, font:this.getFont()});
-	this.setPlan(plans.row, {width:hdrWidth,  height:cellHeight, font:this.getFont()});
+	this.setPlan(plans.cell,{width:cellWidth, height:cellHeight, yoffset:cy, step:stp, font:this.getFont()});
+	this.setPlan(plans.celc,{width:cellWidth, height:cellHeight, yoffset:cy, align:"center",step:stp, font:this.getFont(), brief:rot});
+	this.setPlan(plans.hdr, {width:hdrWidth,  height:hdrHeight,  yoffset:hy, font:this.getFont()});
+	this.setPlan(plans.hd1, {width:hdr1Width, height:hdrHeight,  yoffset:hy, align:"right", font:this.getFont()});
+	this.setPlan(plans.hd2, {width:hdr2Width, height:hdrHeight,  yoffset:hy, font:this.getFont()});
+	this.setPlan(plans.col, {width:cellWidth, height:hdrHeight,  yoffset:ry, xoffset:hx, step:stp,rotate:rot, font:this.getFont()});
+	this.setPlan(plans.row, {width:hdrWidth,  height:cellHeight, yoffset:cy, font:this.getFont()});
 	//console.log("Plan (finally):",JSON.stringify(plans),mheight,mwidth,height,width,lenr);
 	return plans;
     }

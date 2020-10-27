@@ -4,20 +4,23 @@ import { withStyles } from '@material-ui/core/styles';
 
 //import {teal_palette} from '../mui/metMuiThemes';
 
-//import TooltipContainer from './TooltipContainer'
-import MapInfo from './MapInfo'
+//import TooltipFixedComponent from './TooltipFixedComponent'
+import MapInfo from './MapInfoComponent'
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import worldGeoJSON from 'geojson-world-map';
+//import worldGeoJSON from 'geojson-world-map';
+import worldGeoJSON from '../geojson/custom_world';
 import { Map, GeoJSON, Marker, Tooltip } from 'react-leaflet';//TileLayer ,Popup
-import TooltipFloat  from './TooltipFloat';
+import TooltipFloatComponent  from './TooltipFloatComponent';
 
 L.Icon.Default.imagePath = 'images'
 
-const footAndHeaderheight = "100px";
-
 const styles = theme => ({
-    content: {},
+    dataset: {},
+    content: {
+	width: 'calc(98% - 5px)',
+	border: '0px',
+    },
     root: {
 	height: '100%',
 	padding:0,
@@ -25,7 +28,6 @@ const styles = theme => ({
 	border: '0px solid red'
     },
     invisible:{border:0,padding:0},
-    dataset: {},
     map: {
 	backgroundColor:'Gray',
 	overflow: 'hidden',
@@ -47,6 +49,8 @@ class GeoJsonMap extends Component {
 	this.update=this.update.bind(this);
 	this.cnt=0;
 	this.updateTooltip=this.updateTooltip.bind(this);
+        this.width= window.innerWidth;
+	this.height=window.innerHeight;
 	this.marker=null;
 	this.tooltip=null;
 	this.bounds=null;
@@ -91,21 +95,13 @@ class GeoJsonMap extends Component {
     // 	if (state.Layout.state.tooltip===2) {
     // 	    return null;
     // 	} else {
-    // 	    return <TooltipContainer state={marker.state} data={marker} update={this.update}/>;
+    // 	    return <TooltipFixedComponent state={marker.state} data={marker} update={this.update}/>;
     // 	}
     // }
     onClickMarker(marker, markerObject, event) {
 	//console.log("Clicked marker...",marker.id)
 	var state=marker.state;
-	var colkey=marker.colrangekey;
-	var colrange=marker.colrange;
-	var colwhere=marker.colwhere;
-	var rowkey=marker.rowrangekey;
-	var rowrange=marker.rowrange;
-	var rowwhere=marker.rowwhere;
-	var cnt=marker.cnt;
-	//console.log("Clicked marker...",marker.id);
-	state.Navigate.selectItemRange(state,colkey,rowkey,colrange,rowrange,colwhere,rowwhere,cnt,1);
+	state.Navigate.selectElement(state,marker.element);
     };
     handleClick() {
 	this.refs.map.leafletElement.locate();
@@ -123,7 +119,8 @@ class GeoJsonMap extends Component {
     };
     showFocus(state) {
 	var zoom,focus;
-	if (!state.Path.inFocus(state) || this.bounds===null) { // use stored focus
+	if (!state.Path.inFocus(state) || this.bounds===null ||
+	    this.bounds === undefined ||! this.bounds.isValid()) { // use stored focus
 	    zoom=state.Path.getFocusZoom(state);
 	    this.config.zoom=zoom;
 	    focus=[state.Path.getFocusLat(state),state.Path.getFocusLon(state)];
@@ -133,6 +130,7 @@ class GeoJsonMap extends Component {
 		//	JSON.stringify(state.Path.focus));
 	    state.Path.setFocus(state,zoom,focus[0],focus[1],false);
 	} else {// use focus from marker data...
+	    //console.log("Bounds:",JSON.stringify(this.bounds));
 	    this.refs.map.leafletElement.fitBounds(this.bounds);
 	    zoom=this.refs.map.leafletElement.getZoom();
 	    focus=this.refs.map.leafletElement.getCenter();
@@ -158,43 +156,30 @@ class GeoJsonMap extends Component {
 	var sum={x2:0,y2:0,z2:0,x:0,y:0,z:0,cnt:0};
 	if (matrix !== undefined) {
 	    state.Matrix.printElements(matrix);
-	    var colkey = state.Path.getColKey(state)||"";
-	    var rowkey = state.Path.getRowKey(state)||"";
-	    var colvalues = state.Path.getValues(state,colkey);
-	    var rowvalues = state.Path.getValues(state,rowkey);
-	    //console.log("Matrix:",colkey,JSON.stringify(matrix));
-	    //console.log("Colvalues:",colkey,JSON.stringify(colvalues));
-	    //console.log("Rowvalues:",rowkey,JSON.stringify(rowvalues));
-            // make markers
-	    //console.log("Rows:",rowvalues.length);
-            var rlen=rowvalues.length;
-            for(var ii=0; ii<rlen; ii++) {
-		var rowval=rowvalues[ii];
-		var rowrange=state.Grid.getLatRange(state,rowvalues[ii]);
-		var rowwhere = state.Grid.getLatWhere(state,"lat",rowvalues[ii]);
-		var clen=colvalues.length;
-		for(var jj=0; jj<clen; jj++) {
-		    var colval=colvalues[jj];
-		    var colrange=state.Grid.getLonRange(state,colvalues[jj]);
-		    var colwhere = state.Grid.getLonWhere(state,"lon",colvalues[jj]);
-		    var element=state.Matrix.getMatrixElement(colval,rowval,matrix);
-		    if (element !== undefined) {
-			var lon=element.colval;
-			var lat=element.rowval;
-			var lev=element.maxlev;
-			var svgid=element.svgid;
-			//console.log("Found SVG:",svgid);
-			var bgcolor=state.Colors.getLevelBgColor(lev);
-			var fgcolor=state.Colors.getLevelFgColor(lev);
-			var cnt=element.cnt;
+	    var elements=state.Matrix.getMatrixElements(state,matrix);
+	    elements.forEach( element => {
+		//console.log("Element:",JSON.stringify(element));
+		if (element !== null && element !== undefined) {
+		    var lon=element.lon;
+		    var lat=element.lat;
+		    var lev=element.maxlev;
+		    var svgid=element.svgid;
+		    //console.log("Found SVG:",svgid);
+		    //var latRange=element.latRange;
+		    //var lonRange=element.lonRange;
+		    var bgcolor=state.Colors.getLevelBgColor(lev);
+		    var fgcolor=state.Colors.getLevelFgColor(lev);
+		    var cnt=element.cnt;
+		    var rlat=lat*Math.PI/180;
+		    var rlon=lon*Math.PI/180;
+		    var clat=Math.cos(rlat);
+		    var slat=Math.sin(rlat);
+		    var clon=Math.cos(rlon);
+		    var slon=Math.sin(rlon);
+		    var pos={x:clat*clon,y:clat*slon,z:slat};
+		    //console.log("Latlon:",lat,lon);
+		    if (lat !== undefined && lon !== undefined) {
 			tcnt=tcnt+1;
-			var rlat=lat*Math.PI/180;
-			var rlon=lon*Math.PI/180;
-			var clat=Math.cos(rlat);
-			var slat=Math.sin(rlat);
-			var clon=Math.cos(rlon);
-			var slon=Math.sin(rlon);
-			var pos={x:clat*clon,y:clat*slon,z:slat};
 			sum.cnt=sum.cnt+1;
 			sum.x=sum.x+pos.x;
 			sum.y=sum.y+pos.y;
@@ -202,57 +187,30 @@ class GeoJsonMap extends Component {
 			sum.x2=sum.x2+pos.x*pos.x;
 			sum.y2=sum.y2+pos.y*pos.y;
 			sum.z2=sum.z2+pos.z*pos.z;
-			var fact=4;
-			//console.log("mapComponent:",colkey,colval,rowkey,rowval);
 			//console.log("Colors:",tcnt,lev,bgcolor);
 			//console.log("Marker:",tcnt," Pos=",lat,lon," Lev=",lev,bgcolor);
-			// var data;
-			// if (colkey==="" && rowkey==="") {
-			//     data=null;
-			// } else {
-			//     data=JSON.stringify({colkey:colkey,rowkey:rowkey,colvalues:colvalues,index:0,step:1}); 
-			// };
-			var size={width : (colrange.max-colrange.min)*clat*fact,
-				  depth : (rowrange.max-rowrange.min)*fact,
-				  height: 1};
-			this.bounds.extend(new L.LatLng(rowval,colval));
+			this.bounds.extend(new L.LatLng(lat,lon));
 			var mark={id:tcnt,
 				  coordinates:[lat,lon],
 				  city:"Test",
 				  value:5,
-				  size:size,
 				  element:element,
 				  level:lev,
 				  bgcolor:bgcolor,
 				  fgcolor:fgcolor,
 				  svgid:svgid,
 				  state:state,
-				  colkey:"_lon",
-				  colvalues:[colval],
-				  step:1,
-				  index:0,
-				  colrangekey:"lon",
-				  colrange:colrange,
-				  colwhere:colwhere,
-				  rowkey:"_lat",
-				  rowval:rowval,
-				  rowrangekey:"lat",
-				  rowrange:rowrange,
-				  rowwhere:rowwhere,
 				  map:true,
 				  cnt:cnt
 				 };
 			if (first) {
 			    first=false;
-			    //console.log("row=",rowval,"(",rowwhere,") col=",colval,"(",colwhere,") ",JSON.stringify(element));
 			}
 			markers.push(mark);
 			//this.config.markers.push(mark);
-		    } else {
-			//console.log("No element at ",colkey,"=",colval,", ",rowkey,"=",rowval);
-		    }
+		    };
 		}
-	    }
+	    });
 	} else {
 	    console.log("No matrix available...");
 	}
@@ -277,8 +235,8 @@ class GeoJsonMap extends Component {
 		cen.z=0;
 	    }
 	    ll=Math.sqrt(cen.x*cen.x+cen.y*cen.y);
-	    clat=Math.acos(ll) * 180/Math.PI;
-	    clon=Math.atan2(cen.y,cen.x) * 180/Math.PI;
+	    var clat=Math.acos(ll) * 180/Math.PI;
+	    var clon=Math.atan2(cen.y,cen.x) * 180/Math.PI;
 	    //console.log("Center:",clon,clat,dist,ll,cen,zoom);
 	    //this.config.dist=dist;
 	    //this.config.zoom=zoom;
@@ -304,23 +262,17 @@ class GeoJsonMap extends Component {
     };
   render() {
       const { classes, state } = this.props;
-      var height='calc(95% - '+footAndHeaderheight+')';
+      //var width=0.92*this.width;//window.innerWidth
+      //var height=0.98*this.height - 70 - 50 - 5;//window.innerHeight
+      var height='calc(100% - 70px - 70px - 5px)';
       //var layoutMode  = state.Layout.getLayoutMode(state);
       var markFunction= (mark) => {
-	  //var data=JSON.stringify({rowkey:mark.rowkey,
-	 //			   rowval:mark.rowval,
-	//			   colkey:mark.colkey,
-	//			   colvalues:mark.colvalues,
-	//			   index:0,
-	//			   step:0,
-	//			   layout:layoutMode}); 
-	  //<Marker data-for='cell' data-tip={data}/>
 	  var size=50;
-	  var svgstr=state.Svg.getSvg(state,mark.svgid,'black',mark.bgcolor,size); //mark.fgcolor,mark.bgcolor
+	  var svgstr=state.Svg.getSvg(state,mark.svgid,'black',mark.bgcolor,size);
 	  //console.log("Using SVG:",mark.svgid,svgstr,mark.fgcolor,mark.bgcolor);
 	  var flagIcon = new  L.divIcon({iconSize: [size, size],html: svgstr,className:'dummy'});
 	  //console.log("Tooltip data:",data);
-	  var onOpen=(mark)=>{this.marker=mark;state.React.TooltipFloat.update(this.marker);};
+	  var onOpen=(mark)=>{this.marker=mark;state.React.TooltipFloatComponent.update(state,this.marker);};
           var onClose=(mark)=>{};
 //&#128077; thumbs up
 	  return (<Marker key={mark.id}
@@ -338,7 +290,6 @@ class GeoJsonMap extends Component {
 	      var zoom=this.refs.map.leafletElement.getZoom();
 	      var focus=this.refs.map.leafletElement.getCenter();
 	      state.Path.setFocus(state,zoom,focus.lat,focus.lng,true);
-	      //console.log("MoveEnd:",zoom,focus.lat,focus.lng);
 	  };
       };
       return (<div ref={el=>{this.element(el)}}
@@ -374,19 +325,12 @@ class GeoJsonMap extends Component {
 			   fillOpacity: 1, //zIndex: 1,
 		       })}/>
 	      {this.config.markers.map(markFunction)}
-	      <TooltipFloat state={state} data={this.marker} update={this.update}/>
+	      <TooltipFloatComponent state={state} data={this.marker} update={this.update}/>
 	      </Map>
 	      </div>
 	     );
   }
 }
-
-//<Tooltip><h1>Test</h1></Tooltip>
-		  
-	      //<TooltipContainer state={state}
-	        // classes={{button:classes.button}}
-	        // element={this}
-	        // type={'cell'}/>
 
 GeoJsonMap.propTypes = {
     classes: PropTypes.object.isRequired,

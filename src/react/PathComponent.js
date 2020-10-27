@@ -2,9 +2,9 @@ import React, {Component} from "react";
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 
-import SelectPath from './SelectPathComponent';
-import TablePath from './TablePathComponent';
-import RestPath from './RestPathComponent';
+import PathSelect from './PathSelectComponent';
+import PathTable from './PathTableComponent';
+import PathRest from './PathRestComponent';
 //console.log("Inside PathComponent.")
 //calc(95% - 5px)
 
@@ -16,6 +16,7 @@ const styles = theme => ({
 	alignContent:'flex-start',
 	border:0,
 	fontSize:'0px',
+	zIndex:999999,
 	//	border:  '1px solid red',
     },
     paper: {
@@ -36,11 +37,12 @@ const styles = theme => ({
 function Details(props) {
     const { state,classes } = props; // 
     if (state.Layout.state.viewMode === state.Layout.modes.view.path) {
+	var cls={button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled};
 	return (
 		<div className={classes.root}>
-		<SelectPath    state={state} key={"select"} classes={{button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled}}/>
-		   <TablePath  state={state} key={"table"} classes={{button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled}}/>
-		   <RestPath   state={state} key={"rest"} classes={{button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled}}/>
+		 <PathSelect    state={state} key={"select"} classes={cls}/>
+		 <PathTable  state={state} key={"table"} classes={cls}/>
+		 <PathRest   state={state} key={"rest"} classes={cls}/>
 		</div>
 	);
     } else {

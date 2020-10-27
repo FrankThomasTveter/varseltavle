@@ -1,7 +1,8 @@
 //console.log("Loading PathLib.js");
 
 function Path() {
-    this.tkeys=2;
+    this.maxtarget=3;
+    this.table={nkeys:2, ntarget:2, nmanual: undefined};
     this.keys={path:[],  // selected keys
 	       other:[], // keys available for selection
 	       trash:[]  // invisible keys
@@ -11,7 +12,7 @@ function Path() {
 		ignore:[] /// keys to ignore
 	       };
     this.trash={found:[],  // keys found in documents
-		rest:[],   // other relevant keys keys
+		rest:[],   // other relevant keys
 		ignore:[] /// keys to ignore
 	       };        
     this.list=[];          // keys in listing...
@@ -41,8 +42,10 @@ function Path() {
     this.sort={key:null,dir:false};
     this.focus={auto:true,zoom:0,lat:0,lon:0};
     this.focusChanged=false;
+    this.pathFocus=undefined;
     this.init=function(state){
 	state.Utils.init("Path",this);
+	console.log("Path initialised:",JSON.stringify(this.select));
     };
     this.isNumeric=function(key) {
 	var lenn=this.numeric.length;
@@ -54,6 +57,46 @@ function Path() {
 		return true;};
 	}
 	return false;
+    };
+    this.getPathFocus=function(state) {
+	//console.log("GET Path focus:",state.Path.pathFocus);
+	return state.Path.pathFocus;
+    };
+    this.setPathFocus=function(state,key) {
+	//console.log("SET Path focus:",state.Path.pathFocus);
+	state.Path.pathFocus=key;
+    };
+    this.getKeyType=function(state,key) {
+	if (state.Path.keys.path.indexOf(key)!==-1) {
+	    return "select";
+	} else if (state.Path.other.table.indexOf(key)!==-1) {
+	    return "table";
+	} else if (state.Path.other.rest.indexOf(key)!==-1) {
+	    return "rest";
+	} else if (state.Path.other.ignore.indexOf(key)!==-1) {
+	    return "ignore";
+	} else if (state.Path.trash.found.indexOf(key)!==-1) {
+	    return "trash";
+	} else if (state.Path.trash.rest.indexOf(key)!==-1) {
+	    return "junk";
+	} else if (state.Path.trash.ignore.indexOf(key)!==-1) {
+	    return "pass";
+	} else {
+	    console.log("Orphan key:",key);
+	    return "error";
+	}
+    };
+    this.setDim=function(state,dim) {
+	var odim=this.table.ntarget;
+	var ndim=Math.min(Math.max(dim,0),4);
+	if (odim !== ndim) {
+	    state.Navigate.store(state);
+	    this.table.ntarget=ndim;
+	    state.Show.show(state);
+	};
+    };
+    this.getDim=function(state) {
+	return (this.table.ntarget);
     };
     this.toggleFocus=function(state) {
 	this.focus.auto=!this.focus.auto;
@@ -67,6 +110,10 @@ function Path() {
 	state.Path.focus.lon=lon;
 	if (changed!== undefined && changed) {
 	    state.Path.focusChanged=true;
+	    if (! state.Path.inFocus(state)) {
+		//console.log("Url update:",zoom,lat,lon);
+		state.Utils.pushUrl(state);
+	    };
 	} else {
 	    state.Path.focusChanged=false;
 	}
@@ -135,7 +182,7 @@ function Path() {
 	state.Path.select.val=state.Utils.cp(state.Path.home.val);
 	state.Path.select.range=state.Utils.cp(state.Path.home.range);
 	state.Path.keys.path=state.Utils.cp(state.Path.home.path);
-	state.Path.tkeys=state.Path.home.tkeys;
+	state.Path.table=state.Utils.cp(state.Path.home.table);
 	//console.log(">>>>>> Path.goHome: ",JSON.stringify(state.Path.home),JSON.stringify(state.Path.keys.path));
 	state.Utils.pushUrl(state);
 	state.Navigate.store(state);
@@ -147,14 +194,14 @@ function Path() {
 	this.home.path=state.Utils.cp(state.Path.keys.path);
 	this.home.val=state.Utils.cp(state.Path.select.val);
 	this.home.range=state.Utils.cp(state.Path.select.range);
-	this.home.tkeys=state.Path.tkeys;
+	this.home.table=state.Utils.cp(state.Path.table);
 	state.Utils.pushUrl(state);
 	//console.log("Setting home.");
     };
     this.getSnapshort=function(state) { // store state
 	var snap={keys:state.Utils.cp(state.Path.keys),
 		  select:state.Utils.cp(state.Path.select),
-		  tkeys:state.Path.tkeys
+		  table:state.Utils.cp(state.Path.table)
 		 };
 	snap.focus=state.Utils.cp(state.Path.focus);
 	if (snap.keys.path.other !== undefined) {
@@ -168,7 +215,7 @@ function Path() {
 		  other:state.Utils.cp(state.Path.other),
 		  select:state.Utils.cp(state.Path.select),
 		  order:state.Utils.cp(state.Path.order),
-		  tkeys:state.Path.tkeys
+		  table:state.Utils.cp(state.Path.table)
 		 };
 	snap.focus=state.Utils.cp(state.Path.focus);
 	if (focus!==undefined) {snap.focus.auto=focus;};
@@ -343,6 +390,7 @@ function Path() {
     };
     this.getTitle=function(state) {
 	var title="";
+	var del=" ~ ";
 	var keys=state.Path.keys.path;
 	keys.forEach(
 	    function(key,index) {
@@ -353,14 +401,14 @@ function Path() {
 		    var range=state.Path.select.range[key];
 		    //console.log("   select:",key,JSON.stringify(vals));
 		    if (range !== undefined) {
-			if (title !== "") { title=title + " | ";};
+			if (title !== "") { title=title + del;};
 			title=title+key+"<"+range[0]+","+range[1]+">";
 		    } else { 
 			if (vals === undefined) {vals=[];};
 			var lenv=vals.length
 			for (var ii=0;ii<lenv;ii++) {
-			var val=vals[ii]
-			    if (title !== "") { title=title + " | ";};
+			    if (title !== "") { title=title + del;};
+			    var val=vals[ii];
 			    title=title+state.Database.getTitleDynamic(state,key,val);
 			}
 		    }
@@ -430,7 +478,7 @@ function Path() {
 	    });
     };
     this.makePath=function(state) { // note that not all keys are present in the data!
-	//console.log("Entering makepath.",JSON.stringify(this.keys));
+	//console.log("Entering makepath.",JSON.stringify(this.select));
 	var ii,key;
 	var bdeb=false;
 	var pathSet=[];
@@ -448,14 +496,16 @@ function Path() {
 	    this.keys.trash=this.keys.trash.filter(this.Unique);
 	    if (bdeb) {console.log("Remove invalid keys from path.",JSON.stringify(this.keys));};
 	    // remove invalid keys from path
+	    //console.log(">>>> Checking path:",JSON.stringify(this.keys.path),JSON.stringify(this.select));
 	    var plen = this.keys.path.length;
 	    for (ii = 0; ii < plen; ii++) {
 		key=this.keys.path[ii];
 		if (state.Database.keyCnt[key]  === undefined) {
 		    if (this.select !== undefined &&
-			this.select.range[key] !== undefined) {
-			//console.log("**** Keeping:",key);
+			(this.select.range[key] !== undefined || this.select.val[key] !== undefined)) {
+			//console.log("**** Keeping:",key,JSON.stringify(this.select.range[key]));
 		    } else {
+			//console.log("**** Removing:",key);
 			this.keys.path.splice(ii, 1);
 			ii=ii-1;
 			plen=plen-1;
@@ -502,6 +552,7 @@ function Path() {
 	    };
 	    this.keys.path=[];
 	    this.other.table=[]
+	    this.table.nkeys=0
 	    this.other.rest=[]
 	    this.select.val={}; // no values are set so far
 	    this.select.where={}; // no values are set so far
@@ -574,8 +625,9 @@ function Path() {
 	    var glen = this.keys.other.length;
 	    for (ii = 0; ii < glen; ii++) {
 		key=this.keys.other[ii];
-		if (ii<this.tkeys) {
+		if (ii<this.table.ntarget) {
 		    this.other.table.push(key);
+		    this.table.nkeys=this.table.nkeys+1
 		} else {
 		    this.other.rest.push(key);
 		}
@@ -660,6 +712,7 @@ function Path() {
 	return (sid!==-1)
     }
     this.exportAllKeys=function(state) { // export keys from "all" to "rest"
+	this.table.nkeys=0
 	this.other.table=[];
 	this.other.rest=[];
 	this.other.ignore=[];
@@ -674,7 +727,7 @@ function Path() {
 		if (key === "") {
 		    if (jj === 0) {
 			delay=true;
-		    } else if (jj < this.tkeys) {
+		    } else if (jj < this.table.ntarget) {
 			jj=jj+1
 		    }
 //		} else if (state.Matrix.keyCnt[key] === undefined ||
@@ -682,19 +735,23 @@ function Path() {
 //		    //console.log("Ignoring key:",key,JSON.stringify(state.Matrix.keyCnt[key]));
 		} else {
 		    //console.log("Adding key:",key,JSON.stringify(state.Matrix.keyCnt[key]));
+		    //console.log("Adding key:",key,jj,JSON.stringify(this.table));
 		    if (key !== "" & key !== null) {
 			if ((state.Matrix.keyCnt[key] === undefined ||
 			     state.Matrix.keyCnt[key] === 0)) {
 			    this.other.ignore.push(key); // ignore key...
-			} else if (jj < this.tkeys) {
+			} else if (jj < this.table.ntarget) {
 			    this.other.table.push(key);
+			    this.table.nkeys=this.table.nkeys+1
 			    jj=jj+1;
-			    if (delay && jj<this.tkeys) {jj=jj+1;};
+			    if (delay && jj<this.table.ntarget) {
+				jj=jj+1;
+			    };
 			} else  {
 			    this.other.rest.push(key);
 			}
 		    } else {
-			console.log("Strange key:",key,jj,this.tkeys);
+			console.log("Strange key:",key,jj,this.table.nkeys);
 		    }
 		}
 	    };
@@ -739,12 +796,11 @@ function Path() {
 	    }
 	}
 	//this.sortTableKeys(state);
-	//console.log("Exported:",
-	//	    JSON.stringify(this.keys),
-	//	    JSON.stringify(this.other),
-	//	    JSON.stringify(this.keys.trash));
+	//console.log("Exported keys:",JSON.stringify(this.keys));
+	//console.log("Exported other:",JSON.stringify(this.other));
+	//console.log("Exported trash:",JSON.stringify(this.keys.trash));
     };
-    this.addTableKeyToPath=function(state,key,val,where,cnt) { // keep abscissa
+    this.addTableKeyToPath=function(state,key,val,where) { // keep abscissa
 	var sid = state.Path.keys.other.indexOf(key);
 	if (sid !== -1) { // key is a table-key...
 	    if (typeof (val)=="object") {
@@ -782,7 +838,7 @@ function Path() {
 		//state.Path.keys.path=state.Path.keys.path.concat(src); // last path position
 	    };
 	    if (cnt>1 && state.Utils.missing(state.Path.keys.trash,src)) {
-		//console.log("Adding ",JSON.stringify(src)," to trash.");
+		console.log("Adding ",JSON.stringify(src)," to trash.");
 		state.Utils.pushKey(state.Path.keys.trash,src);
 		//state.Path.keys.trash=state.Path.keys.trash.concat(src)
 	    };
@@ -931,7 +987,7 @@ function Path() {
     this.moveOther2Table=function(state,key) {
 	//console.log("MoveKey2Table:",JSON.stringify(this.keys));
 	var sid=this.keys.other.indexOf(key)
-	if (sid !== -1) { // exists
+	if (sid !== -1) {
 	    var src=this.keys.other.splice(sid, 1);    // remove from array
 	    state.Utils.spliceArray(this.keys.other,0, 0, src);
 	    //console.log("Moved key:",key,JSON.stringify(this.keys.other));
@@ -1001,6 +1057,45 @@ function Path() {
 	return sin;
     };
     //////////////////////////////// COL/ROW FUNCTIONS ///////////////////////
+    this.getTableKeys=function(state) {
+	var keys=[];
+	state.Utils.cpArray(keys,state.Path.other.table);
+	return keys;
+    };
+    this.getTableVals=function(state,doc) { // returns vector
+	var ret=[];
+	var lent=state.Path.other.table.length;
+	for (var ii=0; ii<lent ; ii++) {
+	    var key=state.Path.other.table[ii];
+	    var val=state.Matrix.getDocVal(state,doc,key);
+	    ret.push(val);
+	}
+	return ret;
+    };
+    this.getMatrixValues=function(state,colval,rowval) {
+	if (this.table.nkeys===0) {
+	    return;
+	} else if (this.table.nkeys===1) {
+	    return [colval];
+	} else {
+	    if (this.getColIndex(state)===0) {
+		return [colval,rowval];
+	    } else {
+		return [rowval,colval];
+	    }
+	}
+    };
+    this.getOtherTableKeys=function(state,key) {
+	var keys=[];
+	state.Utils.cpArray(keys,state.Path.other.table,[key]);
+	return keys;
+    };
+    this.getRestTableKeys=function(state,key) {
+	var keys=[];
+	//console.log("YADS:",JSON.stringify(state.Path.other.rest));
+	state.Utils.cpArray(keys,state.Path.other.rest,[key]);
+	return keys;
+    };
     this.getFirstKey=function(state) {
 	return this.other.table[0];
     };
@@ -1027,32 +1122,49 @@ function Path() {
 	if (def===undefined) {def=[""];}
 	return this.filterKeys(state,state.Matrix.values[key]||def);
     };
+    this.isTableKey=function(state,key) {
+	var lent=state.Path.other.table.length;
+	for (var ii=0; ii< lent; ii++) {
+	    if (key === state.Path.other.table[ii]) { return true;};
+	};
+	return false;
+    };
     this.getColKey=function(state) {
-	var mode=state.Layout.getLayoutMode(state);
-	if (mode !== state.Layout.modes.layout.Table &&
-	    mode !== state.Layout.modes.layout.List) { // Map or Custom
-	    return "_lon";
-	} else {
+	//var mode=state.Layout.getLayoutMode(state);
+	//if (mode !== state.Layout.modes.layout.Table &&
+	//    mode !== state.Layout.modes.layout.List) { // Map or Custom
+	//    return "_lon";
+	//} else {
 	    return this.other.table[this.getColIndex(state)];
-	}
+	//}
     };
     this.getRowKey=function(state) {
-	var mode=state.Layout.getLayoutMode(state);
-	if (mode !== state.Layout.modes.layout.Table &&
-	    mode !== state.Layout.modes.layout.List) { // Map or Custom
-	    return "_lat";
-	} else {
+	//var mode=state.Layout.getLayoutMode(state);
+	//if (mode !== state.Layout.modes.layout.Table &&
+	//    mode !== state.Layout.modes.layout.List) { // Map or Custom
+	//    return "_lat";
+	//} else {
 	    return this.other.table[this.getRowIndex(state)];
-	}
+	//}
     };
-    this.getRestKeys=function(state) {
-	var keys=[];
-	var leni=Math.min(this.tkeys-2,this.other.rest.length);
-	for (var ii=0;ii<leni;ii++) {
-	    keys.push(this.other.rest[ii]);
+    this.getColval=function(state,values) {
+	if (values !== undefined && values.length > 0 ) {
+	    return values[this.getColIndex(state)];
 	}
-	return keys;
-    };
+    }
+    this.getRowval=function(state,values) {
+	if (values !== undefined && values.length > 1 ) {
+	    return values[this.getRowIndex(state)];
+	}
+    }
+    // this.getRestKeys=function(state) {
+    // 	var keys=[];
+    // 	var leni=Math.min(this.table.nkeys-2,this.other.rest.length);
+    // 	for (var ii=0;ii<leni;ii++) {
+    // 	    keys.push(this.other.rest[ii]);
+    // 	}
+    // 	return keys;
+    // };
     this.pushKey=function(state,typ,key,ind) {
 	if (key !== undefined && key !== "") {
 	    state.Utils.spliceArray(this.keys[typ], ind, 0, key);
@@ -1066,16 +1178,6 @@ function Path() {
 	    if (src !== key) {console.log("System error:",src,key);}
 	    return sin;
 	};
-    };
-    this.pushColKey=function(state,key) {
-	if (key !== undefined && key !== "") {
-	    state.Utils.spliceArray(this.keys.other,0, 0, key);
-	}
-    };
-    this.pushRowKey=function(state,key) {
-	if (key !== undefined && key !== "") {
-	    state.Utils.spliceArray(this.keys.other,1, 0, key);
-	}
     };
     this.checkNewPath=function(state,styp,skey) { // check if values are defined for path
 	var ok,ii;
@@ -1108,27 +1210,6 @@ function Path() {
     //values[key]=values[key].filter(this.Unique);
     this.Unique=function(value, index, self) { 
 	return self.indexOf(value)  === index;
-    }
-    this.getClickableTooltipKeys=function(state,data) {
-	var colkey=data.colkey;
-	var rowkey=data.rowkey;
-	var click=[rowkey,colkey];
-	state.Utils.cpArray(click,state.Path.tooltip.click);
-	return click;
-    }
-    this.getTooltipKeys=function(state,data,tooltip) {
-	var colkey=data.colkey;
-	var rowkey=data.rowkey;
-	var colvalues=data.colvalues;
-	var rowval=data.rowval;
-	var keys=[];
-	if (colvalues===undefined) {keys.push(colkey);}
-	if (rowval===undefined) {keys.push(rowkey);}
-	state.Utils.cpArray(keys,state.Path.tooltip.keys);
-	state.Utils.remArray(keys,state.Path.keys.path);
-	//state.Utils.remArray(keys,state.Path.other.table);
-	keys=state.Utils.keepHash(keys,tooltip);
-	return keys;
     }
 };
 export default Path;

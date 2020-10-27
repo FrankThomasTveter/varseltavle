@@ -23,6 +23,7 @@ class LoadDb extends Component {
 	};
 	const handleFileChosen = (target) => {
 	    let file=target.files[0];
+	    state.Html.broadcast(state,"User uploaded "+file.name);
 	    //console.log("File:",file.name);
 	    this.loaded=file.name;
 	    fileReader = new FileReader();;
