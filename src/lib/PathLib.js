@@ -21,7 +21,7 @@ function Path() {
     this.numeric=["^max$","^min$","^a\\d*$","^f\\d*$"];
     this.select={val:{},where:{},cnt:{},range:{}};  // current selection criteria
     this.where={};         // current cache for where expressions
-    this.home={path:[],val:{},range:{},tkeys:2};  // initial home for data...
+    this.home={path:[],val:{},range:{},table:{nkeys:2,ntarget:2}};  // initial home for data...
     this.film={ index:null, reel:[], play:false, label:"", title:"" } ;// reel={label:"",path:[],val:{},range:{}} 
     this.tooltip={keys:[],   // keys that will be displayed (in addition to row/col-keys)
 		  select:[], // extra level of keys to distinguish reports
@@ -45,7 +45,7 @@ function Path() {
     this.pathFocus=undefined;
     this.init=function(state){
 	state.Utils.init("Path",this);
-	console.log("Path initialised:",JSON.stringify(this.select));
+	//console.log("Path initialised:",JSON.stringify(this.select));
     };
     this.isNumeric=function(key) {
 	var lenn=this.numeric.length;

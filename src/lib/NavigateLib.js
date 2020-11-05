@@ -443,22 +443,24 @@ function Navigate() {
 		where=state.Utils.cp(el.where);
 		cnt=state.Utils.cp(el.cnt);
 	    };
-	    var lenk=keys.length;
-	    for (var kk=0;kk<lenk;kk++) {
-		var key=keys[kk];
-		var val=el.values[key];
-		if (val !== undefined) {
-		    if (values===undefined) {values={};};
-		    if (values[key]===undefined) {values[key]=[];};
-		    //console.log("Values:",key,JSON.stringify(values));
-		    if (values[key].indexOf(val)===-1) {values[key].push(val);}
-		};
-		var range=el.ranges[key];
-		if (ranges !== undefined) {
-		    if (ranges===undefined) {ranges={};};
-		    if (ranges[key]===undefined) {ranges[key]=[];};
-		    ranges[key]=state.Grid.combineRange(ranges[key],range);
-		};
+	    if (keys !== undefined) {
+		var lenk=keys.length;
+		for (var kk=0;kk<lenk;kk++) {
+		    var key=keys[kk];
+		    var val=el.values[key];
+		    if (val !== undefined) {
+			if (values===undefined) {values={};};
+			if (values[key]===undefined) {values[key]=[];};
+			//console.log("Values:",key,JSON.stringify(values));
+			if (values[key].indexOf(val)===-1) {values[key].push(val);}
+		    };
+		    var range=el.ranges[key];
+		    if (ranges !== undefined) {
+			if (ranges===undefined) {ranges={};};
+			if (ranges[key]===undefined) {ranges[key]=[];};
+			ranges[key]=state.Grid.combineRange(ranges[key],range);
+		    };
+		}
 	    }
 	}
 	//console.log("Key:",JSON.stringify(keys),JSON.stringify(values));

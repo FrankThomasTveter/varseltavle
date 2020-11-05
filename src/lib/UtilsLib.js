@@ -70,9 +70,9 @@ function Utils() {
     this.init=function(par,setup){
 	var url=this.getUrlVars();
 	if (par in url) {
-	    if (par==="Path") {
-		console.log("Path start:", JSON.stringify(setup.select));
-	    }
+	    //if (par==="Path") {
+		//console.log("Path start:", JSON.stringify(setup.select));
+	    //}
 	    //console.log(par,url);
 	    var code;
 	    try {
@@ -83,9 +83,9 @@ function Utils() {
 	    } catch (e) { // is a value, not json
 		setup[par]=url[par];
 	    }
-	    if (par==="Path") {
-		console.log("Path after:", JSON.stringify(setup.select));
-	    }
+	    //if (par==="Path") {
+		//console.log("Path after:", JSON.stringify(setup.select));
+	    //}
 	} else {
 	    console.log("No '"+par+"' in URL.",JSON.stringify(Object.keys(url||{})));
 	}

@@ -82,17 +82,19 @@ class TooltipWrapper extends Component {
 	var onClickMarker=function (event) {
 	    if (this.marker !== null) {
 		var marker=this.marker;
-		//console.log("Clicked marker...",marker.id)
-		var state=marker.state;
-		var colkey=marker.colrangekey;
-		var colrange=marker.colrange;
-		var colwhere=marker.colwhere;
-		var rowkey=marker.rowrangekey;
-		var rowrange=marker.rowrange;
-		var rowwhere=marker.rowwhere;
-		var cnt=marker.cnt;
-		//console.log("Clicked marker...",marker.id);
-		state.Navigate.selectItemRange(state,colkey,rowkey,colrange,rowrange,colwhere,rowwhere,cnt,1);
+		var state = marker.state;
+		//var location=marker.location;
+		// //console.log("Clicked marker...",marker.id)
+		// var cnt   = marker.cnt;
+		// var colkey   = location.colrangekey;
+		// var colrange = location.colrange;
+		// var colwhere = location.colwhere;
+		// var rowkey   = location.rowrangekey;
+		// var rowrange = location.rowrange;
+		// var rowwhere = location.rowwhere;
+		console.log("Clicked marker...",marker.id);
+		state.Navigate.selectElement(state,marker.element);
+		//state.Navigate.selectItemRange(state,colkey,rowkey,colrange,rowrange,colwhere,rowwhere,cnt,1);
 		//state.Show.showAll(state);
 	   // } else {
 	   //	console.log("Clicked empty marker...");

@@ -111,21 +111,22 @@ function Threshold() {
 		}
 	    };
 	} else if (typeof thrs === "object" && thrs !== null) {
-	    if (thrs.key === undefined) { // there is another level
-		//if (debug) {console.log("   Iterating with:",JSON.stringify(thrs[trgkey][trgval]));};
-		for (var trgkey in thrs) { // loop over thresholds
-		    if (doc[trgkey] !== undefined) {
-			var trgval=doc[trgkey]; // trgval-value
-			if (thrs[trgkey][trgval] !== undefined) {
+	    for (var trgkey in thrs) { // loop over thresholds
+		if (doc[trgkey] !== undefined) {
+		    var trgval=doc[trgkey]; // trgval-value
+		    if (thrs[trgkey][trgval] !== undefined) {
+			//console.log("Found:",trgkey,trgval,JSON.stringify(thrs[trgkey][trgval]));
+			if (thrs[trgkey][trgval].key === undefined) { // there is another level
+			    //if (debug) {console.log("   Iterating with:",JSON.stringify(thrs[trgkey][trgval]));};
 			    lret=this.getThresholds(state,doc,thrs[trgkey][trgval]);
 			    if (lret !== undefined) {return lret;};
-			    //console.log("Found:",trgkey,trgval,JSON.stringify(thrs[trgkey][trgval]));
+			} else if (doc[thrs[trgkey][trgval].key] !== undefined) {
+			    var thr = thrs[trgkey][trgval];
+			    lret=this.processThreshold(state,doc,thr);
+			    if (lret !== undefined) {return lret;};
 			}
 		    }
 		}
-	    } else if (doc[thrs.key] !== undefined) {
-		lret=this.processThreshold(state,doc,thrs);
-		if (lret !== undefined) {return lret;};
 	    }
 	};
 	return ret;
