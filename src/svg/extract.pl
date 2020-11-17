@@ -105,7 +105,7 @@ sub uniq {
     my %seen;
     return grep { !$seen{$_}++ } @_;
 }
-if (! $svg && $verbose) {
+if (! $svg && ($verbose || $list)) {
     if ($list) {
 	my $cmd="$0";
 	if (@colorsB) {
