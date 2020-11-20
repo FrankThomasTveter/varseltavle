@@ -8,14 +8,17 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Undo         from './ConfigUndoComponent';
 import Redo         from './ConfigRedoComponent';
 import Mode         from './ConfigModeComponent';
-import View         from './ConfigViewPathComponent';
+import ViewPath     from './ConfigViewPathComponent';
 import Collect      from './ConfigCollectComponent';
 import Reload       from './ConfigReloadComponent';
 import Tooltip      from './ConfigTooltipComponent';
 import Order        from './ConfigOrderComponent';
 import Home         from './ConfigHomeComponent';
 import Film         from './ConfigFilmComponent';
+import Star         from './ConfigStarComponent';
 import File         from './ConfigFileComponent';
+import ViewPolygon  from './ConfigViewPolygonComponent';
+import Polygon      from './ConfigPolygonComponent';
 import Archive      from './ConfigArchiveComponent';
 import Font         from './ConfigFontComponent';
 import Dims         from './ConfigDimComponent';
@@ -83,7 +86,7 @@ class SettingsMenu extends Component {
 		       <Mode state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="path" onClose={this.onClose}>
-		       <View state={state} classes={cls}/>
+		       <ViewPath state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="key" onClose={this.onClose}>
 		       <Collect state={state} classes={cls}/>
@@ -103,8 +106,17 @@ class SettingsMenu extends Component {
 		    <MenuItem className={classes.order} key="film" onClose={this.onClose}>
 		       <Film state={state} classes={cls}/>
 		    </MenuItem>
+		    <MenuItem className={classes.order} key="star" onClose={this.onClose}>
+		       <Star state={state} classes={cls}/>
+		    </MenuItem>
 		    <MenuItem className={classes.order} key="file" onClose={this.onClose}>
 		       <File state={state} classes={cls}/>
+		    </MenuItem>
+		    <MenuItem className={classes.order} key="viewPoly" onClose={this.onClose}>
+		       <ViewPolygon state={state} classes={cls}/>
+		    </MenuItem>
+		    <MenuItem className={classes.order} key="polygon" onClose={this.onClose}>
+		       <Polygon state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="archive" onClose={this.onClose}>
 		       <Archive state={state} classes={cls}/>

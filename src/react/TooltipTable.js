@@ -43,7 +43,7 @@ const styles = theme => ({
 	display: 'table-cell',
 	padding: '5px',
 	backgroundColor:teal_palette.main,
-	color:'black',
+	color:'white',
     },
     divTableCell:{
 	border: '1px solid #000',

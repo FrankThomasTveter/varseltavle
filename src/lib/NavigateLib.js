@@ -135,6 +135,15 @@ function Navigate() {
 	    }
 	    this.implementKeyChange(state,true);
 	}
+	//console.log("Push:",JSON.stringify(state.Path.keys));
+    };
+    this.pushSelectToRest=function(state,key) {
+	var src=this.removeKey(state,key,state.Path.keys.path);
+	if (src !== undefined) {
+	    this.removeKey(state,key,state.Path.keys.other); // remove if it exists
+	    state.Utils.pushKey(state.Path.keys.other,src);
+	    this.implementKeyChange(state,true);
+	}
     };
     this.pushTableToRest=function(state,key,inc) {
 	if (state.Path.other.table.indexOf(key)!==-1) {

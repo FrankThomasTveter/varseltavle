@@ -16,7 +16,7 @@ const styles = theme => ({
         marginTop: theme.spacing(0),
         padding: theme.spacing(1),
         bottom: 0,
-        color: '#FFF',
+        color: '#000',
 	fontSize: '100%',
 	pointerEvents: 'none',
 	zIndex: 10000,

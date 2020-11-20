@@ -20,6 +20,7 @@ import Grid from '../lib/GridLib';
 import Matrix from '../lib/MatrixLib';
 import Navigate from '../lib/NavigateLib';
 import Path from '../lib/PathLib';
+import Polygon from '../lib/PolygonLib';
 import Auto from '../lib/AutoLib';
 import Show from '../lib/ShowLib';
 import Svg from '../lib/SvgLib';
@@ -75,6 +76,7 @@ const styles = theme => ({
     },
     header: {
 	backgroundColor:teal_palette.main,
+	color:'white',
 	position:'fixed',
 	height:layout.header.height, //'calc(2% + '+headerheight+')',
 	width: layout.header.width,//'100%',
@@ -139,6 +141,7 @@ class App extends Component {
 	    Colors:    new Colors()    ,
 	    Layout:    new Layout()    ,
 	    Path:      new Path()      ,
+	    Polygon:   new Polygon()   ,
 	    Auto:      new Auto()      ,
 	    Navigate:  new Navigate()  ,
 	    Show:      new Show()      ,

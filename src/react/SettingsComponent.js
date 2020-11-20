@@ -10,14 +10,17 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import Undo         from './ConfigUndoComponent';
 import Redo         from './ConfigRedoComponent';
 import Mode         from './ConfigModeComponent';
-import View         from './ConfigViewPathComponent';
+import ViewPath     from './ConfigViewPathComponent';
 import Collect      from './ConfigCollectComponent';
 import Reload       from './ConfigReloadComponent';
 import Tooltip      from './ConfigTooltipComponent';
 import Order        from './ConfigOrderComponent';
 import Home         from './ConfigHomeComponent';
 import Film         from './ConfigFilmComponent';
+import Star         from './ConfigStarComponent';
 import File         from './ConfigFileComponent';
+import ViewPolygon  from './ConfigViewPolygonComponent';
+import Polygon      from './ConfigPolygonComponent';
 import Archive      from './ConfigArchiveComponent';
 import Font         from './ConfigFontComponent';
 import Dims         from './ConfigDimComponent';
@@ -80,8 +83,8 @@ class Settings extends Component {
 		    <MenuItem key="mode" onClose={this.onClose}>
 		       <Mode state={state} classes={cls} visible={true}/>
 		    </MenuItem>
-		    <MenuItem key="view" onClose={this.onClose}>
-		       <View state={state} classes={cls} visible={true}/>
+		    <MenuItem key="viewPath" onClose={this.onClose}>
+		       <ViewPath state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="key" onClose={this.onClose}>
 		       <Collect state={state} classes={cls} visible={true}/>
@@ -98,8 +101,17 @@ class Settings extends Component {
                     <MenuItem key="Film" onClose={this.onClose}>
 		       <Film state={state} classes={cls} visible={true}/>
 		    </MenuItem>
+                    <MenuItem key="Star" onClose={this.onClose}>
+		       <Star state={state} classes={cls} visible={true}/>
+		    </MenuItem>
 		    <MenuItem key="file" onClose={this.onClose}>
 		       <File state={state} classes={cls} visible={true}/>
+		    </MenuItem>
+		    <MenuItem key="viewPolygon" onClose={this.onClose}>
+		       <ViewPolygon state={state} classes={cls} visible={true}/>
+		    </MenuItem>
+		    <MenuItem key="polygon" onClose={this.onClose}>
+		       <Polygon state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="archive" onClose={this.onClose}>
 		       <Archive state={state} classes={cls} visible={true}/>

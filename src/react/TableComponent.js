@@ -46,6 +46,7 @@ const styles = theme => ({
     },
     divTableRow:  {
 	backgroundColor:teal_palette.main,
+	color:'white',
 	border: '0px solid #999999',
 	display: 'table-row',
 	padding: '0px',
@@ -120,7 +121,7 @@ function FirstDataCell (props) {
 }
 function DataCell(props) {
     const {classes,state,elements,mode,plan,rowindex,...other}=props;
-    if (elements.length===0) {
+    if (elements.length===0 || Object.keys(elements[0]).length===0) {
 	if (rowindex%2===1) {
 	    return <div className={classes.divTableCell} style={{backgroundColor:'#EEE'}}/>
 	} else {
@@ -144,7 +145,9 @@ function renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,ro
 	//console.log("Matrix:",JSON.stringify(matrix));
 	var elements=state.Cell.getElements(state,matrix,colkey,rowkey,
 					    colvalues,rowval,index,plan.step);
-	//console.log("Elements:",colkey,"=",JSON.stringify(colvalues),":",rowkey,"=",rowval,":",index,plan.step,' =>',JSON.stringify(elements.length));
+	//if (colkey==="") {
+	//    console.log("Elements:",colkey,"=",JSON.stringify(colvalues),":",rowkey,"=",rowval,":",index,plan.step,' =>',JSON.stringify(elements));
+	//}
 	// get count and colwhere
         // var cnt = Math.min(colvalues.length,index+plan.step)-index;
         var colwhere = state.Cell.getColWhere(state,colkey,colvalues,index,plan.step);
@@ -205,7 +208,7 @@ function FirstHdrCell (props) {
     //var height=plans.hdr.height;
     //teal_palette
     //console.log("Making first header cell.",colkey,rowkey,plan.width,plan.height);
-    //style={{backgroundColor:teal_palette.main}}
+    //style={{backgroundColor:teal_palette.main,color:'white'}}
     var onclickCol=() => state.Navigate.switchTableKey(state,colkey);
     var onclickRow=() => state.Navigate.switchTableKey(state,rowkey);
     var data;

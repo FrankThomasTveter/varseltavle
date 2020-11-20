@@ -114,6 +114,11 @@ function Show() {
 	    state.React.MapInfo.showMapInfo(state,force);
 	}
     };	
+    this.showChart=function(state,force) {
+	if (state.React.Chart !== undefined) {
+	    state.React.Chart.showMap(state,force);
+	}
+    };
     this.showDataset=function(state,matrix,force) {
 	state.Utils.pushUrl(state);
 	//console.log("Showing table...");
@@ -138,6 +143,19 @@ function Show() {
 	    }
 	}
 	//console.log("Showing table done...");
+    };
+    this.showPolygons=function(state) {
+	var mode = state.Layout.getLayoutMode(state);
+	if (mode === state.Layout.modes.layout.Chart) {
+	    state.Polygon.makePolygon(state,0,function(state,polygons,changed){
+		if (changed) {
+		    //console.log("Polygons loaded? ",changed);
+		    state.Show.showDataset(state,state.React.matrix,true);
+		} else {
+		    //console.log("Polygons loaded? ",changed);
+		}
+	    });
+	};
     };
     this.showFocus=function(state) {
 	if (state.React.Chart !== undefined) {

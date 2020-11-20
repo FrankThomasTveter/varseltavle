@@ -47,13 +47,19 @@ function Default() {
 	[["colors"],  ["Colors","colors"]]
     ];
     this.toStateTooltip = [
-	[["tooltip"], ["Path","tooltip"]]
+	[["tooltip"], ["Path","tooltip"]],
+	[["polygons","dir"],      ["Polygon","dir"]],
+	[["polygons","seperator"],["Polygon","seperator"]],
+	[["polygons","keys"],     ["Polygon","keys"]]
     ];
     this.toStateTooltips = [
 	[["tooltip","keys"],   ["Path","tooltip","keys"]],
 	[["tooltip","select"], ["Path","tooltip","select"]],
 	[["tooltip","sort"],   ["Path","tooltip","sort"]],
-	[["tooltip","click"],  ["Path","tooltip","click"]]
+	[["tooltip","click"],  ["Path","tooltip","click"]],
+	[["polygons","dir"],      ["Polygon","dir"]],
+	[["polygons","seperator"],["Polygon","seperator"]],
+	[["polygons","keys"],     ["Polygon","keys"]]
     ];	
     this.toStatePath = [
 	[["focus"],  ["Path","focus"]],
@@ -242,13 +248,16 @@ function Default() {
 	    //if (lenk>0) {console.log("   keys:",JSON.stringify(keys));}
 	    for (let ii=0;ii<lenk;ii++) {
 		let key=keys[ii];
-		if (typeof src[key]==="object" && src[key] !== null) {
+		if (src[key] !== null && typeof src[key]==="object" && ! Array.isArray(src[key])) {
 		    if (trg[key]===undefined) {trg[key]={};};
 		    //console.log(this.cnt,"   ",ii," -> ",key)
+		    if (key==="visible") {console.log("Object cp:",key,JSON.stringify(trg),JSON.stringify(src[key]));}
 		    this.copyFill(state,src[key],trg[key]);
 		} else if (trg[key]===undefined && Array.isArray(src[key])) {
+		    if (key==="visible") {console.log("Array cp:",key,JSON.stringify(src[key]));}
 		    trg[key]=state.Utils.cp(src[key]);		    
 		} else if (trg[key]===undefined) {
+		    if (key==="visible") {console.log("Item cp:",key,JSON.stringify(src[key]));}
 		    trg[key]=src[key];		    
 		}
 	    }
@@ -331,12 +340,11 @@ function Default() {
     };
     //
     this.loadDefault=function(state, response, callbacks ) {
-	var file=this.setup;
 	if (state.Threshold.thrs !== undefined) { // defaults already loaded, execute callback...
 	    state.File.next(state,"",callbacks);
 	} else {
 	    var path=state.Default.setupdir + state.Default.setup;
-	    console.log("Default setup:",path,file);
+	    //console.log("Default setup:",path,this.setup);
 	    state.File.load(state,path,callbacks);
 	}
     };
@@ -352,8 +360,8 @@ function Default() {
 		alert("Default '"+state.Default.setup+"' contains Invalid SETUP:"+e.name+":"+e.message);
 	    }
 	    if (setup !== undefined) { // URL and hardcoded values are loaded
-		//console.log("State:",JSON.stringify(state.Database));
-		//console.log("ORIGINAL:  ",JSON.stringify(state.Default.current));
+		//console.log("Initial STATE:",JSON.stringify(state.Settings.visible));
+		//console.log("Initial CURRENT:  ",JSON.stringify(state.Default.current.visible));
 		//  hard copy current to hardcode+url-state
 		this.copyForce(state, state.Default.current, state, state.Default.stateData);
 		if (state.Default.start !== undefined) { // get previous values
@@ -368,12 +376,12 @@ function Default() {
 		this.copyFill(state, setup, state.Default.current, state.Default.toStateOther);
 		this.copyFill(state, setup, state.Default.current, state.Default.toStateCustom);
 		this.copyFill(state, setup, state.Default.current, state.Default.toStateKeys);
+		this.copyFill(state, setup, state.Default.current, state.Default.toStateVisible);
 		// hard copy setup to current (state.Default.forceToStateDefaults)
 		this.copyForce(state, setup, state.Default.current, state.Default.toStateSelect);
 		this.copyForce(state, setup, state.Default.current, state.Default.toStateThr);
 		this.copyForce(state, setup, state.Default.current, state.Default.toStateColors);
 		this.copyForce(state, setup, state.Default.current, state.Default.toStateTooltip);
-		this.copyForce(state, setup, state.Default.current, state.Default.toStateVisible);
 		this.copyForce(state, setup, state.Default.current, state.Default.toStateCustom);
 		this.copyForce(state, setup, state.Default.current, state.Default.toStateHome);
 		this.copyForce(state, setup, state.Default.current, state.Default.toStatePath);
@@ -395,8 +403,8 @@ function Default() {
 		
 		//this.printMap(state,state.Default.current,state.Default.stateSelect);
 
-		//console.log("SETUP:  ",JSON.stringify(setup));
-		//console.log("DEFAULT:",JSON.stringify(state.Default.current));
+		//console.log("SETUP:  ",JSON.stringify(setup.visible));
+		//console.log("CURRENT:",JSON.stringify(state.Default.current.Settings.visible));
 		//console.log("STATE:  ",JSON.stringify(state.Settings.visible));
 		
 	    };
@@ -424,7 +432,7 @@ function Default() {
 	    this.copyFill(state, state, state.Default.start, state.Default.statePath);
 	    this.copyFill(state, state, state.Default.start, state.Default.stateLooks);
 	    this.copyFill(state, state, state.Default.start, state.Default.stateSvg);
-	    //console.log("Done:",JSON.stringify(state.Default.start));
+	    //console.log("Done:",JSON.stringify(state.Default.start.visible));
 	    //console.log("State:",JSON.stringify(state.Settings.visible));
 	    //state.Default.save(state);
 	}
@@ -434,12 +442,14 @@ function Default() {
     }.bind(this);
     // replace critical objects after URL has been loaded...
     this.checkState=function(state,response,callbacks) {
+	//console.log("Checkstate A:",JSON.stringify(state.Settings.visible));
 	//console.log("Path Start",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.select));
 	//console.log("Filling blanks...",JSON.stringify(state.Default.start));
 	// replace any critical objects removed by the url...
 	this.copyFill(state, state.Default.start, state);
 	//console.log("Filling blanks done...");
 	//console.log("Path Done",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.select));
+	//console.log("Checkstate B:",JSON.stringify(state.Settings.visible));
 	state.File.next(state,"",callbacks);
     }.bind(this);
     this.resetSetup=function(state,response,callbacks) {
@@ -499,10 +509,10 @@ function Default() {
 	    this.copyForce(state, state.Default.current, state, state.Default.stateTooltips);
 	    this.copyForce(state, state.Default.current, state, state.Default.stateLooks);
 	    this.copyForce(state, state.Default.current, state, state.Default.stateSvg);
-	    //console.log("SETUP:",JSON.stringify(setup.visible));
-	    //console.log("Default:",JSON.stringify(state.Default.Settings.visible));
+	    console.log("SETUP:",JSON.stringify(setup.visible));
+	    console.log("Default:",JSON.stringify(state.Default.Settings.visible));
 	    state.Database.resetSetup(state);
-	    //console.log("Reset State:",JSON.stringify(state.Settings.visible));
+	    console.log("Reset State:",JSON.stringify(state.Settings.visible));
 	};
     };
     this.getSetup=function(state) {
@@ -550,8 +560,8 @@ function Default() {
 	this.copyFill(state,  current, setup, this.invert(state.Default.toStateTrash));
 	this.copyFill(state,  current, setup, this.invert(state.Default.toStateVisible));
 	this.copyFill(state,  current, setup, this.invert(state.Default.toStateCustom));
-	//console.log("Current:",JSON.stringify(state.Default.current.Settings.visible));
-	//console.log("Setup:  ",JSON.stringify(current.Settings.visible));
+	console.log("Current:",JSON.stringify(state.Default.current.Settings.visible));
+	console.log("Setup:  ",JSON.stringify(current.Settings.visible));
 	//JSON.stringify(setup, null, "   ");
 	return setup;
     };
@@ -626,6 +636,7 @@ function Default() {
 	this.pushUrlDetails(state,url,this.stateHome);
 	this.pushUrlDetails(state,url,this.stateTooltips);
 	this.pushUrlDetails(state,url,this.stateLooks);
+	this.pushUrlDetails(state,url,this.stateVisible);
 	this.pushUrlDetails(state,url,this.statePath);
 	return url;
     }

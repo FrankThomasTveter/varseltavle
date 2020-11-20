@@ -2,9 +2,10 @@
 
 function Settings() {
     // list of all controls (visible and invisible)
-    this.controls=["Undo","Redo","Mode","Path",
-		   "Reload","Home","Film","Key",
+    this.controls=["Undo","Redo","Mode","ViewPath",
+		   "Reload","Home","Film","Star","Key",
 		   "Order","Tooltip","Font","Dim","File",
+		   "ViewPolygon","Polygon",
 		   "Archive","Focus","FullScreen","About"];
     // list of visible controls...
     this.visible=[];//["Undo","Redo","Mode","Path"];

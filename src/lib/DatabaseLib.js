@@ -498,6 +498,7 @@ function Database() {
 	    state.Matrix.makeMatrix(state,docs,m);
 	    //console.log ("Matrix:",JSON.stringify(m));
 	}
+	state.Show.showPolygons(state);
 	this.processing=false;
 	showFunc(state,m);
     };
@@ -575,13 +576,23 @@ function Database() {
 	return ret;
     };
     this.getWhereRange=function(key,range) {
-	if (range  !== undefined ||
-	    range  !== null ||
-	    range  !== "") {
+	if (range  !== undefined &&
+	    range  !== null &&
+	    range  !== "" &&
+	    range[0] < range[1]
+	   ) {
 	    //console.log("getWhereRange:",key,JSON.stringify(range),range[0],range[2]);
-	    return key +' >= '+range[0]+' AND ' + key + ' < '+range[1]+'';
+	    if (range[0] !== undefined && range[1] !== undefined) {
+		return key +' >= '+range[0]+' AND ' + key + ' < '+range[1]+'';
+	    } else if (range[0] !== undefined) {
+		return key +' >= '+range[0]+'';
+	    } else if (range[1] !== undefined) {
+		return key +' < '+range[1]+'';
+	    } else {
+		return "";
+	    }
 	} else {
-	    return;
+	    return "";
 	};
     };
     this.getWhereValue=function(key,val) {
@@ -684,11 +695,12 @@ function Database() {
 	return group;
     };
     this.getCols=function(ikeys) {
+	var cols="";
+	if (ikeys.length===0){return cols;};
 	var onlyUnique=function(value, index, self) { 
 	    return self.indexOf(value) === index;
 	};
 	var keys = ikeys.filter( onlyUnique );
-	var cols="";
 	var plen = keys.length;
 	for (var ii = 0; ii < plen; ii++) {
 	    var key=keys[ii];
@@ -706,6 +718,16 @@ function Database() {
 	    if (cols !== "") { cols = cols +  ',';};
 	};
 	return cols;
+    };
+    this.getUnique=function(state,whereInn,keys,level) {
+	var whereLev=this.getWhereRange("level",[level,undefined]);
+	var where=this.addWhere(whereInn,whereLev);
+	var group=this.getGroup(keys);
+	var cols=this.getCols(keys);
+	var qry="select "+cols+"max(level) AS maxlev FROM alarm"+where+group;
+	//console.log("Query:",qry);
+	var dd=this.query(qry);
+	return (dd===undefined?[]:dd);
     };
     this.getDocsRank=function(state,where,keys,maxrank) {
 	var dd;
@@ -734,8 +756,8 @@ function Database() {
 	}
 	return (dd===undefined?[]:dd);
     };
-    this.getDocsCnt=function(state,where,keys) {
-	var sql,dd, group;
+    this.getDocsCnt=function(state,where,keys,group) {
+	var sql,dd;
 	//console.log("Docs:",JSON.stringify(this.db.tables.alarm.data));
 	var body='count(*) AS cnt, max(level) AS maxlev, max(rank) AS maxrank, min(level) AS minlev, '
             +'max(lat) AS maxlat, min(lat) AS minlat, max(lon) AS maxlon, min(lon) AS minlon, avg(lat) as lat, avg(lon) as lon '
@@ -749,7 +771,7 @@ function Database() {
 	    //console.log("Cnt-A:",JSON.stringify(dd));
 	} else {
 	    var cols = this.getCols(keys);
-	    group = this.getGroup(keys);
+	    if (group===undefined) {group = this.getGroup(keys);};
 	    sql="select "+cols+body+where+group;
 	    //console.log("SQL:",sql);
 	    //console.log("Body:",body,":",where,",group:",group,",keys:",JSON.stringify(keys));

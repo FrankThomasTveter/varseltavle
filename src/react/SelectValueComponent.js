@@ -20,6 +20,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     othchip: {
@@ -33,6 +34,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
   },
 });

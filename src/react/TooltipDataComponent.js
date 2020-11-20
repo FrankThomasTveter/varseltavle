@@ -13,6 +13,7 @@ const styles = theme => ({
     tooltip:{
 	border: '0px solid #999999',
 	backgroundColor:teal_palette.main,
+	color:'white',
 	zIndex:10000,
     },
 });

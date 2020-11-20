@@ -269,7 +269,7 @@ function Path() {
 	    reel[pos-1]=snapshot;
 	}
 	state.Utils.pushUrl(state);
-    }
+    };
     this.removeFilm=function(state,pos) {
 	var label="";
 	var film=state.Path.film;
@@ -289,7 +289,7 @@ function Path() {
 	}
 	if (label===undefined) {label="";};
 	film.label=label;
-	console.log("Removing :",pos,label,reel.length);
+	//console.log("Removing :",pos,label,reel.length);
 	state.Show.showFilm(state);
 	state.Utils.pushUrl(state);
 	return label;
@@ -303,6 +303,10 @@ function Path() {
     this.getFilmPlay=function(state) {
 	var film=state.Path.film;
 	return film.play;
+    };
+    this.getFilmFocus=function(state) {
+	var film=state.Path.film;
+	return film.index;
     };
     this.nextFilm=function(state,pos) {
 	var film=state.Path.film;

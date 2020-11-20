@@ -58,6 +58,47 @@ function File() {
 	    state.Html.setProgress(state, true);
 	};
     };
+    this.got = function(response) {
+	return new Promise(function(resolve, reject) {
+	    resolve(response);
+	});
+    };
+    this.get = function(url) {
+	// Return a new promise.
+	return new Promise(function(resolve, reject) {
+	    // Do the usual XHR stuff
+	    var regHttp = new XMLHttpRequest();
+	    regHttp.responseType="";
+	    regHttp.overrideMimeType("text/text");
+	    var path=process.env.PUBLIC_URL+"/"+url;
+	    regHttp.open('GET', path, true);
+	    
+	    regHttp.onload = function() {
+		// This is called even on 404 etc
+		// so check the status
+		if (regHttp.status === 200) {
+		    // Resolve the promise with the response text
+		    resolve(regHttp.response);
+		}
+		else {
+		    // Otherwise reject with the status text
+		    // which will hopefully be a meaningful error
+		    reject(Error(regHttp.statusText));
+		}
+	    };
+	    
+	    // Handle network errors
+	    regHttp.onerror = function() {
+		reject(Error("Network Error"));
+	    };
+	    
+	    // Make the request
+	    regHttp.send();
+	});
+    };
+    this.getJSON=function(url) {
+	return this.get(url).then(JSON.parse);
+    }
 };
 
 export default File;

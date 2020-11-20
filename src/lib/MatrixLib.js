@@ -8,6 +8,7 @@ function Matrix() {
     this.limit=100;     // displayed data
     this.popSingle=2000;//0000;
     this.popSeries=2000;//0000;
+    this.maxLevel=-1;
     this.init=function(state){
 	var par="Matrix";
 	state.Utils.init(par,this);
@@ -16,6 +17,14 @@ function Matrix() {
 	this.values={};
 	this.keyCnt={};
     };
+    this.getLevels=function(state) {
+	//console.log("Matrix maxLevel:",state.Matrix.maxLevel);
+	var ret=[];
+	for (var ii=0; ii<= state.Matrix.maxLevel;ii++) {
+	    ret.push(ii);
+	}
+	return ret;
+    }
     this.cntKey=function(state,key,nrec,where) {
 	var val;
 	if (this.values[key]  === undefined) {
@@ -288,6 +297,8 @@ function Matrix() {
     this.makeMatrixCntMap=function(state,cntDocs,matrix) {
 	//console.log("MatrixCnt:",JSON.stringify(cntDocs));
 	//var lonmin,lonmax,latmin,latmax;
+	state.Matrix.maxLevel=-1;
+	state.Matrix.maxRank=-1;
 	var found=false;
 	var dlen=cntDocs.length;
 	for (var ii = 0; ii < dlen; ii++) {
@@ -295,6 +306,11 @@ function Matrix() {
 	    var cnt=this.getDocVal(state,doc,"cnt");
 	    var maxlev=this.getDocVal(state,doc,"maxlev");
 	    var maxrank=this.getDocVal(state,doc,"maxrank");
+	    //console.log("Cnt item:",maxlev,state.Matrix.maxLevel,JSON.stringify(doc));
+	    if (maxlev > state.Matrix.maxLevel || maxrank > state.Matrix.maxRank){
+		state.Matrix.maxLevel=maxlev;
+		state.Matrix.maxRank=maxrank;
+	    };
 	    var minlev=this.getDocVal(state,doc,"minlev");
 	    var svgid=state.Svg.getId(state,doc);
     	    //console.log ("Processing:",JSON.stringify(doc),maxlev,minlev,cnt);
@@ -322,15 +338,18 @@ function Matrix() {
 	    }
 	    // 	state.Grid.setArea(minlat,maxlat,minlon,maxlon);
 	}
+	//console.log("Cnt maxLevel:",state.Matrix.maxLevel);
 	if (! found) {
-	    console.log("makeMatrixCntMap No relevant thresholds found.");
-	    state.Html.setFootnote(state,"No data found.");
+	    console.log("No valid data found.",JSON.stringify(matrix));
+	    state.Html.setFootnote(state,"No data with valid threshold was found.");
 	}
 	if (state.Layout.state.tooltip === 0) { // pre-generate all tooltips
 	    state.Matrix.addAllTooltip(state,matrix);
 	};
     };
     this.makeMatrix=function(state,docs,matrix) {
+	state.Matrix.maxLevel=-1;
+	state.Matrix.maxRank=-1;
 	var found=false;
 	//var svgkey=state.Svg.getKey(state);
 	//var pos=[];
@@ -343,15 +362,22 @@ function Matrix() {
     	    // update matrix array element
     	    //console.log ("Processing:",JSON.stringify(doc));
 	    var dlev=state.Threshold.getLevel(state,doc);
+	    var drank=state.Threshold.getRank(state,doc);
+	    //console.log("Level and Rank:",dlev,drank,JSON.stringify(doc));
 	    if (dlev === undefined) {dlev=-2;};
 	    if (dlev >= 0) { found=true;}
+	    if (dlev > state.Matrix.maxLevel || drank > state.Matrix.maxRank) {
+		state.Matrix.maxLevel=dlev;
+		state.Matrix.maxRank=drank;
+	    };
 	    var svgid=state.Svg.getId(state,doc);
-    	    this.updateMatrixElement(state,arr,dlev,svgid,doc);
+    	    this.updateMatrixElement(state,arr,dlev,drank,svgid,doc);
 	}
 	if (! found) {
-	    console.log("makeMatrix No relevant thresholds found.");
+	    console.log("No valid data found.",JSON.stringify(matrix));
 	    state.Html.setFootnote(state,"No data with valid threshold was found.");
 	}
+	//console.log("Maxlev:",state.Matrix.maxLevel,state.Matrix.maxRank);	
 	//console.log ("makeMatrix tooltip-keys:",JSON.stringify(state.Path.tooltip));
 	//console.log ("makeMatrix:",JSON.stringify(matrix));
     };
@@ -468,11 +494,19 @@ function Matrix() {
     };
     this.printElements=function(matrix) {};
 /////////////////////
+    this.isInterestingTooltipDoc=function(state,docs,doc,dlev,drank) {
+	if ((dlev > 0 && dlev < state.Threshold.getMaxLevel(doc) && 
+	     docs.length < 3) || docs.length < 1) {
+	    return true;
+	} else {
+	    return false;
+	};
+    }
     this.getDocVal=function(state,doc,key) {
 	if (key === undefined || key === null) { return null; };
 	var val = doc[key];if (val  === undefined) {val="";};return val;
     };
-    this.updateMatrixElement=function(state,arr,dlev,svgid,doc) { // called once for every hit
+    this.updateMatrixElement=function(state,arr,dlev,drank,svgid,doc) { // called once for every hit
 	if (arr  === undefined) {
 	    console.log("Undefined matrix element.");
 	    return;
@@ -480,8 +514,11 @@ function Matrix() {
 	var nn=arr.cnt||0;
 	var dd=arr.def||0;
 	if (arr.maxlev  === undefined || arr.maxlev === -1 ||
-	    (dlev !== -1 && arr.maxlev < dlev)) {
+	    (dlev !== -1 && arr.maxlev < dlev) ||
+	    arr.maxrank  === undefined || arr.maxrank === -1 ||
+	    (drank !== -1 && arr.maxrank < drank)) {
 	    arr.maxlev=dlev;
+	    arr.maxrank=drank;
 	    arr.svgid=svgid;
 	    arr.svgcnt=1;
 	} else if (arr.svgcnt===undefined || arr.maxlev===dlev) {
@@ -501,23 +538,24 @@ function Matrix() {
 	    arr.docs.push(doc);
 	}
 	//if (state.Layout.state.tooltip === 0) {
-	    var rank=state.Threshold.getRank(state,doc);
-	    if (arr.tooltip === undefined) {arr.tooltip={};};
-	    var el=this.getTooltipElement(state,arr.tooltip,doc);
-	    if ( dlev !== -1 &&
-		 ((el.maxrank === undefined && el.maxlev === undefined) || 
-		  (el.maxlev < dlev || (el.maxlev===dlev && el.maxrank < rank)))
-	       ) {
-		el.maxlev=dlev;
-		el.maxrank=rank;
-		el.docs=[];
+	//var drank=state.Threshold.getRank(state,doc);	
+	if (arr.tooltip === undefined) {arr.tooltip={};};
+	var el=this.getTooltipElement(state,arr.tooltip,doc);
+	if ( dlev !== -1 &&
+	     ((el.maxrank === undefined && el.maxlev === undefined) || 
+	      (el.maxlev < dlev || (el.maxlev===dlev && el.maxrank < drank)))
+	   ) {
+	    el.maxlev=dlev;
+	    el.maxrank=drank;
+	    el.docs=[];
+	    el.docs.push(doc);
+	    //console.log("Resetting doc:",dlev,drank,el.docs.length);
+	} else if (el.maxlev === dlev && el.maxrank === drank && dlev > 0) {
+	    if (this.isInterestingTooltipDoc(state,el.docs,doc,dlev,drank)) {
 		el.docs.push(doc);
-	    } else if (el.maxlev === dlev && el.maxrank === rank && dlev > 0) {
-		if ((dlev > 0 && dlev < state.Threshold.getMaxLevel(doc) && 
-		     el.docs.length < 3) || el.docs.length < 1) {
-		    el.docs.push(doc);
-		};
+		//console.log("Adding doc:",dlev,drank);
 	    };
+	};
 	//}
 	//console.log ("Updating:",JSON.stringify(arr),dlev,rank,JSON.stringify(doc));
     };
@@ -735,6 +773,8 @@ function Matrix() {
 		}
 		// loop over tooltips and put maxrank-docs into tooltip array
 		this.mergeTooltipElement(state,elements[ee].tooltip,tooltip,state.Path.tooltip.select.length);
+		//console.log(">>> New tooltip:",ee,maxlev,JSON.stringify(tooltip));
+		//console.log("RRR Result tooltip:",ee,maxlev,JSON.stringify(tooltip));
 	    }
 	    docs=this.getTooltipDocs(state,tooltip);
 	    //console.log("Tooltip docs:",JSON.stringify(tooltip),JSON.stringify(docs));
@@ -790,19 +830,19 @@ function Matrix() {
 	var dlen=docs.length;
 	for (var ii = 0; ii < dlen; ii++) {
     	    var doc=docs[ii];
-	    var rank=doc.rank;
+	    var drank=doc.rank;
 	    var dlev=doc.level;
 	    var el=this.getTooltipElement(state,tooltip,doc);
-	    if (el.maxrank === undefined || el.maxrank < rank) {
-		el.maxrank=rank;
+	    if (el.maxrank === undefined || el.maxrank < drank) {
+		el.maxrank=drank;
 		el.docs=[];
 		el.docs.push(doc);
-	    } else if (el.maxlev === dlev && el.maxrank === rank && dlev > 0) {
-		if (rank!==0 || el.docs.length < 3) {
+	    } else if (el.maxlev === dlev && el.maxrank === drank && dlev > 0) {
+		if (this.isInterestingTooltipDoc(state,el.docs,doc,dlev,drank)) {
 		    el.docs.push(doc);
 		}
 	    }
-	    //console.log("Rank:",rank,el.maxrank,JSON.stringify(tooltip));
+	    //console.log("$$$ MakeCntTooltip Rank:",drank,el.maxrank,JSON.stringify(tooltip));
 	}
 	return tooltip;
     };

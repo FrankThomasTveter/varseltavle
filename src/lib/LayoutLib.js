@@ -506,7 +506,7 @@ function Layout() {
 		cellWidth=(width/cnt)-2*border;
 		hdrHeight=mwidth;
 		hx=(cellWidth-mheight)/2 + border;
-		console.log("Plan (rot+step):",lenc/stp,cnt,cellWidth,stp,width,lenc,mheight,hx);
+		//console.log("Plan (rot+step):",lenc/stp,cnt,cellWidth,stp,width,lenc,mheight,hx);
 		//console.log("Plan (rot+step):",JSON.stringify(plans),stp,cellWidth,hdrHeight,hx);
 	    }
 	    // calculate cell height

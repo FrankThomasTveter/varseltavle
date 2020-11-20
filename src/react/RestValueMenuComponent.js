@@ -28,6 +28,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     remove: {
@@ -65,7 +66,7 @@ function renderMenuItem(classes,state,item,index,keyitem,keytype,onClose) {
 class RestValueMenu extends Component {
     state={anchor:null};
     render() {
-        const { classes, state, keyitem, keytype, remove,target, focusPoints, focusType } = this.props;
+        const {classes,state,keyitem,keytype,remove,target,focusPoints,focusType} = this.props;
 	this.focusPoints=focusPoints;
 	this.focusType=focusType;
 	this.onClick = event => {

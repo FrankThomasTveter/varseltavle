@@ -6,14 +6,17 @@ import {black_palette} from '../mui/metMuiThemes';  // teal_palette
 import Undo         from './ConfigUndoComponent';
 import Redo         from './ConfigRedoComponent';
 import Mode         from './ConfigModeComponent';
-import View         from './ConfigViewPathComponent';
+import ViewPath     from './ConfigViewPathComponent';
 import Collect      from './ConfigCollectComponent';
 import Reload       from './ConfigReloadComponent';
 import Tooltip      from './ConfigTooltipComponent';
 import Order        from './ConfigOrderComponent';
 import Home         from './ConfigHomeComponent';
 import Film         from './ConfigFilmComponent';
+import Star         from './ConfigStarComponent';
 import File         from './ConfigFileComponent';
+import ViewPolygon  from './ConfigViewPolygonComponent';
+import Polygon      from './ConfigPolygonComponent';
 import Archive      from './ConfigArchiveComponent';
 import Font         from './ConfigFontComponent';
 import Dims         from './ConfigDimComponent';
@@ -59,14 +62,17 @@ class Config extends Component {
 		<Undo state={state} classes={classes} visible={false}/>
                 <Redo state={state} classes={classes} visible={false}/>
 		<Mode state={state} classes={cls} visible={false}/>
-		<View state={state} classes={cls} visible={false}/>
+		<ViewPath state={state} classes={cls} visible={false}/>
 		<Collect state={state} classes={cls} visible={false}/>
 		<Reload state={state} classes={cls} visible={false}/>
 		<Tooltip state={state} classes={cls} visible={false}/>
 		<Order state={state} classes={cls} visible={false}/>
 		<Home state={state} classes={cls} visible={false}/>
 		<Film state={state} classes={cls} visible={false}/>
+		<Star state={state} classes={cls} visible={false}/>
 		<File state={state} classes={cls} visible={false}/>
+		<ViewPolygon state={state} classes={cls} visible={false}/>
+		<Polygon state={state} classes={cls} visible={false}/>
 		<Archive state={state} classes={cls} visible={false}/>
 		<Font state={state} classes={cls} visible={false}/>
 		<Dims state={state} classes={cls} visible={false}/>

@@ -32,7 +32,7 @@ class View extends Component {
     render() {
 	const {classes, state, visible}=this.props;
 	var onclick, title;
-	if (visible !== undefined && ! visible && state.Settings.isInvisible(state,"Path")) {
+	if (visible !== undefined && ! visible && state.Settings.isInvisible(state,"ViewPath")) {
 	    return null;
 	} else if (visible !== undefined) {
 	    onclick= () => state.Layout.toggleView(state);
@@ -47,9 +47,9 @@ class View extends Component {
                  </Button>
 	    );
 	} else {
-	    onclick=() => {state.Settings.toggle(state,"Path");};
+	    onclick=() => {state.Settings.toggle(state,"ViewPath");};
 	    title="Show View";
-	    if (state.Settings.isInvisible(state,"Path")) {
+	    if (state.Settings.isInvisible(state,"ViewPath")) {
 		return (<Button
 			className={classes.buttonInvisible}
 			onClick={onclick}

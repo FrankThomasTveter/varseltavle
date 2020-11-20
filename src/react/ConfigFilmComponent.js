@@ -39,7 +39,7 @@ function Play(props) {
 };
 function PlayFilm(props) {
     const {state,classes}=props;
-    var onclick=() => {state.Path.toggleFilm(state); state.Show.showConfig(state);; state.Show.showSettings(state);};
+    var onclick=() => {state.Path.toggleFilm(state); state.Show.showConfig(state); state.Show.showSettings(state);};
     var title="Play or pause.";
     return <Button className={classes.button} onClick={onclick} title={title}><Play state={state}/></Button>;
 };

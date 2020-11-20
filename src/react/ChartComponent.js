@@ -10,7 +10,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 //import worldGeoJSON from 'geojson-world-map';
 import worldGeoJSON from '../geojson/custom_world';
-import { Map, GeoJSON, Marker, Tooltip } from 'react-leaflet';//TileLayer ,Popup
+import { Map, GeoJSON, Marker, Tooltip, Polyline } from 'react-leaflet';//Polygon, TileLayer ,Popup
 import TooltipFloatComponent  from './TooltipFloatComponent';
 
 L.Icon.Default.imagePath = 'images'
@@ -29,7 +29,8 @@ const styles = theme => ({
     },
     invisible:{border:0,padding:0},
     map: {
-	backgroundColor:'Gray',
+	backgroundColor:'LightTurquoise',
+//	backgroundColor:'Gray',
 	overflow: 'hidden',
 	height: '100%',
     },
@@ -37,6 +38,31 @@ const styles = theme => ({
     buttonInvisible:{},
     buttonDisabled:{},
 });
+
+function polygon(state,classes,name,pos,color) {
+    if (pos === undefined || color === undefined) {
+	return null;
+    } else {
+	return (
+	    <Polyline key={name} positions={pos} color={color}/>
+	);
+    }
+};
+
+function polygons(state,classes,name,index) {
+    var lines=state.Polygon.positions[name];
+    var level=state.Polygon.levels[name];
+    var color=state.Colors.getLevelBgColor(level);
+    var mapFunction= (pos,index)=>{return polygon(state,classes,name+index,pos,color);};
+    if (lines === undefined || color === undefined) {
+	//console.log("Not showing polygon:",name,color);
+	return null;
+    } else {
+	//console.log("Showing polygon:",name,level);
+	return (lines.map(mapFunction));
+    }
+};
+
 class GeoJsonMap extends Component {
     constructor(props) {
 	super(props);
@@ -134,8 +160,8 @@ class GeoJsonMap extends Component {
 	    this.refs.map.leafletElement.fitBounds(this.bounds);
 	    zoom=this.refs.map.leafletElement.getZoom();
 	    focus=this.refs.map.leafletElement.getCenter();
-	    this.config.zoom=zoom;
-	    this.config.focus=[focus.lat,focus.lng];
+	    if (zoom !== undefined) {this.config.zoom=zoom;};
+	    if (focus!== undefined) { this.config.focus=[focus.lat,focus.lng];};
 	    state.Path.setFocus(state,zoom,focus[0],focus[1],false);
 	}
     }
@@ -268,7 +294,7 @@ class GeoJsonMap extends Component {
       //var layoutMode  = state.Layout.getLayoutMode(state);
       var markFunction= (mark) => {
 	  var size=50;
-	  var svgstr=state.Svg.getSvg(state,mark.svgid,'black',mark.bgcolor,size);
+	  var svgstr=state.Svg.getSvg(state,mark.svgid,mark.fgcolor,mark.bgcolor,size);
 	  //console.log("Using SVG:",mark.svgid,svgstr,mark.fgcolor,mark.bgcolor);
 	  var flagIcon = new  L.divIcon({iconSize: [size, size],html: svgstr,className:'dummy'});
 	  //console.log("Tooltip data:",data);
@@ -292,6 +318,9 @@ class GeoJsonMap extends Component {
 	      state.Path.setFocus(state,zoom,focus.lat,focus.lng,true);
 	  };
       };
+      var mapFunction= (name,index)=>{return polygons(state,classes,name,index);};
+      var names=state.Polygon.getNames(state);
+      //console.log("Names:",JSON.stringify(names));
       return (<div ref={el=>{this.element(el)}}
 	      className={classes.content}
 	      style={{position:'fixed',
@@ -324,6 +353,7 @@ class GeoJsonMap extends Component {
 			   fillColor: 'lightGray',//"#1a1d62",
 			   fillOpacity: 1, //zIndex: 1,
 		       })}/>
+	      {names.map(mapFunction)}
 	      {this.config.markers.map(markFunction)}
 	      <TooltipFloatComponent state={state} data={this.marker} update={this.update}/>
 	      </Map>
@@ -331,6 +361,8 @@ class GeoJsonMap extends Component {
 	     );
   }
 }
+
+//	      <Polygon positions={[[60,10],[61,10],[60.5,9],[60,10]]} color="red"/>
 
 GeoJsonMap.propTypes = {
     classes: PropTypes.object.isRequired,

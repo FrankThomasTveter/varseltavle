@@ -33,7 +33,8 @@ class ReelAdd extends Component {
 	this.state={anchor:null, label:""};
 	//state.Path.getLabel(state)
 	this.onClick  = event => {this.setState({ anchor: event.currentTarget });};
-	this.onAdd    = () => {state.Path.addFilm(state,state.Path.getSnapshort(state)); this.setState({label:""});state.Show.showSettings(state);};
+	this.onAdd    = () => {state.Path.addFilm(state,state.Path.getSnapshort(state)); this.setState({label:""});
+			       state.Show.showConfig(state);state.Show.showSettings(state);};
 	this.onRemove = (index) => {this.setState({label:state.Path.removeFilm(state,index)});};
 	this.handleChange=(event) => {
 	    //console.log("handleChange:",event.target.value);

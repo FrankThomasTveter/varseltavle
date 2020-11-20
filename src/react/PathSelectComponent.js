@@ -21,11 +21,12 @@ function renderPathSelect(classes,state,keyitem,keyindex,focusPoints) {
     if (vals !== undefined && vals.length > 0) {
 	lab=vals[0];
     };
-    var target="table";
+    var target="rest";
+    var remove = () => {state.Navigate.pushSelectToRest(state,key);};
     var title="'"+state.Path.where[key]+"'";
     var cls={button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled};
     return (<span key={`select-${key}`} className={classes.span}>
-	    <SelectValueMenu state={state} classes={cls} keyitem={keyitem} label={lab} target={target} title={title} focusPoints={focusPoints} focusType={"_selected"}/>
+	    <SelectValueMenu state={state} classes={cls} keyitem={keyitem} label={lab} target={target} title={title} focusPoints={focusPoints} focusType={"_selected"} remove={remove}/>
 	    </span>);
 }
 

@@ -544,6 +544,20 @@ function Utils() {
 	//console.log("Original:",JSON.stringify(obj));
 	return json;
     };
+    this.clipboard=function(copyText) {
+	if (navigator.clipboard) {
+	    navigator.clipboard.writeText(copyText).then(
+		() => {
+		    console.log("copy success");
+		},
+		error => {
+		    console.log(error);
+		}
+	    );
+	} else {
+	    alert("Unable to use clipboard.");
+	};
+    };
     this.save=function(data, filename, type) {
 	//console.log("Saving data:",data);
 	//console.log("Saving file:",filename);
@@ -573,6 +587,30 @@ function Utils() {
 	console.log("Matrix size:",size);
 	return size;
     };
+    this.sortArrays=function () {
+	var narg=arguments.length;
+	if (narg===0) {return [];}
+	var nlen=arguments[0].length;
+	var toSort=[];
+	for (var i = 0; i < nlen; i++) {
+	    toSort[i] = [];
+	    for (var jj=0;jj<narg;jj++) {
+		toSort[i].push(arguments[jj][i])
+	    };
+	    toSort[i].push(i);
+	};
+	toSort.sort(function(left, right) {
+	    return left[0] < right[0] ? -1 : 1;
+	});
+	var ret=[];
+	for (var ll=0;ll<narg;ll++) {
+	    ret[ll] = [];
+	    for (var j = 0; j < nlen; j++) {
+		ret[ll].push(toSort[j][ll])
+	    };
+	};
+	return ret;
+    }
 };
 export default Utils;
     

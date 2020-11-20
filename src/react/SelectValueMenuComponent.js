@@ -29,6 +29,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     reload: {
@@ -85,14 +86,15 @@ class SelectValueMenu extends Component {
 	};
 	this.onClose = () => {this.setState({ anchor: null });};
 	this.pushToTable = () => {
-	    console.log("Setting focus to:",keyitem);
+	    //console.log("Setting focus to:",keyitem);
 	    state.Path.setPathFocus(state,keyitem);
-	    state.Navigate.pushKeyToTable(state,keyitem);
+	    state.Navigate.pushSelectToTable(state,keyitem);
 	    this.onClose();
 	};
 	var items=state.Database.getKeyValues(state,keyitem);
 	if (remove !== undefined) {
 	    this.remove = () => {
+		state.Path.setPathFocus(state,keyitem);
 		remove();this.onClose();
 	    };
 	    this.target=target;

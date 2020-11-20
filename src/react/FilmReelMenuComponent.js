@@ -9,6 +9,7 @@ import Chip from '@material-ui/core/Chip';
 import FilmIcon from '@material-ui/icons/Theaters';
 import TrashIcon from '@material-ui/icons/Delete';
 import UpwardIcon from '@material-ui/icons/ArrowUpward';
+import {teal_palette} from '../mui/metMuiThemes';
 
 const styles = theme => ({
     reel: {
@@ -28,6 +29,20 @@ const styles = theme => ({
     },
     buttonInvisible:{},
     buttonDisabled: {},
+    chip: {
+        margin: theme.spacing(0),
+	cursor: "pointer",
+        color:"black",
+        borderColor:"blue",
+	backgroundColor:'white',
+	"&&:hover":{
+	    backgroundColor:teal_palette.light,
+	},
+	"&&:focus":{
+	    backgroundColor:teal_palette.main,
+	    color:'white',
+	}
+    },
 });
 function RemoveReel(props) {
     const {classes,index,onRemove}=props; //state,
@@ -47,13 +62,13 @@ function renderMenuItem(classes,state,keyitem,keyindex,onRemove,onUpward) {
     if (keyindex===0) { // remove
 	return ( <MenuItem className={classes.order} key={"film_" + keyindex}>
 		<RemoveReel state={state} classes={cls} index={keyindex} onRemove={onRemove}/>
-		<Chip icon={null} label={keyitem.label} onClick={onclick}/>
+		 <Chip icon={<FilmIcon/>} label={keyitem.label} onClick={onclick} className={classes.chip} variant="outlined"/>
 		</MenuItem>
 	       );
     } else {
 	return (<MenuItem className={classes.order} key={"film_" + keyindex}>
 		<UpwardReel state={state} classes={cls} index={keyindex} onUpward={onUpward}/>
-		<Chip icon={null} onClick={onclick} label={keyitem.label}/>
+		<Chip icon={<FilmIcon/>} onClick={onclick} label={keyitem.label}/>
 		</MenuItem>
 	       );
     }
@@ -66,7 +81,7 @@ class ReelMenu extends Component {
 	//state.Path.getLabel(state)
 	this.onClick  = event => {this.setState({ anchor: event.currentTarget });};
 	this.onClose  = () => {this.setState({ anchor: null });};
-	this.onRemove = (index) => {this.setState({label:state.Path.removeFilm(state,index)});};
+	this.onRemove = (index) => {this.setState({label:state.Path.removeFilm(state,index)});state.Show.showConfig(state);state.Show.showSettings(state);};
 	this.onUpward = (index) => {state.Path.moveFilm(state,index);state.Show.showConfig(state);state.Show.showSettings(state);};
 	//
 	this.onClick=this.onClick.bind(this);

@@ -36,7 +36,7 @@ function Threshold() {
 	};
 	var rank=0; // universal rank
 	if (doclev > -1) {
-	    rank= doclev+(docmax-Number(maxs[doclev]))/(Number(maxs[mlen-1])-Number(maxs[0]));
+	    rank= doclev+((docmax-Number(maxs[doclev]))/(Number(maxs[mlen-1])-Number(maxs[0])))/1000.0;
 	    //console.log("Doclev:",doclev," max:",docmax,jj,mlen,maxs[doclev],maxs[mlen-1],maxs[0]);
 	};
 	//if (debug) {console.log("Level:",docmax,doclev,JSON.stringify(maxs));}
@@ -168,7 +168,7 @@ function Threshold() {
     }
     this.getRank=function(state,doc) {
 	if (doc._thr !== undefined) {
-	    return doc._rank;
+	    return doc._thr.rank;
 	} else {
 	    return 0;
 	}

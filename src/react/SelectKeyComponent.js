@@ -29,6 +29,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     tablechip: {
@@ -42,6 +43,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     restchip: {
@@ -55,6 +57,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     otherfullchip: {
@@ -68,6 +71,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     otheremptychip: {
@@ -81,6 +85,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     trashfullchip: {
@@ -94,6 +99,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     trashemptychip: {
@@ -107,6 +113,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     trashignorechip: {
@@ -120,6 +127,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
     othchip: {
@@ -132,6 +140,7 @@ const styles = theme => ({
 	},
 	"&&:focus":{
 	    backgroundColor:teal_palette.main,
+	    color:'white',
 	}
     },
 });
