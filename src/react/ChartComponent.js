@@ -151,10 +151,12 @@ class GeoJsonMap extends Component {
 	    this.config.zoom=zoom;
 	    focus=[state.Path.getFocusLat(state),state.Path.getFocusLon(state)];
 	    this.config.focus=focus;
-	    this.refs.map.leafletElement.setView(focus,zoom);
-	    //console.log("Focus:",this.config.zoom,this.config.focus[0],this.config.focus[1],
+	    if (focus !== undefined && focus[0] !== undefined && focus[1]!==undefined) {
+		this.refs.map.leafletElement.setView(focus,zoom);
+		//console.log("Focus:",this.config.zoom,this.config.focus[0],this.config.focus[1],
 		//	JSON.stringify(state.Path.focus));
-	    state.Path.setFocus(state,zoom,focus[0],focus[1],false);
+		state.Path.setFocus(state,zoom,focus[0],focus[1],false);
+	    }
 	} else {// use focus from marker data...
 	    //console.log("Bounds:",JSON.stringify(this.bounds));
 	    this.refs.map.leafletElement.fitBounds(this.bounds);
@@ -162,7 +164,9 @@ class GeoJsonMap extends Component {
 	    focus=this.refs.map.leafletElement.getCenter();
 	    if (zoom !== undefined) {this.config.zoom=zoom;};
 	    if (focus!== undefined) { this.config.focus=[focus.lat,focus.lng];};
-	    state.Path.setFocus(state,zoom,focus[0],focus[1],false);
+	    if (focus !== undefined && focus[0] !== undefined && focus[1]!==undefined) {
+		state.Path.setFocus(state,zoom,focus[0],focus[1],false);
+	    }
 	}
     }
     getMarkers(state) {

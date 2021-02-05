@@ -22,8 +22,9 @@ function Html() {
     this.broadcast=function(state,msg,variant) {
 	if (state.React !== undefined && state.React.Status !== undefined) {
 	    if (msg  === undefined) {msg=state.Utils.getStatusString(state);};
-	    //console.log("setlog:",msg,state.Matrix.cnt);
-	    state.React.App.broadcast(msg,'info');
+	    if (variant === undefined) {variant='info';};
+	    //console.log("broadcast:",msg,variant);
+	    state.React.App.broadcast(msg,variant);
 	}
     };
     this.progressInfo=function(state,e) {

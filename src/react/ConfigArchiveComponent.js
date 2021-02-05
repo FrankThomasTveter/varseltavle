@@ -6,13 +6,25 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 //import ArchiveIcon from '@material-ui/icons/VpnArchive';
 import ArchiveIcon from '@material-ui/icons/Storage';
-import Archive     from './ArchiveComponent';
-import Upload from './UploadDbComponent';
+import Fragment   from './FragmentListComponent';
+import Archive    from './ArchiveListComponent';
+import Upload     from './UploadDbComponent';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
 import SelectedIcon from '@material-ui/icons/CloudDone';
+import AppendIcon from '@material-ui/icons/PlaylistAdd';
+import ReplaceIcon from '@material-ui/icons/PlaylistAddCheck';
 
 const styles = theme => ({
     settings:{},
+    order: {
+	display: 'inline-block',
+        marginRight: 'auto',
+	height:'100%',
+    },
+    tableOrder: {
+	display: 'inline-block',
+        marginRight: 'auto',
+    },
     config: {
         marginLeft: 'auto',
     },
@@ -24,6 +36,15 @@ const styles = theme => ({
     },
 });
 
+function Append(props) {
+    const {classes,append,onclick}=props; //state,
+    var title="Toggle append or replace";
+    if (append) {
+	return <Button className={classes.button} onClick={onclick} title={title}><AppendIcon/></Button>;
+    } else {
+	return <Button className={classes.button} onClick={onclick} title={title}><ReplaceIcon/></Button>;
+    };
+};
 function Download(props) {
     const {state,classes}=props;
     var onclick=() => {state.Database.saveDb(state);};
@@ -36,18 +57,8 @@ function Selected(props) {
     var title="Download database subset";
     return <Button className={classes.button} onClick={onclick} title={title}><SelectedIcon/></Button>;
 };
-function renderMenuItem(classes,state,item,index) {
-    if (item[0]==="" || item[0] === null || item[0]===undefined) {
-	return null;
-    } else {
-	//console.log("Archive:",JSON.stringify(item),JSON.stringify(index));
-	return (<MenuItem key={item[0]}>
-		<Archive state={state} item={item[0]}  index={item[1]} active={item[2]}/> 
-		</MenuItem>);
-    }
-}
 class ArchiveMenu extends Component {
-    state={anchor:null};
+    state={anchor:null, append:false};
     render() {
 	//console.log("Rendering ArchiveComponents...");
         const { classes, state, visible } = this.props;
@@ -59,41 +70,48 @@ class ArchiveMenu extends Component {
 	} else if (visible !== undefined) {
  	    this.onClick = event => {this.setState({ anchor: event.currentTarget });};
  	    this.onClose = () => {this.setState({ anchor: null });};
-	    var items=state.Database.files.map(
-		function(item,index) {
-		    return [item,index,index===state.Database.index]
-		}
-	    );//.sort(state.Utils.ascendingArr);
-	    var mapFunction= (item,index)=>renderMenuItem(classes,state,item,index);
+ 	    this.onAppend = event => {this.setState({ append: ! this.state.append });};
 	    //console.log("Archives.rendering:",JSON.stringify(state.Path.other));
 	    //console.log("Archives.rendering",items.length,JSON.stringify(anchor),Boolean(anchor));
 	    title="Available database files.";
 	    var cls={button:classes.button};
+	    //classes.view
 	    return (
-		<div className={classes.view}>
+		    <div className={classes.tableOrder} key={"archive"}>
 		   <Button
                       className={classes.button}
-                      aria-owns={this.state.anchor ? 'keys-menu' : undefined}
+                      aria-owns={this.state.anchor ? 'archiveconfig-menu' : undefined}
                       aria-haspopup="true"
                       onClick={this.onClick}
 	              title={title}
 		    >
 	  	       {<ArchiveIcon state={state}/>}
                      </Button>
-		     <Menu
-                        id="archive-menu"
-	                anchorEl={this.state.anchor}
-                        open={Boolean(this.state.anchor)}
-                        onClose={this.onClose}
-		     >
-
-		        <MenuItem key="upload"  className={classes.file} onClose={this.onClose}>
-		           <Upload state={state}/>
+		      <Menu
+                         id="archiveconfig-menu"
+	                 anchorEl={this.state.anchor}
+                         open={Boolean(this.state.anchor)}
+                         onClose={this.onClose}
+		      >
+		       <MenuItem className={classes.order} key="fragment" onClose={this.onClose}>
+		           <Fragment state={state} classes={classes}/>
+		       </MenuItem>
+		       <MenuItem className={classes.order} key="append" onClose={this.onClose}>
+		           <Append state={state} classes={classes} append={this.state.append} onclick={this.onAppend}/>
+		       </MenuItem>
+		       <MenuItem className={classes.order} key="upload" onClose={this.onClose}>
+		           <Upload state={state} append={this.state.append}/>
+		       </MenuItem>
+		       <MenuItem className={classes.order} key="download" onClose={this.onClose}>
 		           <Download state={state} classes={cls}/>
+		       </MenuItem>
+ 	               <MenuItem className={classes.order} key="selected" onClose={this.onClose}>
 		           <Selected state={state} classes={cls}/>
+		       </MenuItem>
+		       <MenuItem className={classes.order} key="archive" onClose={this.onClose}>
+		           <Archive state={state} classes={classes}/>
 		        </MenuItem>
-		        {items.map(mapFunction)}
-	             </Menu>
+	              </Menu>
 		</div>
 	    );
 	} else {
@@ -107,6 +125,7 @@ class ArchiveMenu extends Component {
 	};
     }
 }
+
 
 ArchiveMenu.propTypes = {
     classes: PropTypes.object.isRequired,

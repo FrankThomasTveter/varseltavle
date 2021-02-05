@@ -56,7 +56,7 @@ function getChipIcon(active) {
 
 class Archive extends Component {
     render() {
-        const { classes, state, item, index, active } = this.props;
+        const { classes, state, item, index, active, title } = this.props;
 	//console.log("Rendering Archive...",item,index,active);
 	var chip=getChipClass(classes,active);
 	var icon=getChipIcon(active);
@@ -66,13 +66,14 @@ class Archive extends Component {
 	};
 	//console.log("...archive:",JSON.stringify(item),JSON.stringify(index),active);
 	return (
-		<div className={classes.archive}>
+		<div className={classes.archive} title={title}>
 	 	<Chip
-	    icon={icon}
-	    label={item}
-	    onClick={onclick}
-	    className={chip}
-	    variant="outlined"
+	         icon={icon}
+	         label={item}
+	         title={title}
+	         onClick={onclick}
+	         className={chip}
+	         variant="outlined"
 		/>
 		</div>
 	);

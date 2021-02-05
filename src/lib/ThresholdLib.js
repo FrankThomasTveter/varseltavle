@@ -2,6 +2,7 @@
 
 function Threshold() {
     this.thrs=undefined; // threshold parameter levels, set by Default
+    this.debug=false;
     //this.imax=0;        // threshold item types
     //this.ithr=1;
     //this.ikey=2;
@@ -22,7 +23,7 @@ function Threshold() {
 	}
     };
     this.getMaxThreshold=function(doc,thr,maxs) {
-	//if (debug) {console.log("Thresholds:",JSON.stringify(maxs),val);};
+	if (this.debug) {console.log("Thresholds:",JSON.stringify(maxs));};
 	var doclev=-1; // found thresholds, but will we find a valid level?
 	var val = doc[thr["key"]];
 	var docmax=Number(val);
@@ -30,7 +31,7 @@ function Threshold() {
 	// get new level
 	for (var jj = 0; jj < mlen; jj++) {
 	    if (docmax >= Number(maxs[jj])) {
-		//if (debug) {console.log("Hit:",docmax,jj,maxs[jj],docmax>=maxs[jj],doclev);}
+		if (this.debug) {console.log("Hit:",docmax,jj,maxs[jj],docmax>=maxs[jj],doclev);}
 		doclev=jj;
 	    }
 	};
@@ -39,7 +40,7 @@ function Threshold() {
 	    rank= doclev+((docmax-Number(maxs[doclev]))/(Number(maxs[mlen-1])-Number(maxs[0])))/1000.0;
 	    //console.log("Doclev:",doclev," max:",docmax,jj,mlen,maxs[doclev],maxs[mlen-1],maxs[0]);
 	};
-	//if (debug) {console.log("Level:",docmax,doclev,JSON.stringify(maxs));}
+	if (this.debug) {console.log("Level:",docmax,doclev,JSON.stringify(maxs));}
 	var ret={};
 	ret.level=doclev;
 	ret.rank=rank;
@@ -52,7 +53,7 @@ function Threshold() {
 	return ret;
     };
     this.getMinThreshold=function(doc,thr,mins) {
-	//if (debug) {console.log("Thresholds:",JSON.stringify(mins),val);};
+	if (this.debug) {console.log("Thresholds:",JSON.stringify(mins));};
 	var doclev=-1; // found thresholds, but will we find a valid level?
 	var val = doc[thr["key"]];
 	var docmin=Number(val);
@@ -88,46 +89,71 @@ function Threshold() {
 	} else if (mins !== undefined) { // below thresholds
 	    return this.getMinThreshold(doc,thr,mins)
 	} else {
-	    //if (debug) {console.log("No Thresholds:",JSON.stringify(thrs),val);};
+	    if (this.debug) {console.log("No Thresholds:",JSON.stringify(thr));};
 	}
     };
     this.getThresholds=function(state,doc,ithrs) { // returns keys...
 	var ret;
 	var thrs;
 	var lret;
+	var ii;
+	var lent;
+	var obj;
 	if (ithrs === undefined) {
 	    thrs=this.thrs;
-	    ret=this.getDefaultThreshold();
+	    if (this.debug) {console.log("Entering...",JSON.stringify(doc));};
 	} else {
+	    if (this.debug) {console.log("Re-Entering...",JSON.stringify(ithrs));};
 	    thrs=ithrs;
 	};
 	if (Array.isArray(thrs)) {
-	    var lent=thrs.length;
-	    for (var ii=0;ii<lent;ii++) {
-		var obj=thrs[ii];
+	    lent=thrs.length;
+	    for (ii=0;ii<lent;ii++) {
+		obj=thrs[ii];
+		//console.log("GetThresholds array...",JSON.stringify(obj));
 		lret=this.getThresholds(state,doc,obj);
 		if (lret !== undefined) {
+		    //console.log("Got result...",ii,JSON.stringify(lret));
 		    return lret;
 		}
 	    };
 	} else if (typeof thrs === "object" && thrs !== null) {
 	    if (thrs.key === undefined) { // there is another level
-		//if (debug) {console.log("   Iterating with:",JSON.stringify(thrs[trgkey][trgval]));};
 		for (var trgkey in thrs) { // loop over thresholds
 		    if (doc[trgkey] !== undefined) {
 			var trgval=doc[trgkey]; // trgval-value
-			if (thrs[trgkey][trgval] !== undefined) {
-			    lret=this.getThresholds(state,doc,thrs[trgkey][trgval]);
-			    if (lret !== undefined) {return lret;};
-			    //console.log("Found:",trgkey,trgval,JSON.stringify(thrs[trgkey][trgval]));
+			obj=thrs[trgkey];
+			if (Array.isArray(obj)) {
+			    if (this.debug) {console.log("   Looping with:",trgkey,trgval,JSON.stringify(obj)!==undefined);};
+			    lent=obj.length;
+			    for (ii=0;ii<lent;ii++) {
+				var thr=obj[ii][trgval];
+				if (thr !== undefined) {
+				    lret=this.getThresholds(state,doc,thr);
+				    if (lret !== undefined) {return lret;};
+				}
+			    }
+			} else {
+			    if (this.debug) {console.log("   Iterating with:",trgkey,trgval,JSON.stringify(thrs[trgkey][trgval])!==undefined);};
+			    if (thrs[trgkey][trgval] !== undefined) {
+				lret=this.getThresholds(state,doc,thrs[trgkey][trgval]);
+				if (lret !== undefined) {return lret;};
+				//console.log("Found:",trgkey,trgval,JSON.stringify(thrs[trgkey][trgval]));
+			    }
 			}
 		    }
 		}
 	    } else if (doc[thrs.key] !== undefined) {
+		//console.log("GetThresholds array...",ii,JSON.stringify(obj));
 		lret=this.processThreshold(state,doc,thrs);
 		if (lret !== undefined) {return lret;};
 	    }
 	};
+	if (ithrs === undefined && ret===undefined) {
+	    ret=this.getDefaultThreshold();
+	    console.log("GetThresholds using defaults...",JSON.stringify(ret));
+	};
+	//console.log("GetThresholds done...",JSON.stringify(ret));
 	return ret;
     };
     this.setThresholds=function(state,doc) {

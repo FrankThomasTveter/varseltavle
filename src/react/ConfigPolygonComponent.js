@@ -90,6 +90,7 @@ class PolygonMenu extends Component {
 	    this.onChange = event => {state.Polygon.mode=(state.Polygon.mode+1)%2;this.forceUpdate()};
  	    this.onClick  = event => {this.setState({ anchor: event.currentTarget })};
 	    this.onClose  = () => {this.setState({ anchor: null });};
+	    this.onClose = this.onClose.bind(this);
 	    var mapFunction= (item,index)=>renderDownload(classes,state,item,index,this.onClose);
 	    //var cls={button:classes.button};
 	    return (<div className={classes.tablePolygon}>

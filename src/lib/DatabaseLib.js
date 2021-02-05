@@ -8,21 +8,32 @@ function Database() {
     this.bdeb=false;
     this.processing=false;
     var ret;
-    this.files=["1.json"];                  // json data file
+    this.files={};
+    this.summarydir="";
+    this.summaries=["summary"];
+    this.summary=[];
+    this.sumcnt={};
+    this.fragments=[]; // frags to be loaded
+    this.fragload=[];         // active loaded
+    this.fragjson={};         // json[frag]
+    this.fragfile={};         // file[frag]
+    this.fragcnt={};          // cnt[frag]
+    this.fragdtg=null;
     this.loaded="";
-    this.index=0;
+    this.append=false;
+    this.indexDtg=undefined; // undefined is first element, otherwise dtg, null is custom
     this.keyCnt={};
     this.values= {};
     this.epoch0=0;
     this.jsonOrg={};
-    this.data="data";
-    this.regfile="register";      // register file (shows current datfile)
     this.arrayConstructor=[].constructor;
     this.objectConstructor={}.constructor;
     this.casc=0; // key is sorted ascending
     this.cdes=1; // key is sorted descending
     this.nasc=2; // key is sorted ascending
     this.ndes=3; // key is sorted descending
+    //this.delay=5*1000;  // step length in ms (film reel period)
+    //this.step=2;        // steps between each server polling
     this.delay=10*1000;  // step length in ms (film reel)
     this.step=60;        // steps between each server polling
     this.stepCnt=0;      // current step count
@@ -38,10 +49,6 @@ function Database() {
 		 Max:3
 		};
     this.db=null;
-    this.newDb=function() {
-	this.db=new alasql.Database();
-	//console.log("Alasql:",JSON.stringify(this.db));
-    };
     this.init=function(state,response,callbacks){
         state.Colors.init(state);
         state.Path.init(state);
@@ -50,11 +57,50 @@ function Database() {
         state.Custom.init(state);
         state.Settings.init(state);
 	state.Utils.init("Database",this);
-	console.log("Data location:",this.data);
 	state.File.next(state,response,callbacks);
     }.bind(this);
+    this.newDb=function(state) {
+	if (state.Database.append && this.db !== null) {
+	    // keep old database...
+	    //console.log("Keeping old database...");
+	} else {
+	    this.db=new alasql.Database();
+	    //console.log("Alasql:",JSON.stringify(this.db));
+	    this.dbcnt=0;
+	};
+    };
+    this.saveOrg=function(state,json) {
+	if (state.Database.append && this.jsonOrg !== undefined) {
+	    var keys=Object.keys(json);
+	    var lenk=keys.length;
+	    for (var ii=0;ii<lenk;ii++) {
+		var key=keys[ii];
+		if (this.jsonOrg[key] !== undefined) {
+		    if (Array.isArray(this.jsonOrg[key]) && Array.isArray(json[key])) {
+			state.Utils.appendArray(this.jsonOrg[key],json[key]);
+		    } else {
+			this.jsonOrg[key]=json[key];
+		    }
+		} else {
+		    this.jsonOrg[key]=json[key];
+		}
+	    }
+	} else {
+	    this.jsonOrg=state.Utils.cp(json);
+	}
+    };
+    this.makeTable=function(state) {
+	if (state.Database.append) {
+	    //console.log("Keeping data...");
+	    this.query('CREATE TABLE IF NOT EXISTS alarm;');
+	} else {
+	    //console.log("Deleting data...");
+	    this.query('DROP TABLE IF EXISTS alarm; CREATE TABLE alarm;');
+	    this.dbcnt=0;
+	};
+    };
     this.updateLoop=function(state) {
-	//console.log("Updating database...");
+	if (this.bdeb) {console.log("Updating database...");}
 	this.setTime(state);
 	if (this.stepCnt%this.step===0) {
 	    this.load(state);
@@ -66,46 +112,558 @@ function Database() {
 	    state.Database.updateLoop(state)
 	},state.Database.delay); //state.Database.delay
     }.bind(this);
-    this.load=function(state) {
-	console.log("Database load number:",++this.loadcnt);
-	if (state.Database.index === 0) {
-	    state.Database.loadRegister(state,"",
-					       [state.Database.processRegister,
-						state.Database.loadData,
-						state.Database.processData
-					       ]);
+    this.getDtg=function(state) {
+	var now = new Date();
+	var yyyy = now.getFullYear();
+	var mm = String(now.getMonth() + 1).padStart(2, '0'); //January is 0!
+	var dd = String(now.getDate()).padStart(2, '0');
+	var hh =  String(now.getHours()).padStart(2, '0');
+	var mi =  String(now.getMinutes()).padStart(2, '0');
+	var ret = ''+yyyy+mm+dd+hh+mi;
+	//console.log("Date:",ret," -> ",yyyy,"/",mm,"/",dd,"T",hh,":",mi);
+	return (ret);
+    };
+    this.getFileDtg=function(state,file) {
+	if (file === undefined) {
+	    console.log("Invalid call to getFileDtg...");
+	} else {
+	    var regex = /\d+_(?<dtg>\d{8}T\d{4}).json/;
+	    var mm = file.match(regex);
+	    if (mm !== undefined && mm !== null) {
+		var found = mm.groups;
+		if (found !== null && found !== undefined && found.dtg !== undefined) {
+		    return found.dtg;
+		} else {
+		    return;
+		}
+	    } else {
+		//console.log("Invalid file dtg:",file);
+		return;
+	    }
 	};
     };
-    this.loadRegister=function(state, response, callbacks ) {
-	var prefix=(state.Database.data||"data") + "/";
-	//console.log("Using register-prefix:",prefix);
-	var path=prefix + state.Database.regfile;
-	if (this.loadcnt === 1) {console.log("Database loadRegister:",path);}
-	state.File.load(state,path,callbacks);
-    };
-    this.processRegister=function(state,response,callbacks) {
-	var files=response.split('\n');
-	var file=files[Math.min(files.length-1,state.Database.index)]; // register-respo
-	state.Database.files=files;
-	state.Database.index=Math.min(files.length-1,(state.Database.index||0))
-	state.File.next(state,file,callbacks);
-    };	
-    this.loadData=function(state, file, callbacks ) {
-	//console.log("Database loadData:",JSON.stringify(file));
-	if (file !== state.Database.loaded) { // load new data
-	    state.Html.broadcast(state,"Loading "+file);
-	    state.Database.setLoaded(state,file);
-	    // console.log("Files:",JSON.stringify(state.Database.files));
-	    var prefix=(state.Database.data||"data") + "/";
-	    //console.log("Using data-prefix:",prefix);
-	    var path=prefix + file;
-	    //console.log("Database loadPath:",JSON.stringify(path));
-	    state.File.load(state,path,callbacks);
+    this.getDataFile=function(state,frag,files,index) {
+	var file=this.getIndexFile(state,frag,files,index);
+	//console.log("Checking file:",frag,file," loaded:",state.Database.fragfile[frag]);
+	if (file !== undefined && state.Database.fragfile[frag] !== file) {
+	    return file;
 	} else {
-	    //console.log("Setting footer...");
-	    state.Path.nextFilm(state);
-	    state.Html.setFootnote(state);
+	    return null;
 	}
+    };
+    this.getIndexFile=function(state,frag,files,index) {
+	var file;
+	if (index === undefined) {
+	    if (files.length>0) {
+		file=files[0];
+	    }
+	} else {
+	    var lenf=files.length;
+	    var indx={};
+	    // sort files
+	    var ii;
+	    var dtg;
+	    for (ii=1;ii<lenf;ii++) {
+		file=files[ii];
+		dtg=this.getFileDtg(state,file);
+		if (dtg !== undefined) {
+		    //console.log("Indexing:",dtg,"->",file);
+		    indx[dtg]=file;
+		};
+	    };
+	    file=undefined;
+	    var dtgs=Object.keys(indx).sort();
+	    var lend=dtgs.length;
+	    for (ii=0;ii<lend;ii++) {
+		dtg=dtgs[ii];
+		//console.log("Dtg:",dtg,index,dtg>=index,indx[dtg]);
+		if (dtg !== undefined && dtg <=  index) {
+		    file=indx[dtg];
+		} else {
+		    break;
+		}
+	    }
+	}
+	//console.log("getIndexFile:",frag,file,"   ",index);
+	return file;
+    };
+    this.getDtgs=function(state) {
+	var ret=[];
+	var frags=this.getFragmentActive(state);//Object.keys(state.Database.files);
+	var lenp=frags.length;
+	for (var ii=0;ii<lenp;ii++) {
+	    var frag=frags[ii];
+	    var files=state.Database.files[frag]
+	    var lenf=files.length;
+	    for (var jj=0;jj<lenf;jj++) {
+		var file=files[jj];
+		var dtg=this.getFileDtg(state,file);
+		if (ret.indexOf(dtg)===-1) {
+		    ret.push(dtg);
+		};
+	    };
+	};
+	return ret.sort().reverse();
+    };
+    this.cleanFrag=function(state,frag) {
+	if (state.Database.fragfile[frag] !== undefined) {
+	    delete state.Database.fragfile[frag];
+	};
+	if (state.Database.fragjson[frag] !== undefined) {
+	    delete state.Database.fragjson[frag];
+	};
+    };
+    this.combineJsons=function(state,nfrags,frags) {
+	var data=[];
+	var epoch;
+	var lenp=frags.length;
+	for (var ii=0;ii<lenp;ii++) {
+	    var frag=frags[ii];
+	    if (nfrags.indexOf(frag)===-1) { // delete old stuff
+		console.log("Deleting:",frag);
+		this.cleanFrag(state,frag);
+	    } else { // join data
+		var json=state.Database.fragjson[frag];
+		if (json !==undefined && json.data !==undefined) {
+		    state.Utils.cpArray(data,json.data);
+		    if (epoch !== undefined && epoch < json.epoch) {
+			epoch=json.epoch;
+		    } else if (epoch === undefined) {
+			epoch=json.epoch;
+		    }
+		} else {
+		    console.log("Undefined fragment:",frag);
+		}
+	    }
+	}
+	return {data:data,epoch:epoch};
+    };
+    this.load=function(state) { // autoload function
+	if (state.Database.indexDtg === undefined) {
+	    state.Database.loadDataFragments(state);
+	};
+    };
+    this.lastLoad=function(state) {
+	var fragments=state.Database.getFragments(state);
+	var lenr=fragments.length;
+	var last;
+	for (var ii=0;ii<lenr;ii++) {
+	    var frag=fragments[ii];
+	    var cnt=state.Database.fragcnt[frag];
+	    if (cnt !== undefined) {
+		if (last === undefined) {
+		    last=cnt;
+		} else {
+		    last=Math.max(last,cnt);
+		};
+	    };
+	};
+	return last;
+    };
+    this.processSummary=function(state,file,summary) {
+	var lines=summary.split(/\r?\n/);
+	var reg = /^(?<frag>\S+)\s+(?<size>\d+)$/;
+	var lenl=lines.length;
+	for (var ii=0;ii<lenl;ii++) {
+	    var line=lines[ii];
+	    var mm=line.match(reg).groups;
+	    if (mm.frag !== undefined) {
+		state.Database.summary.push(mm.frag);
+		state.Database.sumcnt[mm.frag]=mm.size;
+	    }
+	}
+    };
+    this.loadSummary=function(state, response, callbacks ) {
+	state.Database.summary=[];
+	state.Database.sumcnt={};
+	var sequence = Promise.resolve();
+	// loop over polygons and collect promises
+	var lens=state.Database.summaries.length;
+	for (var ii=0;ii<lens;ii++) {
+	    let file=state.Database.summaries[ii];
+	    if (file !==undefined && file!=="") {
+		let path=state.Database.summarydir + file;
+		const complete=function(result) {
+		    //console.log(file,result);
+		    state.Database.processSummary(state,file,result);
+		};
+		sequence = sequence.then(
+		    function() {
+			return state.File.get(path);
+		    }
+		).then(complete).catch(
+		    function(err) {
+			//console.log("Unable to load:"+name," ("+err.message+")");
+		    });
+	    };
+	};
+	sequence.then(function() {
+	    if (state.Database.summary.length === 0) {
+		state.Html.broadcast(state,"Summary contains no fragments.",'warning');
+	    };
+	    //console.log("Normal end...");
+	    //console.log(JSON.stringify(state.Database.sumcnt));
+	}).catch(function(err) {
+	    // Catch any error that happened along the way
+	    console.log("Error msg: " + err.message);
+	}).then(function() {
+	    // always do this
+	    //console.log("This is the end...",callbacks.length);
+	    state.File.next(state,"",callbacks);
+	})
+	//console.log("Polygons:",JSON.stringify(state.Polygon.names));
+    };
+    // extract parent path relative to granny
+    this.getParentName=function(state,granny,parent) {
+	var grn = new RegExp("^" + granny + "(?<name>.*)$");
+	var mm=parent.match(grn);
+	if (mm !== undefined && mm !== null) {
+	    var found = mm.groups;
+	    if (found !== null && found !== undefined && found.name !== undefined) {
+		return (found.name);
+	    };
+	};
+	return "Bastard";
+    };
+    this.getName=function(frag,gl,mg) {
+	var name="";
+	if (frag !== undefined) {
+	    if (gl===undefined) { gl=0;};
+	    var lenf=frag.length;
+	    if (mg===undefined) { mg=lenf;};
+	    mg=Math.min(mg,lenf);
+	    for (var ii=gl;ii<mg;ii++) {
+		if (name !== "") {name=name+"/";};
+		name=name + frag[ii];
+	    };
+	}
+	return name
+    };
+    this.fragmentMatch=function(f1,f2,gg) {
+	if (f1 === undefined || f2 === undefined) {
+	    //console.log("Invalid match",f1,f2,gg);
+	    return (true);
+	} else {
+	    var len1=f1.length;
+	    var len2=f2.length;
+	    if (gg === undefined) { gg= len1;};
+	    for (var ii=0; ii< Math.min(len1,len2,gg);ii++) {
+		if (f1[ii] !== f2[ii]) { return false;}
+	    };
+	    return (true);
+	}
+    };
+    //return	([{
+    //	    value: 'mars',
+    //	    label: 'Mars',
+    //	    children: [
+    //		{ value: 'phobos', label: 'Phobos' },
+    //		{ value: 'deimos', label: 'Deimos' },
+    //	    ]}]);
+    // get a list of all the fragments...
+    this.getFragmentList=function(state,frags,mg,gg,pp,cc) {
+	var bdeb=false; // false
+	if (mg === undefined) { mg=0;}; // max granny level
+	if (frags === undefined) {
+	    frags=[];
+	    var summary=state.Database.summary.sort();
+	    var lens=summary.length;
+	    for (var jj=0; jj<lens;jj++) {
+		var ss=summary[jj];
+		var parts=ss.split("/");
+		if (bdeb) {console.log("Fragment:",jj,JSON.stringify(parts));};
+		mg=Math.max(mg,parts.length);
+		frags.push(parts);
+	    }
+	    if (bdeb) {console.log("Initial summary:",JSON.stringify(frags));};
+	};
+	var lenf=frags.length;
+	if (gg === undefined) { gg=0;}; // granny level
+	if (pp === undefined) { pp=0;};  // parent position
+	if (cc === undefined) { cc=lenf-1;}; // child position
+	var path;
+	var name;
+	var item;
+	var ret=[];
+	var lp=pp;
+	var lc=pp;
+	var lg=gg;
+	var ii=pp;
+	if (bdeb) {console.log(">>>>> Fragments processing: ",gg,pp,cc,lenf-1);};
+	var bdone=(ii > frags.length);
+	while (! bdone) {
+	    if (bdeb) {console.log("Loop par=",lp,"(",pp,") ch=",lc,"(",cc,") ii=",
+				   ii,"(",lenf,") lev=",lg,"(",mg,")");}
+	    if (this.fragmentMatch(frags[lp],frags[ii],lg)) {
+		if (bdeb) {console.log(" Fragments ",lp,ii,lenf,
+				JSON.stringify(frags[lp]),JSON.stringify(frags[ii])," match",lg,mg);};
+		lc=ii;
+		ii=ii+1;
+		bdone= (lc >= Math.min(cc,lenf-1));
+		if (bdone) { // all matched, increase gg
+		    if (lc===cc && lp===pp) {
+			lg=lg+1;
+			if (lg > mg) { // end of the line 
+			    // only one match...
+			    path=this.getName(frags[lp],0,mg);
+			    name=this.getName(frags[lp],gg,mg);//this.getParentName(state,granny,parent);
+			    item={value:path,label:name}
+			    //console.log("+++ total:",JSON.stringify(item));
+			    ret.push(item);
+			} else {
+			    ii=lp;
+			    bdone= (ii > Math.min(cc,lenf-1));
+			}
+		    } else {
+			path=this.getName(frags[lp],0,lg);
+			name=this.getName(frags[lp],gg,lg);//this.getParentName(state,granny,parent);
+			if (lc === lp) {
+			    item={value:path,label:name};
+			    if (bdeb) {console.log("+++ CHILD:",JSON.stringify(item),JSON.stringify(frags[lp]),lg,mg);};
+			    ret.push(item);
+			} else {
+			    item={value:path,label:name};
+			    if (bdeb) {console.log("+++ PARENT:",JSON.stringify(item),lg,lp,lc);};
+			    item["children"]=this.getFragmentList(state,frags,mg,lg,lp,lc);
+			    ret.push(item);
+			}
+		    }
+		}
+	    } else if (lg-1 > gg) { // make common parent
+		if (bdeb) {console.log(" Fragments ",lp,ii,lenf,JSON.stringify(frags[lp]),
+				       JSON.stringify(frags[ii])," DO NOT MATCH",gg,lg,mg);};
+		path=this.getName(frags[lp],0,lg-1);
+		name=this.getName(frags[lp],gg,lg-1);//this.getParentName(state,granny,parent);
+		item={value:path,label:name};
+		if (bdeb) {console.log("+++ parent:",JSON.stringify(item));};
+		item.children=this.getFragmentList(state,frags,mg,lg-1,pp,cc);
+		ret.push(item);
+		return ret;
+	    } else {
+		if (bdeb) {console.log(" Fragments ",lp,ii,lenf,JSON.stringify(frags[lp]),
+				       JSON.stringify(frags[ii])," do not match",gg,lg,mg);};
+		name=this.getName(frags[lp],gg,lg);//this.getParentName(state,granny,parent);
+		if (lc === lp) {
+		    path=this.getName(frags[lp],0,mg);
+		    item={value:path,label:name};
+		    if (bdeb) {console.log("+++ child:",JSON.stringify(item));}
+		    ret.push(item);
+		} else {
+		    path=this.getName(frags[lp],0,lg);
+		    item={value:path,label:name};
+		    if (bdeb) {console.log("+++ parent:",JSON.stringify(item),lg,lp,lc);};
+		    item["children"]=this.getFragmentList(state,frags,mg,lg,lp,lc);
+		    ret.push(item);
+		}
+		lp=ii;
+		lc=ii;
+		ii=ii+1;
+		bdone= (ii > Math.min(cc,lenf-1));
+		if (bdone){
+		    path=this.getName(frags[lc],0,lg);
+		    name=this.getName(frags[lc],gg,lg);//this.getParentName(state,granny,parent);
+		    item={value:path,label:name};
+		    //console.log("+++ last child:",JSON.stringify(item));
+		    ret.push(item);
+		}
+	    };
+	};
+	if (bdeb) {console.log("Fragmentlist:",JSON.stringify(ret));};
+	return ret;
+    };
+    this.getFragmentActive=function(state) {
+	var bdeb=false;
+	var ret=[];
+	var frags=state.Database.fragload.sort();
+	var lenf=frags.length;
+	for (var ii=0;ii<lenf;ii++) {
+	    var frag=frags[ii];
+	    ret.push(frag);
+	};
+	if (bdeb) {console.log("Active:",JSON.stringify(ret));};
+	return	(ret);
+    };
+    this.setFragmentActive=function(state,items) {
+	//console.log("Setting active fragments:",JSON.stringify(items));
+	state.Database.fragments=state.Utils.cp(items);
+    };
+    this.getFragments=function(state) {
+	var ret=[];
+	var lens=state.Database.summary.length;
+	var lenf=state.Database.fragments.length;
+	for (var ii=0;ii<lenf;ii++) {
+	    let frag=state.Database.fragments[ii]||"data";
+	    //console.log("Fragment:",ii,frag,lens);
+	    var reg = new RegExp(frag);
+	    for (var jj=0;jj<lens;jj++) {
+		let sum=state.Database.summary[jj]||"";
+		let mm=sum.match(reg);
+		if (mm !== undefined && mm !== null && mm.length>0) {
+		    //console.log("Summary:",jj,sum,frag,JSON.stringify(mm));
+		    ret.push(sum);
+		}
+	    }
+	};
+	if (ret.length===0) {
+	    console.log("No valid DB-fragments specified!");
+	} else if (this.bdeb) {
+	    console.log("Fragments found:",ret.length);
+	}
+	return ret;
+    };
+    // executed after Default-URL has been loaded and before other URL load
+    this.loadDataFragments=function(state,index,callbacks,verbose) {
+	// loop over all register files, read content, load data...
+	// Start off with a promise that always resolves
+	state.Database.loadcnt=state.Database.loadcnt+1;
+	var sequence = Promise.resolve();
+	// loop over register files and collect promises
+	var newfrags=[];
+	var oldfrags=state.Database.getFragmentActive(state);
+	var fragments=state.Database.getFragments(state);
+	let lenf=fragments.length;
+	if (lenf===0) {
+	    if (verbose === "verbose") {
+		state.Html.broadcast(state,"No valid DB-fragments specified.",'warning');
+	    };
+	    console.log("No valid DB-fragments specified.");
+	} else {
+	    //console.log("Processing fragments: ",lenf);
+	    for (let ii=0;ii<lenf;ii++) {
+		let frag=fragments[ii]||"data";
+		let path=frag + "/register"; // register dir
+		//console.log("Fragment ",ii,frag);
+		let file;
+		newfrags.push(frag);
+		let readRegister=function() {
+		    return state.File.get(path);
+		};
+		let processRegister=function(result) {
+		    var files=result.split('\n');
+		    state.Database.files[frag]=files;
+		    file=state.Database.getDataFile(state,frag,files,index);
+		    if (file === undefined || file === null) {
+			return file;
+		    } else  {
+			return file; // get name of data file
+		    }
+		};
+		let errorRegister=function(err) {
+		    //state.Html.broadcast(state,"Register error: "+frag,'warning');
+		    state.Html.broadcast(state,frag+":"+err.message,'warning');
+		    console.log("Unable to load: "+path+" ("+err.message+")");
+		};
+		let readData=function(file) {
+		    if (file === undefined) { // file is obsolete
+			state.Database.fragfile[frag]=undefined;
+			return null;
+		    } else if  (file === null) { // file is loaded
+			return null; //state.Database.fragjson[frag]; //file;
+		    } else { // load new file
+			var path=frag+"/"+file;
+			state.Database.fragfile[frag]=file;
+			if (ii===0) {
+			    state.Html.broadcast(state,"Loading "+lenf+" DB-fragments.");
+			};
+			//console.log("Loading: "+path);
+			return state.File.getJSON(path);
+		    }
+		};
+		let processData=function(result) {
+		    if (result !== null) {
+			state.Database.fragcnt[frag]=state.Database.loadcnt;
+			state.Database.fragjson[frag]=result;
+		    };
+		};
+		let errorData=function(err) {
+		    //state.Html.broadcast(state,"Data error: "+frag,'warning');
+		    state.Html.broadcast(state,"Unable to load:"+frag+":"+file,'warning');
+		    console.log("Unable to load: "+frag+":"+file+" ("+err.message+")");
+		};
+		//console.log(">>> Need data for:",frag);
+		sequence = sequence.then(
+		    readRegister
+		).then(
+		    processRegister
+		).catch(
+		    errorRegister
+		).then(
+		    readData
+		).then(
+		    processData
+		).catch(
+		    errorData
+		);
+	    };
+	    if (callbacks !== undefined) {
+		var callback=callbacks.shift();
+		if (callback !== undefined) {
+		    setTimeout(callback(state,callbacks),0.1);
+		}
+	    };
+	};
+	const processAll=function() {
+	    // And we're all done!
+	    var last=state.Database.lastLoad(state);
+	    var olddata= (last !== undefined && last !== state.Database.loadcnt);
+	    var oldfrag= state.Utils.matchArray(newfrags,oldfrags);
+	    var olddtg= (state.Database.fragdtg===undefined &&
+			 state.Database.indexDtg===undefined ) ||
+		state.Database.fragdtg === state.Database.indexDtg;
+	    //console.log("Dtg:",state.Database.fragdtg,state.Database.indexDtg,
+		//	olddata,oldfrag,olddtg,last,state.Database.loadcnt);
+	    //console.log("Change to DB?",last,state.Database.loadcnt,changed);
+	    //console.log("Old DB frags:",JSON.stringify(oldfrag));
+	    //console.log("Req DB frags:",JSON.stringify(fragments));
+	    //console.log("New DB frags:",JSON.stringify(newfrags));
+	    if (olddata && oldfrag && olddtg) { // nothing added, nothing removed and same dtg...
+		if (verbose === "verbose") {
+		    state.Html.broadcast(state,"No changes to DB.",'warning');
+		};
+		console.log("DB load unchanged:", state.Database.loadcnt);
+		return;
+	    } else {
+		console.log("DB load changed:  ", state.Database.loadcnt);
+		state.Database.fragdtg=state.Database.indexDtg;
+		state.Database.fragload=newfrags;
+		// collect all data into database
+		var frags=Object.keys(state.Database.fragfile);
+		if (frags.length>0) {
+		    state.Html.broadcast(state,"Updating database.");
+		};
+		var json=state.Database.combineJsons(state,newfrags,frags);
+		// insert into database
+		state.Database.dbInsert(state,json);
+		// update where-expressions...
+		state.Database.makeWhere(state);
+		// put data into database...
+		state.Show.showAll(state);
+		//console.log("Normal end...")
+	    };
+	    // set status...
+	    if (state.Database.indexDtg === undefined) {
+	    	state.Database.setLoaded(state,"Latest");
+	    } else if (state.Database.indexDtg === null) {
+	    	state.Database.setLoaded(state,"Custom");
+	    } else {
+	    	state.Database.setLoaded(state,state.Database.indexDtg);
+	    };
+	};
+	const errorAll=function(err) {
+	    state.Html.broadcast(state,err.message,'warning');
+	    console.log("Error msg: " + err.message);
+	};
+	const endAll=function() {
+	    //console.log("Done..");
+	};
+	// wrap up
+	sequence.then(
+	    processAll
+	).catch(
+	    errorAll
+	).then(
+	    endAll
+	);
     };
     this.processData=function(state,response,callbacks) {
 	//console.log("Database processData.");
@@ -113,7 +671,7 @@ function Database() {
 	    try {
 		state.Database.json=JSON.parse(response);
 	    } catch (e) {
-		alert("Data '"+state.Database.files[(state.Database.index||0)]+"' contains Invalid JSON:"+e.name+":"+e.message);
+		alert("Data '"+state.Database.files[0]+"' contains Invalid JSON:"+e.name+":"+e.message);
 	    }
 	    if (state.Database.json !== undefined) {
 		state.Database.processJson(state,state.Database.json,callbacks);
@@ -136,8 +694,29 @@ function Database() {
 	}
     };
     this.saveDb=function(state) {
-	state.Utils.save(state.Utils.prettyJson(this.jsonOrg),this.loaded,"json");
+	var name=this.getDtg() + '_' + this.loaded;
+	state.Utils.save(state.Utils.prettyJson(this.jsonOrg),name,"json");
+	state.Html.broadcast(state,"Database was downloaded.");
     };
+    this.pushDocs=function(state,doc,check) {
+	var ret=[];
+	if (doc === undefined || doc === null) {
+	    // do nothing
+	} else if (Array.isArray(doc)) {
+	    var lend=doc.length;
+	    for (var jj=0;jj<lend;jj++) {
+		var d=doc[jj];
+		var ds=this.pushDocs(state,d,check);
+		if (ds !== undefined) {
+		    state.Utils.appendArray(ret,ds);
+		};
+	    }
+	} else if (state.Matrix.checkSelected(state,doc,check)) {
+	    ret.push(state.Utils.cp(doc));
+	};
+	return ret;
+    }
+    
     this.saveSelectedDb=function(state) {
 	var sub=state.Matrix.hasSelected(state);
 	var json={};
@@ -148,43 +727,92 @@ function Database() {
 		var key=keys[ii];
 		if (key === "data" && sub) {
 		    var docs=this.jsonOrg[key];
-		    var ret=[];
-		    var lend=docs.length;
-		    for (var jj=0;jj<lend;jj++) {
-			var doc=docs[jj];
-			if (state.Matrix.checkSelected(state,doc,true)) {
-			    ret.push(state.Utils.cp(doc));
-			}
-		    }
+		    var ret=this.pushDocs(state,docs,true);
 		    json[key]=ret;
-		    console.log("Selected ",ret.length," from ",lend);
+		    //console.log("Selected: ",JSON.stringify(ret));
 		} else {
 		    json[key]=this.jsonOrg[key];
+		    //console.log("Other: ",key,json[key].length);
 		}
 	    };
 	};
 	var pjson=state.Utils.prettyJson(json,"data");
-	//console.log("Json:",pjson);
-	state.Utils.save(pjson,this.loaded,"json");
+	//console.log("Json:",json.data.length);
+	var name=this.getDtg() + '_selected';
+	state.Utils.save(pjson,name,"json");
+    };
+    this.setAppend=function(state,append) {
+	//console.log("Setting append to...",append);
+	state.Database.append=append;
     };
     this.resetDb=function(state,response,callbacks) {
-	state.Database.index=-1;
+	state.Database.indexDtg=null;
 	state.Database.processData(state,response,callbacks);
     };
     this.setLoaded=function(state,loaded) {
 	this.loaded=loaded;
     };
     this.selectIndex=function(state,item,index) {
-	//console.log("Setting file index:",index,item);
-	state.Database.index=Math.max(0,Math.min(index,state.Database.files.length-1));
-	state.Database.loadData(state,item,[state.Database.processData]);
+	//console.log("Setting file index:",item,"(",index,")");
+	if (index === undefined || state.Database.indexDtg !== index) {
+	    if (state.Database.indexDtg === index) {
+		//do nothing
+	    } else if (index === undefined) {
+		state.Html.broadcast(state,"Loading Latest.");
+	    } else {
+		state.Html.broadcast(state,"Loading "+index);
+	    };
+	    setTimeout(function() {
+		state.Database.loadDataFragments(state,index,[function(state){
+		    state.Database.indexDtg=index;
+		}],"verbose");
+	    },0.1);
+	} else {
+	    console.log("Omitting DB-load:",state.Database.indexDtg, index);
+	    state.Html.broadcast(state,"Data already loaded.","warning");
+	};
+    };
+    this.getIndexFiles=function(state,index) {
+	var ret=[];
+	//console.log("Get index files:",index,JSON.stringify(state.Database.files));
+	// loop over all register files, read content, load data...
+	var fragments=state.Database.getFragments(state);
+	var lenr=fragments.length;
+	// loop over register files
+	for (var ii=0;ii<lenr;ii++) {
+	    let frag=fragments[ii]||"data";
+	    var files=state.Database.files[frag]||[];
+	    var file=state.Database.getIndexFile(state,frag,files,index);
+	    //console.log("Files:",frag,"(",index,") -> ",file,JSON.stringify(files),files.length);
+	    if (file !== null && file !== undefined) {
+		ret.push(frag+"/"+file);
+	    };
+	}
+	return (ret);
+    };
+    this.getIndexTitle=function(state,index) {
+	var files=this.getIndexFiles(state,index)||[];
+	var s="";
+	var lenf=files.length;
+	for (var ii=0;ii<lenf;ii++) {
+	    var file=files[ii];
+	    if (file !== undefined && file !== "") {
+		if (s !== "") { s=s+"\n";};
+		s=s+file;
+	    };
+	};
+	return s;
     };
     this.getTime=function(state,s) {
-	var nn = s.match(/\d+/g).map(Number);
-	var date0 = new Date(Date.UTC(nn[0],nn[1]-1,nn[2],nn[3],nn[4],nn[5],
-				      ((nn[6]||'')+'000').slice(0,3))); // modification time
-	//console.log("Gettime:",s,JSON.stringify(nn));
-	return date0.getTime();
+	if (s === undefined) {
+	    console.log("Invalid call to getTime...");
+	} else {
+	    var nn = s.match(/\d+/g).map(Number);
+	    var date0 = new Date(Date.UTC(nn[0],nn[1]-1,nn[2],nn[3],nn[4],nn[5],
+					  ((nn[6]||'')+'000').slice(0,3))); // modification time
+	    //console.log("Gettime:",s,JSON.stringify(nn));
+	    return date0.getTime();
+	};
     };
     this.setTime=function(state) {
 	var d = new Date();
@@ -207,6 +835,21 @@ function Database() {
 	} else {
 	    return [];
 	}
+    };
+    // check if key is redundant
+    this.getValues=function(state,key) {
+	var where=state.Database.getWhere(state);
+	//console.log("Redundant?",key," where=",where);
+	var docs=state.Database.getKeyCnt(state,key,where);
+	//console.log("Key cnt",JSON.stringify(docs));
+	var vals=[];
+	var lend=docs.length;
+	for (var ii=0;ii<lend;ii++) {
+	    var doc=docs[ii];
+	    vals.push(doc[key]);
+	}
+	//console.log("Key vals",JSON.stringify(vals));
+	return vals;
     };
     this.getKeytrg=function(state,key,val) {
 	if (Array.isArray(val)) {
@@ -261,14 +904,13 @@ function Database() {
 	    };
 	    // get modified date
 	    //console.log("Setting time.");
-	    this.jsonOrg=state.Utils.cp(json);
+	    this.saveOrg(state,json);
 	    this.epoch0=this.getTime(state,json.epoch);     // data file time
 	    this.setTime(state);     // data file time
-	    this.newDb();
+	    this.newDb(state);
 	    // make database for raw data
 	    this.makeTable(state);
 	    // reset key counts and range
-	    this.dbcnt=0;
 	    this.keyCnt={}; // reset key-count
 	    // put data into databse
 	    //console.log("inserting");
@@ -291,7 +933,7 @@ function Database() {
 	    //console.log("Home keys:",JSON.stringify(homeKeys)," delayed:",JSON.stringify(delayKeys));
 	    // extract data from json-file and insert into data-array...
 	    // var rcnt=
-	    this.extractData(state,data,{},"",json.data,homeKeys,home);
+	    this.dbcnt=this.dbcnt+this.extractData(state,data,{},"",json.data,homeKeys,home);
 	    //console.log("Database count:",rcnt);
 	    //console.log("Data:",JSON.stringify(data));
 	    // put data-array into database...
@@ -445,7 +1087,6 @@ function Database() {
 		//console.log("Ignoring:",lenh,JSON.stringify(hkeys),JSON.stringify(home),JSON.stringify(doc));
 	    }
 	}
-	this.dbcnt=rcnt;
 	return rcnt;
     };
     this.dbextract=function(state,showFunc) { // extract data from db and show
@@ -616,8 +1257,8 @@ function Database() {
 	    ranges=state.Path.select.range;
 	    //console.log("getWhere ranges:",JSON.stringify(ranges));
 	};
-	if (vals === undefined) {vals=[];};
-	if (ranges === undefined) {ranges=[];};
+	if (vals === undefined) {vals={};};
+	if (ranges === undefined) {ranges={};};
 	if (keys !== undefined) {
 	    var plen = keys.length;
 	    for (var ii = 0; ii < plen; ii++) {
@@ -801,11 +1442,18 @@ function Database() {
 	//console.log("getDocs q:",query,JSON.stringify(dd));
 	return (dd===undefined?[]:dd);
     };
-    this.makeTable=function(state) {
-	this.query('DROP TABLE IF EXISTS alarm; CREATE TABLE alarm;');
-    };
     this.dataToDb=function(state,data) {
-	this.db.tables.alarm.data = data;
+	if (state.Database.append &&
+	    this.db.tables !== undefined &&
+	    this.db.tables.alarm !== undefined &&
+	    this.db.tables.alarm.data !== undefined ) {
+	    //console.log("Appending data...",this.db.tables.alarm.data.length,data.length);
+	    state.Utils.appendArray(this.db.tables.alarm.data,data);
+	} else {
+	    //console.log("Replacing data...",this.db.tables.alarm.data.length,data.length);
+	    this.db.tables.alarm.data = data;
+	};
+	this.setAppend(state,false);
     };
     this.getKeyCnt=function(state,key,where){
 	var sql="select "+key+",count(*) AS cnt FROM alarm"+

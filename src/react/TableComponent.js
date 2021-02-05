@@ -274,6 +274,7 @@ function Details(props) {
     var rowkey = state.Path.getRowKey(state)||"";
     var colvalues = state.Path.getValues(state,colkey,[null]);
     var rowvalues = state.Path.getValues(state,rowkey,[null]);
+    var nodata = state.Matrix.noDataAvailable(state);
     var cellMode  = state.Layout.getCellMode(state);
     //var ncol=colvalues.length + 1;
     //var nrow=rowvalues.length + 1;
@@ -297,13 +298,21 @@ function Details(props) {
     //console.log("Details => Width/Height:",window.innerWidth,window.innerHeight,plan.cell.width,plan.hdr.height)
     //console.log("Colkey:",colkey," colval:",JSON.stringify(colvalues));
     //console.log("Rowkey:",rowkey," rowval:",JSON.stringify(rowvalues));
+    var plan;
+    var label;
     if (state.React.matrix === undefined) {
-	var label="Processing..."
-	var plan=state.Layout.makePlan(label,width,height);
+	label="Loading data..."
+	plan=state.Layout.makePlan(label,width,height);
 	return (<div className={classes.divEmpty}>
 		   <CanvasText state={state} label={label} plan={plan}/>
 		</div>);
-    } else {
+    } else if (nodata) {
+	label="No data available..."
+	plan=state.Layout.makePlan(label,width,height);
+	return (<div className={classes.divEmpty}>
+		   <CanvasText state={state} label={label} plan={plan}/>
+		</div>);
+    } else  {
 	return (<div className={classes.divTable}>
 		 <div className={classes.divTableBody}>
 	          <HdrRow classes={classes} state={state} plans={plans} colkey={colkey} colvalues={colvalues} rowkey={rowkey} rowvalues={rowvalues}/>

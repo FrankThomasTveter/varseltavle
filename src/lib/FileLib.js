@@ -25,7 +25,7 @@ function File() {
 	    regHttp.onreadystatechange = function() {
 		state.File.ready=true;
 		//console.log("Status:",JSON.stringify(regHttp.readyState),JSON.stringify(regHttp.status));
-		if (regHttp.readyState  === 4) {
+		if (regHttp.readyState  === 4) { //done
 		    if (regHttp.status  === 200) {
 			//console.log(regHttp.responseText);
 			var response = regHttp.responseText;
@@ -36,8 +36,17 @@ function File() {
 			state.Html.setProgress(state, false);
 			//state.Html.setConsole(file+" error");
 		    }
-		} else {
-		    state.Html.setFootnote(state,file+" error");		
+		} else if  (regHttp.readyState  === 0) { //done
+		    state.Html.setFootnote(state,file+" unsent");		
+		    state.Html.setProgress(state, false);
+		} else if  (regHttp.readyState  === 1) { //opened
+		    state.Html.setFootnote(state,file+" opened");		
+		    state.Html.setProgress(state, false);
+		} else if  (regHttp.readyState  === 2) { //receiving headers
+		    state.Html.setFootnote(state,file+" headers");		
+		    state.Html.setProgress(state, false);
+		} else if  (regHttp.readyState  === 3) { //loading
+		    state.Html.setFootnote(state,file+" loading");		
 		    state.Html.setProgress(state, false);
 		};
 	    };

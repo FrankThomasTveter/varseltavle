@@ -1,5 +1,6 @@
 //console.log("Loading DefaultLib.js");
 function Default() {
+    this.debug=false;
     this.setupdir="def/"; // defaults directory
     this.setup="defaults.json"; // defaults file, contains default setup...
     this.path="test.json";
@@ -16,7 +17,8 @@ function Default() {
     // Syntax: [[target, source],...], target=[level0,level1,level2...] etc.
     // what we copy from Setup-file to the default setup at startup (before url) | if default setup is empty...
     this.toStateData  = [
-	[["data"],    ["Database","data"]]
+	[["fragments"],    ["Database","fragments"]],
+	[["summaries"],    ["Database","summaries"]]
     ];
     this.toStateKeys= [
 	[["path"],    ["Path","keys","path"]],
@@ -163,7 +165,7 @@ function Default() {
 		tt=tt[t[ii]];
 	    }
 	    tt[t[ll-1]]=state.Utils.cp(ss)
-	    //console.log("Force copied:",JSON.stringify(t),JSON.stringify(tt[t[ll-1]]));
+	    if (this.debug) {console.log("Force copied:",JSON.stringify(t),JSON.stringify(tt[t[ll-1]]));}
 	    return tt[t[ll-1]];
 	}
     };
@@ -175,7 +177,7 @@ function Default() {
 	    trg=ss;
 	    return trg;
 	} else {
-	    //console.log("Trg:",JSON.stringify(t),":",JSON.stringify(trg),":",JSON.stringify(ss));
+	    if (this.debug) {console.log("Trg:",JSON.stringify(t),":",JSON.stringify(trg),":",JSON.stringify(ss));}
 	    var tt=trg;
 	    for (var ii=0;ii<ll-1;ii++) {
 		if (tt[t[ii]]===undefined) { tt[t[ii]]={} };
@@ -191,9 +193,15 @@ function Default() {
 	var ss=this.getItem(state,s,src);
 	this.setForce(state,t,trg,ss);
     }.bind(this);
+    this.cpAnything=function(state,t,s,trg,src) {
+	var ss=this.getItem(state,s,src);
+        if (ss !== undefined) {
+	    this.setForce(state,t,trg,ss);
+	};
+    }.bind(this);
     this.cpFill=function(state,t,s,trg,src) {
 	var ss=this.getItem(state,s,src);
-	//console.log("Filling:",s,'->',t,! this.isEmpty(state,ss),JSON.stringify());
+	if (this.debug) {console.log("Filling:",s,'->',t,! this.isEmpty(state,ss));}
 	//if (! this.isEmpty(state,ss) ) {
         if (ss !== undefined) {
 	    this.setFill(state,t,trg,ss);
@@ -235,6 +243,42 @@ function Default() {
 	    }
 	}
     }.bind(this);
+    // map src onto target always
+    this.copyAnything=function(state,src,trg,map) {
+	if (src===undefined) {
+	    throw new Error("ERROR: MapForce with no src.");
+	} else if (trg===undefined) {
+	    throw new Error("ERROR: MapForce with no trg.");
+	} else if (map===undefined) {
+	    let keys=Object.keys(src);
+	    let lenk=keys.length;
+	    for (let ii=0;ii<lenk;ii++) {
+		let key=keys[ii];
+		if (typeof src[key]==="object" && src[key] !== null) {
+		    if (trg[key]===undefined) {trg[key]={};};
+		    this.copyAnything(state,src[key],trg[key]);
+		} else if (Array.isArray(src[key])) {
+		    trg[key]=state.Utils.cp(src[key]);		    
+		} else {
+		    trg[key]=src[key];		    
+		}
+	    }
+	} else {
+	    let len=map.length
+	    for (let ii=0;ii<len;ii++){
+		let s=map[ii][0];
+		let t=map[ii][1];
+		if ( (s===undefined || ! Array.isArray(s)) &&
+		      (t===undefined || ! Array.isArray(t)) ) {
+		    s=map[ii];
+		    t=map[ii];
+		} else if (t===undefined) {
+		    t=s;
+		};
+		this.cpAnything(state,t,s,trg,src)
+	    }
+	}
+    }.bind(this);
     // map src onto target if target is empty and src is not
     this.copyFill=function(state,src,trg,map) {
 	if (src===undefined) {
@@ -245,10 +289,10 @@ function Default() {
 	    //if (this.cnt++>10) { return;}
 	    let keys=Object.keys(src);
 	    let lenk=keys.length;
-	    //if (lenk>0) {console.log("   keys:",JSON.stringify(keys));}
+	    if (this.debug) {console.log("   keys:",JSON.stringify(keys));};
 	    for (let ii=0;ii<lenk;ii++) {
 		let key=keys[ii];
-		if (src[key] !== null && typeof src[key]==="object" && ! Array.isArray(src[key])) {
+		if (src[key]!==null && typeof src[key]==="object" && ! Array.isArray(src[key])) {
 		    if (trg[key]===undefined) {trg[key]={};};
 		    //console.log(this.cnt,"   ",ii," -> ",key)
 		    if (key==="visible") {console.log("Object cp:",key,JSON.stringify(trg),JSON.stringify(src[key]));}
@@ -267,13 +311,15 @@ function Default() {
 		let s=map[ii][0];
 		let t=map[ii][1];
 		if ( (s===undefined || ! Array.isArray(s)) &&
-		      (t===undefined || ! Array.isArray(t)) ) {
+		     (t===undefined || ! Array.isArray(t)) ) {
 		    s=map[ii];
 		    t=map[ii];
 		} else if (t===undefined) {
 		    t=s;
 		};
-		this.cpFill(state,t,s,trg,src)
+		if (s!==undefined) { // never copy undefined...
+		    this.cpFill(state,t,s,trg,src);
+		};
 	    }
 	}
     }.bind(this);
@@ -363,9 +409,14 @@ function Default() {
 		//console.log("Initial STATE:",JSON.stringify(state.Settings.visible));
 		//console.log("Initial CURRENT:  ",JSON.stringify(state.Default.current.visible));
 		//  hard copy current to hardcode+url-state
-		this.copyForce(state, state.Default.current, state, state.Default.stateData);
+		//console.log("Summaries start:",JSON.stringify(setup.fragments),
+		//	    JSON.stringify(state.Database.fragments));
+		this.copyAnything(state, setup, state, state.Default.toStateData); // copy setup if available
+		//console.log("Summaries setup:",JSON.stringify(state.Database.fragments));
+		this.copyAnything(state, state.Default.current, state, state.Default.stateData);   // copy url if available
+		//console.log("Summaries url:",JSON.stringify(state.Database.fragments));
 		if (state.Default.start !== undefined) { // get previous values
-		    this.copyFill(state, state.Default.start, state, state.Default.stateData);
+		    this.copyFill(state, state.Default.start, state, state.Default.stateData);  // copy previous state...
 		    this.copyFill(state, state.Default.start, state, state.Default.stateOther);
 		    this.copyFill(state, state.Default.start, state, state.Default.stateVisible);
 		    this.copyFill(state, state.Default.start, state, state.Default.stateCustom);
@@ -452,6 +503,7 @@ function Default() {
 	//console.log("Checkstate B:",JSON.stringify(state.Settings.visible));
 	state.File.next(state,"",callbacks);
     }.bind(this);
+
     this.resetSetup=function(state,response,callbacks) {
 	try {
 	    var setup = JSON.parse(response);
@@ -509,10 +561,11 @@ function Default() {
 	    this.copyForce(state, state.Default.current, state, state.Default.stateTooltips);
 	    this.copyForce(state, state.Default.current, state, state.Default.stateLooks);
 	    this.copyForce(state, state.Default.current, state, state.Default.stateSvg);
-	    console.log("SETUP:",JSON.stringify(setup.visible));
-	    console.log("Default:",JSON.stringify(state.Default.Settings.visible));
+	    //console.log("SETUP:",JSON.stringify(setup.visible));
+	    //console.log("Default:",JSON.stringify(state.Default.Settings.visible));
 	    state.Database.resetSetup(state);
-	    console.log("Reset State:",JSON.stringify(state.Settings.visible));
+	    //console.log("Reset State:",JSON.stringify(state.Settings.visible));
+	    state.Html.broadcast(state,"New setup is ready.");
 	};
     };
     this.getSetup=function(state) {
@@ -571,6 +624,7 @@ function Default() {
 	//console.log("Select:",JSON.stringify(state.Default.current));
 	var file=state.Default.setup||"setup.json";
 	state.Utils.save(setup,file,"json");
+	state.Html.broadcast(state,"Setup was downloaded.");
     };
     this.hasChanged=function(state,pth) {
 	var src=state.Default.start;

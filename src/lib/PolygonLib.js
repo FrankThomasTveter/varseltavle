@@ -95,6 +95,7 @@ function Polygon() {
 	    var file=name+"."+state.Polygon.format;
 	    console.log("Saving file:",file,result.length);
 	    state.Utils.save(output,file,"text");//  "json", "text/plain"
+	    state.Html.broadcast(state,"Polygon was downloaded.");
 	};
     };
     this.getPositions=function(state,result) {

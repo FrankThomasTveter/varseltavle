@@ -299,6 +299,7 @@ function Matrix() {
 	//var lonmin,lonmax,latmin,latmax;
 	state.Matrix.maxLevel=-1;
 	state.Matrix.maxRank=-1;
+	state.Matrix.ltooltip=false;
 	var found=false;
 	var dlen=cntDocs.length;
 	for (var ii = 0; ii < dlen; ii++) {
@@ -340,16 +341,17 @@ function Matrix() {
 	}
 	//console.log("Cnt maxLevel:",state.Matrix.maxLevel);
 	if (! found) {
-	    console.log("No valid data found.",JSON.stringify(matrix));
+	    console.log("No valid data available for Matrix.");
 	    state.Html.setFootnote(state,"No data with valid threshold was found.");
 	}
-	if (state.Layout.state.tooltip === 0) { // pre-generate all tooltips
+	if (state.Layout.state.tooltip === 2) { // pre-generate all tooltips
 	    state.Matrix.addAllTooltip(state,matrix);
 	};
     };
     this.makeMatrix=function(state,docs,matrix) {
 	state.Matrix.maxLevel=-1;
 	state.Matrix.maxRank=-1;
+	state.Matrix.ltooltip=true;
 	var found=false;
 	//var svgkey=state.Svg.getKey(state);
 	//var pos=[];
@@ -374,7 +376,8 @@ function Matrix() {
     	    this.updateMatrixElement(state,arr,dlev,drank,svgid,doc);
 	}
 	if (! found) {
-	    console.log("No valid data found.",JSON.stringify(matrix));
+	    state.Html.broadcast(state,"No valid data found.",'warning');
+	    console.log("No valid data available for Matrix.");
 	    state.Html.setFootnote(state,"No data with valid threshold was found.");
 	}
 	//console.log("Maxlev:",state.Matrix.maxLevel,state.Matrix.maxRank);	
@@ -537,7 +540,7 @@ function Matrix() {
 	} else if (nn === dd) { // make sure at least 1 undef is added...
 	    arr.docs.push(doc);
 	}
-	//if (state.Layout.state.tooltip === 0) {
+	//if (state.Layout.state.tooltip === 2) {
 	//var drank=state.Threshold.getRank(state,doc);	
 	if (arr.tooltip === undefined) {arr.tooltip={};};
 	var el=this.getTooltipElement(state,arr.tooltip,doc);
@@ -617,6 +620,9 @@ function Matrix() {
 	    }
 	}
 	return range;
+    };
+    this.noDataAvailable=function(state) {
+	return (state.Matrix.cnt===0);
     };
     this.getRanges=function(state,matrix,keys,kvals) {
 	var range;
@@ -886,6 +892,7 @@ function Matrix() {
 	    var el=elements[cc];
 	    this.addElementTooltip(state,el,mode);
 	}
+	state.Matrix.ltooltip=true;
     };
     this.addElementTooltip=function(state,el,mode) {
 	// called when info-button is pressed - to add tooltip to element...

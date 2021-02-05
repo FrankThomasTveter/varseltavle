@@ -14,7 +14,7 @@ import Order        from './ConfigOrderComponent';
 import Home         from './ConfigHomeComponent';
 import Film         from './ConfigFilmComponent';
 import Star         from './ConfigStarComponent';
-import File         from './ConfigFileComponent';
+import Setup        from './ConfigSetupComponent';
 import ViewPolygon  from './ConfigViewPolygonComponent';
 import Polygon      from './ConfigPolygonComponent';
 import Archive      from './ConfigArchiveComponent';
@@ -70,7 +70,7 @@ class Config extends Component {
 		<Home state={state} classes={cls} visible={false}/>
 		<Film state={state} classes={cls} visible={false}/>
 		<Star state={state} classes={cls} visible={false}/>
-		<File state={state} classes={cls} visible={false}/>
+		<Setup state={state} classes={cls} visible={false}/>
 		<ViewPolygon state={state} classes={cls} visible={false}/>
 		<Polygon state={state} classes={cls} visible={false}/>
 		<Archive state={state} classes={cls} visible={false}/>

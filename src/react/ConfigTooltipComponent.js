@@ -22,11 +22,11 @@ function TooltipIconMode (props) {
     const {state} = props;
     //console.log("ConfigTooltipComponent:",state.Layout.state.tooltip);
     if (state.Layout.state.tooltip===0) {
-	return (<TooltipIcon/>);
+	return (<NoTooltipIcon/>);
     } else if (state.Layout.state.tooltip===1) {
 	return (<ClickTooltipIcon/>);
     } else {
-	return (<NoTooltipIcon/>);
+	return (<TooltipIcon/>);
     }
 };
 class Tooltip extends Component {

@@ -112,6 +112,19 @@ function Utils() {
 	    this.spliceArray(arr,itrg,0,csrc);
 	}
     };
+    this.matchArray=function(sarr,tarr) {
+	var match=true;
+	if (match) {match=(sarr.length === tarr.length);};
+	if (match) {
+	    var leng=sarr.length;
+	    var ii=0;
+	    while(match && ii <leng) {
+		match=(sarr[ii]===tarr[ii]);
+		ii=ii+1;
+	    }
+	}
+	return match;
+    }
     this.cpArray=function(sarr,tarr,iarr) {
 	var lent,ind,indx,ii;
 	if (tarr !== undefined && iarr !== undefined) {
@@ -153,6 +166,13 @@ function Utils() {
     this.prepArray=function(sarr,tarr) {
 	this.ppArray(sarr,tarr);
 	tarr=[];
+    };
+    this.appendArray=function(sarr,tarr) {
+	var lent=tarr.length;
+	for (var ii=0;ii<lent;ii++) {
+	    sarr.push(tarr[ii]);
+	};
+	return sarr;
     };
     this.remArray=function(sarr,tarr) {
 	var lent=tarr.length;

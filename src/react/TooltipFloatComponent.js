@@ -46,7 +46,7 @@ class TooltipFloatComponent extends Component {
     };
     render() {
 	const { state, update } = this.props; //classes, 
-	if (state.Layout.state.tooltip!==2 && this.visible) {
+	if (state.Layout.state.tooltip!==0 && this.visible) {
 	    return (
 		    <div style={{position:'absolute',right:'0px',zIndex:100000, backgroundColor:"white"}} >
 		    <Tooltip state={state} data={this.data} update={update}/>

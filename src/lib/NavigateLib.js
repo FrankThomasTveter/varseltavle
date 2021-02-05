@@ -77,7 +77,12 @@ function Navigate() {
 	    var key=state.Path.keys.path[len-1];
 	    //console.log("Undoing:",key);
 	    //this.onClickPath(state,"path",key);
-	    this.pushSelectToTable(state,key);
+	    if (state.Auto.pushSelectToTable(state,key)) {	    
+		state.Path.table.ntarget=Math.min(state.Path.table.ntarget+1,
+						  state.Path.maxtarget);
+		state.Path.table.nkeys=Math.min(state.Path.table.nkeys+1,
+						state.Path.table.ntarget);
+	    }
 	}
     }
     this.canRedoHistory=function(state) {
@@ -132,7 +137,7 @@ function Navigate() {
 						  state.Path.maxtarget);
 		state.Path.table.nkeys=Math.min(state.Path.table.nkeys+1,
 						state.Path.table.ntarget);
-	    }
+	    };
 	    this.implementKeyChange(state,true);
 	}
 	//console.log("Push:",JSON.stringify(state.Path.keys));
@@ -524,6 +529,32 @@ function Navigate() {
 		    bok=false;
 		    console.log("Unable to select:",key,state.Path.table.nkeys,JSON.stringify(val),where,cnt);
 		};
+	    };
+	    if (pp && changed) { // check if other keys are redundant..
+		rank=state.Utils.cp(state.Path.keys.other);
+		var othkeys=state.Path.getOtherTableKeys(state,key);
+		//loop over keys and check if redundant
+		var leno=othkeys.length;
+		for (var ii=0;ii<leno;ii++) {
+		    var okey=othkeys[ii];
+		    var vals=state.Database.getValues(state,okey);
+		    if (vals.length===1) { // select
+			var oval=vals[0];
+			var owhere=state.Database.getWhereDynamic(state,okey,oval)
+			//console.log("Key is redundant:",okey," val:",oval," ",owhere);
+			if (this.bdeb) {console.log("Checking ",okey," -> ",oval," ",owhere);};
+			if (state.Auto.selectTableKey(state,okey,oval,owhere,1)) {
+			    //console.log("Selected:",JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other));
+			    this.rank[okey]=state.Utils.cp(rank);
+			    changed=true;
+			} else if (state.Path.table.nkeys < 2) {
+			    state.Auto.reorderKeys(state);
+			} else {
+			    bok=false;
+			    console.log("Unable to select:",key,state.Path.table.nkeys,JSON.stringify(val),where,cnt);
+			};
+		    }
+		}
 	    }
 	}
 	if (changed && pp) {

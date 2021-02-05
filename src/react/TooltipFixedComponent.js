@@ -66,7 +66,7 @@ class TooltipFixedComponent extends Component {
 	    }
 	}.bind(this);
 	//console.log("##### Rendering TooltipFixedComponent.");
-	if (state.Layout.state.tooltip===2) {
+	if (state.Layout.state.tooltip===0) {
 	    return null;
 	} else {
 	    return (<ReactTooltip id={type}

@@ -54,8 +54,9 @@ class PathComponent extends Component {
 	super(props);
 	const {state} = props;
 	state.React.Path=this;
+	this.showPath=this.showPath.bind(this);
     };
-    showPath(state) {
+    showPath(state){
 	//console.log("Showing PathComponent.",JSON.stringify(state.Path.keys));
 	this.forceUpdate();
     };

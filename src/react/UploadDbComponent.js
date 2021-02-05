@@ -14,16 +14,18 @@ class LoadDb extends Component {
 	this.loaded="";
     };
     render() {
-	const { classes, state } = this.props;
+	const { classes, state, append } = this.props;
 	let fileReader;
 	const handleFileRead = (e) => {
 	    const content = fileReader.result;
 	    state.Database.setLoaded(state,this.loaded);
+	    state.Database.setAppend(state,append);
 	    state.Database.resetDb(state,content);
+	    // resetDb will reset append to false...
 	};
 	const handleFileChosen = (target) => {
 	    let file=target.files[0];
-	    state.Html.broadcast(state,"User uploaded "+file.name);
+	    state.Html.broadcast(state,"Uploading "+file.name);
 	    //console.log("File:",file.name);
 	    this.loaded=file.name;
 	    fileReader = new FileReader();;
@@ -33,7 +35,8 @@ class LoadDb extends Component {
 	return (
 		<div className={classes.loadDb}>
    	  	   <input type='file' id='file'
-	              onChange={e=>handleFileChosen(e.target)}/>
+	              onChange={e=>handleFileChosen(e.target)}
+	              onClick={e=> {e.target.value = null}}/>
 		</div>
 	);
     }

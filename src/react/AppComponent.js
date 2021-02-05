@@ -185,6 +185,7 @@ class App extends Component {
 				   state.Default.makeStart,
 				   state.Database.init,
 				   state.Default.checkState,
+				   state.Database.loadSummary,
 				   state.Database.updateLoop]
 				 );
     };
@@ -199,6 +200,7 @@ class App extends Component {
 //    };
     broadcast(msg,variant) {
         if (variant === undefined) {variant='info';};
+	//console.log("BROADCAST *** ",msg,variant);
         this.props.enqueueSnackbar(msg, { variant });
     };
     render() {
@@ -229,7 +231,7 @@ const MyApp = withStyles(styles)(withSnackbar( App));
 
 function IntegrationNotistack() {
   return (
-    <SnackbarProvider maxSnack={3} anchorOrigin={{vertical: 'bottom',horizontal: 'right',}}>
+    <SnackbarProvider maxSnack={5} anchorOrigin={{vertical: 'bottom',horizontal: 'right',}}>
       <MyApp />
     </SnackbarProvider>
   );

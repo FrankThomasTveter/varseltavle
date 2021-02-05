@@ -18,7 +18,7 @@ import Order        from './ConfigOrderComponent';
 import Home         from './ConfigHomeComponent';
 import Film         from './ConfigFilmComponent';
 import Star         from './ConfigStarComponent';
-import File         from './ConfigFileComponent';
+import Setup        from './ConfigSetupComponent';
 import ViewPolygon  from './ConfigViewPolygonComponent';
 import Polygon      from './ConfigPolygonComponent';
 import Archive      from './ConfigArchiveComponent';
@@ -105,7 +105,7 @@ class Settings extends Component {
 		       <Star state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="file" onClose={this.onClose}>
-		       <File state={state} classes={cls} visible={true}/>
+		       <Setup state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="viewPolygon" onClose={this.onClose}>
 		       <ViewPolygon state={state} classes={cls} visible={true}/>

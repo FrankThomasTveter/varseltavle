@@ -199,7 +199,7 @@ function Details(props) {
     console.log("Colkey:",colkey," colval:",JSON.stringify(colvalues));
     console.log("Rowkey:",rowkey," rowval:",JSON.stringify(rowvalues));
     if (state.React.matrix === undefined) {
-	var label="Processing..."
+	var label="No data available."
 	var plan=state.Layout.makePlan(label,width,height);
 	return (<div className={classes.divEmpty}>
 		   <CanvasText state={state} label={label} plan={plan}/>

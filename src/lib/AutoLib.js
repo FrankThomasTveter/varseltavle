@@ -1,7 +1,7 @@
 //console.log("Loading AutoLib.js");
 
 function Auto() {
-    this.debug=false;
+    this.debug=false;//false
     this.complete=true;
     this.toggle=function(state) {
 	console.log("Pressed toggle");
@@ -45,6 +45,33 @@ function Auto() {
 	    //console.log("############# Reordered other:",JSON.stringify(state.Path.other));
 	};
     };
+    // push selected key back to table...
+    this.pushSelectToTable=function(state,key,inc) {
+	var ret=false;
+	var src=state.Navigate.removeKey(state,key,state.Path.keys.path);
+	if (src !== undefined) {
+	    var jnk=state.Navigate.removeKey(state,key,state.Path.keys.other); // remove if it exists
+	    var pos=0;
+	    if (state.Auto.complete) {// check if key is redundant
+		//var keywhere=state.Path.select.where[key];
+		//var keyrange=state.Path.select.range[key];
+		//var keycnt=state.Path.select.cnt[key];
+		var where=state.Database.getWhere(state);
+		var testtable=state.Path.getTableKeys(state);
+		if (testtable.length>0) {testtable.pop();};
+		state.Utils.pushKey(testtable,key,0);
+		var testdep=this.getDependancy(state,where,testtable);
+		if (testdep.intprt[key] === "redundant") {
+		    pos=Math.max(0,state.Path.table.nkeys);
+		};
+		//console.log("Dep:",key,JSON.stringify(testtable),JSON.stringify(testdep),pos);
+	    };
+	    state.Utils.pushKey(state.Path.keys.other,src,pos);
+	    state.Navigate.implementKeyChange(state,true);
+	    ret= (inc !== undefined && jnk === undefined);
+	};
+	return ret;
+    };
     // select given table key...
     this.selectTableKey=function(state,key,keyval,keywhere,keycnt,keep) { // keep abscissa
 	if(this.debug){console.log("selectTableKey Entering:",key,keyval,keywhere,keycnt,JSON.stringify(state.Path.other));};
@@ -86,7 +113,7 @@ function Auto() {
 	return ret;
     };
     this.tableKeyToPath=function (state,key,keyval,keywhere,keycnt) {
-	if(this.debug){console.log("tableKeyToPath Entering:",key,keyval,keywhere,JSON.stringify(state.Path.other));};
+	if(this.debug){console.log("tableKeyToPath Entering key=",key," val=",keyval," where='",keywhere,"' other=",JSON.stringify(state.Path.other));};
 	// look for table-key candidates in the rest-stack
 	var analysis=this.analyse(state,key,keywhere);
 	// move the key
@@ -120,7 +147,7 @@ function Auto() {
 	}
 	if (analysis.tblkey !== "") {
 	    state.Path.table.ntarget=1+analysis.othkeys.length
-	    state.Path.keys.other=state.Utils.clean([analysis.tblkey].concat(analysis.othkeys).concat(rest).concat(ignore));
+	    state.Path.keys.other=state.Utils.clean(analysis.othkeys.concat([analysis.tblkey]).concat(rest).concat(ignore));
             if(this.debug){console.log("Table key present:",JSON.stringify(state.Path.keys.other),state.Path.table.nkeys);};
 	} else if (analysis.othkeys !== undefined) {
 	    state.Path.table.ntarget=analysis.othkeys.length;
@@ -188,8 +215,11 @@ function Auto() {
 		    rest.push(testkey);
 		    if(this.debug){console.log("****  Rest:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey,JSON.stringify(testdep),where);};
 		}
-	    } else { // control key
+	    } else { // control key, only if testdep.intprt[othkey]!=="redundant", otherwise postpone...
 		tblkey=testkey;                    // we have found a good candidate
+		// when we have a tblkey, all other keys are ignored....
+
+		
 		if(this.debug){console.log("****  Control:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey);};
 	    }
 	}

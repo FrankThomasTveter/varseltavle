@@ -38,7 +38,8 @@ function Layout() {
 	state.Layout.state.tooltip=(state.Layout.state.tooltip+1)%3;
 	//console.log("Tooltip:",this.state.tooltip);
 	state.Utils.pushUrl(state);
-	state.Show.show(state,true);
+	var reload=(!state.Matrix.ltooltip && state.Layout.state.tooltip === 2); // pre-generate all tooltips
+	state.Show.show(state,reload);
     };
     this.changeFont=function(state) {
 	state.Layout.state.cfont=((state.Layout.state.cfont +1) % state.Layout.fonts.length);
