@@ -5,10 +5,10 @@ function Settings() {
     this.controls=["Undo","Redo","Mode","ViewPath",
 		   "Reload","Home","Film","Star","Key",
 		   "Order","Tooltip","Font","Dim","File",
-		   "ViewPolygon","Polygon",
+		   "ViewPolygon","Polygon","ViewOldData",
 		   "Archive","Focus","FullScreen","About"];
     // list of visible controls...
-    this.visible=[];//["Undo","Redo","Mode","Path"];
+    this.visible=[];//["Undo","Redo","Mode","ViewPath"];
     this.init=function(state){
 	state.Utils.init("Settings",this);
     };

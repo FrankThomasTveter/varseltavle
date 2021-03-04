@@ -71,11 +71,12 @@ function renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index){
 	var val=doc[skey];
 	var where=state.Database.getWhereValue(skey,val);
 	var range;
+	var title=state.Matrix.getTooltipTitle(state,doc,skey); // get threshold... ala 
 	var onClick=()=>{state.Navigate.selectKeys(state,skey,val,range,where,1);};
 	if (val === undefined) {val="";};
 	//console.log("Key:",skey," Val:",JSON.stringify(val),JSON.stringify(doc[skey]));
 	return (
-		<div className={classes.divTableCell} style={{color:fgcolor,backgroundColor:bgcolor,cursor: "pointer"}} key={skey} onClick={onClick}>
+		<div className={classes.divTableCell} style={{color:fgcolor,backgroundColor:bgcolor,cursor: "pointer"}} key={skey} onClick={onClick} title={title}>
 		{val}
 	    </div>
 	);

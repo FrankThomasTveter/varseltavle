@@ -125,6 +125,28 @@ function Utils() {
 	}
 	return match;
     }
+    this.merge=function(sarr,tarr,ignore) {
+	var ii;
+	if (ignore===undefined) {ignore=[];};
+	var ret=[];
+	if (sarr !== undefined) {
+	    var lens=sarr.length;
+	    for (ii=0;ii<lens;ii++) {
+		if (ret.indexOf(sarr[ii])===-1 && ignore.indexOf(sarr[ii])===-1) {
+		    ret.push(sarr[ii]);
+		}
+	    }
+	};
+	if (tarr !== undefined) {
+	    var lent=tarr.length;
+	    for (ii=0;ii<lent;ii++) {
+		if (ret.indexOf(tarr[ii])===-1 && ignore.indexOf(tarr[ii])===-1) {
+		    ret.push(tarr[ii]);
+		}
+	    }
+	};
+	return ret;
+    };
     this.cpArray=function(sarr,tarr,iarr) {
 	var lent,ind,indx,ii;
 	if (tarr !== undefined && iarr !== undefined) {

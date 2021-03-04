@@ -1,36 +1,40 @@
 {
     "thrs":{
 	"Phenomenon":{
-	    "Styrtregn":{"Duration":{ "1t" :{"Method":{"mb0":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,15,25,35] },
-						       "p50":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,15,25,35] },
-						       "p65":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,25,35] },
-						       "p100":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,35] }}},
-                                      "3t" :{"Method":{"mb0":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,30,40,50] },
-						       "p50":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,30,40,50] },
-						       "p65":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,40,50] },
-						       "p100":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,50] }}}}
-			},
-	    "Regn":{"Method":[{"mb0":{"lat":"maxlat","lon":"maxlon", "key":"aavg", ">": [0,5,10,25] },
-			       "p50":{"lat":"maxlat","lon":"maxlon", "key":"aavg", ">": [0,5,10,25] },
-			       "p65":{"lat":"maxlat","lon":"maxlon", "key":"aavg", ">": [0,10,25] },
-                               "p100":{"lat":"maxlat","lon":"maxlon", "key":"aavg", ">": [0,25] }},
-			      {"mb0":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,5,10,25] },
-			       "p50":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,5,10,25] },
-			       "p65":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,10,25] },
-                               "p100":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,25] }}
-			     ]
-		   }
-	}
-    },
+	    "Styrtregn":{"Duration":{ "1t" :{"Area":{"BergenSentrum":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,10,17,20] },
+                                                 "StorBergen":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,10,17,20] },
+                                                 "StareFossen":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,10,17,20] },
+                                                 "ArnaVassdraget":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,15,19,22] },
+                                                 "NesttunVassdraget":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,15,19,22] }}},
+                                  "3t" :{"Area":{"BergenSentrum":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,20,30,37] },
+                                                 "StorBergen":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,20,30,37] },
+                                                 "StareFossen":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,20,30,37] },
+                                                 "ArnaVassdraget":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,25,34,40] },
+                                                 "NesttunVassdraget":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,25,34,40] }}}}},
+	    "Regn":{"Duration":{ "6t" :{"Area":{"BergenSentrum":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,30,44,57] },
+                                            "StorBergen":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,30,44,57] },
+                                            "StareFossen":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,30,44,57] },
+                                            "ArnaVassdraget":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,40,49,61] },
+                                            "NesttunVassdraget":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,40,49,61] }}},
+                            "12t" :{"Area":{"BergenSentrum":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,40,64,86] },
+                                            "StorBergen":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,40,64,86] },
+                                            "StareFossen":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,40,64,86] },
+                                            "ArnaVassdraget":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,55,69,89] },
+                                            "NesttunVassdraget":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,55,69,89] }}},
+                            "24t" :{"Area":{"BergenSentrum":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,50,88,119] },
+                                            "StorBergen":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,50,88,119] },
+                                            "StareFossen":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,50,88,119] },
+                                            "ArnaVassdraget":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,70,97,129] },
+                                            "NesttunVassdraget":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,70,97,129] }}}}}}},
+
     "summaries":["summary_avkrok"],
     "fragments":[".*"],
     "colors":{
-	"background":["rgb(182,219,255)","rgb(255,182,119)","rgb(36,255,36)","rgb(0,0,0)"],
-	"foreground":["black","blue","red","white"]
+	"background":["rgb(36,230,36)","rgb(0,109,219)","rgb(73,0,146)","rgb(146,0,0)"],
+	"foreground":["black","white","white","white"]
     },
     "other":[
-	"Area","Method","Phenomenon","date","dtg","Duration","Partner",
-	"Type","Region","Model","Method","Issued","Output","Unit"
+	"Area","date","dtg","Method","Duration","Phenomenon"
     ],
     "order":{
 	"Duration":["1t","3t","6t","12t","24t"],
@@ -44,21 +48,22 @@
 	     "epoch","level","value",
 	     "Unit","a1600","a1000",
              "aavg","a400","a100","f70","gust","yrp","rr","DMC",
-             "f90","f95","f98","lead","day","rrmax"
+             "f90","f95","f98","lead","day","rrmax","Partner","Output","Issued",
+             "Unit","Region","Type"
 	    ],
     "priority":["dtg","date","Unit","Type","Model","Partner","Output","Duration",
 		"Phenomenon","Area","Region","Method","Issued"],
     "select":{"val":{},"where":{},"cnt":{},"range":{}},
     "state":{"viewMode":0,"cellMode":0,"layoutMode":0},
     "home":{"path":[],"val":{"Partner":[]}},
-    "tooltip":{"keys":["Phenomenon","Region","Duration","Airport","alarm_key","alarm_val","Unit","Model","Method","Output","dtg","lat","lon","max"],
+    "tooltip":{"keys":["Phenomenon","Duration","alarm_key","alarm_val","Unit","Method","dtg","lat","lon","max","aavg","min"],
 	       "select":["Phenomenon","Duration"],
-	       "sort":["Phenomenon","Duration","Region"],
-               "click":["Phenomenon","Region","Duration","Output","Airport","dtg"]
+	       "sort":["Duration","Phenomenon"],
+           "click":["Phenomenon","Duration","dtg"]
 	      },
     "polygons":{"dir":"simplified/","seperator":"_","keys":["Type","Area"]},
     "custom":{},
-    "visible":["Undo","Redo","Mode","Tooltip","Path"],
+    "visible":["Undo","Redo","Mode","ViewPath","Tooltip"],
     "svg":{"key":"Phenomenon","svgs":{
 "Regn":"<svg width=\"Size\" height=\"Size\" fill=\"none\"><path fill=\"#fff\" fill-rule=\"evenodd\" d=\"M31.556 28.24a1.5 1.5 0 0 1-1.302 2.245H1.7A1.5 1.5 0 0 1 .398 28.24L14.675 3.256a1.5 1.5 0 0 1 2.604 0l14.277 24.985z\" clip-rule=\"evenodd\"/><path fill=\"bg\" fill-rule=\"evenodd\" d=\"M30.277 30a1 1 0 0 0 .868-1.496L16.868 3.519a1 1 0 0 0-1.736 0L.855 28.504A1 1 0 0 0 1.723 30h28.554z\" clip-rule=\"evenodd\"/><path fill=\"#908715\" fill-rule=\"evenodd\" d=\"M31.277 29a1 1 0 0 0-.132-.496L16.868 3.519a1 1 0 0 0-1.736 0L.855 28.504A1 1 0 0 0 1.723 30h28.554a1 1 0 0 0 1-1zM16.434 3.767l14.277 24.985a.5.5 0 0 1-.434.748H1.723a.5.5 0 0 1-.434-.748L15.566 3.767a.5.5 0 0 1 .868 0z\" clip-rule=\"evenodd\"/><path fill=\"fg\" d=\"M16 15c-3.314 0-6 2.955-6 6.6h12c0-3.645-2.686-6.6-6-6.6z\"/><path stroke=\"fg\" d=\"M16 21v4.619a1 1 0 0 0 .31.724v0a1 1 0 0 0 1.38 0l.31-.295\"/></svg>",
 

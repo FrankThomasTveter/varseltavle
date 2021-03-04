@@ -18,6 +18,7 @@ import Setup        from './ConfigSetupComponent';
 import ViewPolygon  from './ConfigViewPolygonComponent';
 import Polygon      from './ConfigPolygonComponent';
 import Archive      from './ConfigArchiveComponent';
+import ViewOld      from './ConfigViewOldDataComponent';
 import Font         from './ConfigFontComponent';
 import Dims         from './ConfigDimComponent';
 import Focus        from './ConfigFocusComponent';
@@ -74,6 +75,7 @@ class Config extends Component {
 		<ViewPolygon state={state} classes={cls} visible={false}/>
 		<Polygon state={state} classes={cls} visible={false}/>
 		<Archive state={state} classes={cls} visible={false}/>
+		<ViewOld state={state} classes={cls} visible={false}/>
 		<Font state={state} classes={cls} visible={false}/>
 		<Dims state={state} classes={cls} visible={false}/>
 		<Focus state={state} classes={cls} visible={false}/>

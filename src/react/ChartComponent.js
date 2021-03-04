@@ -8,6 +8,8 @@ import { withStyles } from '@material-ui/core/styles';
 import MapInfo from './MapInfoComponent'
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import metareaGeoJSON from '../geojson/metarea';
+import bankerGeoJSON from '../geojson/banker';
 //import worldGeoJSON from 'geojson-world-map';
 import worldGeoJSON from '../geojson/custom_world';
 import { Map, GeoJSON, Marker, Tooltip, Polyline } from 'react-leaflet';//Polygon, TileLayer ,Popup
@@ -349,6 +351,24 @@ class GeoJsonMap extends Component {
 	            onMoveend={onMoveend}
    	            >
                     <GeoJSON
+                       data={metareaGeoJSON}
+                       style={() => ({
+			   weight: 1,
+		 	   color: 'darkGray',//'#4a83ec',
+			   opacity: 0.0,
+			   fillColor: 'lightBlue',//"#1a1d62",
+			   fillOpacity: 0.2, //zIndex: 1,
+		       })}/>
+                    <GeoJSON
+                       data={bankerGeoJSON}
+                       style={() => ({
+			   weight: 1,
+		 	   color: 'darkGray',//'#4a83ec',
+			   opacity: 0.0,
+			   fillColor: 'lightYellow',//"#1a1d62",
+			   fillOpacity: 0.2, //zIndex: 1,
+		       })}/>
+                    <GeoJSON
                        data={worldGeoJSON}
                        style={() => ({
 			   weight: 1,
@@ -365,6 +385,10 @@ class GeoJsonMap extends Component {
 	     );
   }
 }
+
+
+
+
 
 //	      <Polygon positions={[[60,10],[61,10],[60.5,9],[60,10]]} color="red"/>
 

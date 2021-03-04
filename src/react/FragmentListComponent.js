@@ -9,8 +9,6 @@ import FragmentIcon from '@material-ui/icons/Filter';
 import Fragment from './FragmentCheckboxTree';
 import ReloadIcon from '@material-ui/icons/Autorenew';
 
-import 'react-checkbox-tree/lib/react-checkbox-tree.css';
-
 //import TreeView from 'material-ui-treeview/TreeView';
 //import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 //import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -74,10 +72,10 @@ class FragmentMenu extends Component {
 	                 items={this.items} force={this.force}/>
 		   </MenuItem>
 		   <MenuItem key={"load"}>
-		      <Button
-                      className={classes.button}
-             	         onClick={this.onLoad}
-		      >{<ReloadIcon state={state}/>}</Button>
+		      <Button className={classes.button}
+             	         onClick={this.onLoad}>
+		         <ReloadIcon state={state}/>
+		      </Button>
 		   </MenuItem>
 		</Menu>
 	        </div>

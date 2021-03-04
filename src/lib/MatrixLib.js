@@ -756,7 +756,7 @@ function Matrix() {
 	return vals;
     }
     this.getTooltipTitle=function(state,doc,key) {
-	return JSON.stringify(doc._thr.max);
+	return state.Threshold.getTooltipTitle(state,doc,key);
     };
     this.getInfo=function(state,elements) {
 	var tooltip={}; // list of maxrank-docs

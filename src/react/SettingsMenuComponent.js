@@ -20,6 +20,7 @@ import Setup        from './ConfigSetupComponent';
 import ViewPolygon  from './ConfigViewPolygonComponent';
 import Polygon      from './ConfigPolygonComponent';
 import Archive      from './ConfigArchiveComponent';
+import ViewOld      from './ConfigViewOldDataComponent';
 import Font         from './ConfigFontComponent';
 import Dims         from './ConfigDimComponent';
 import Focus        from './ConfigFocusComponent';
@@ -120,6 +121,9 @@ class SettingsMenu extends Component {
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="archive" onClose={this.onClose}>
 		       <Archive state={state} classes={cls}/>
+		    </MenuItem>
+		    <MenuItem className={classes.order} key="viewold" onClose={this.onClose}>
+		       <ViewOld state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="font" onClose={this.onClose}>
 		       <Font state={state} classes={cls}/>

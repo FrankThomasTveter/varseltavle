@@ -133,6 +133,8 @@
 	    "Turbulens":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,2.0,3.5] }
 	}
     },
+    "summaries":["summary_kommuner"],
+    "fragments":[".*"],
     "colors":{
 	"background":["rgb(182,219,255)","rgb(255,182,119)","rgb(36,255,36)","rgb(0,0,0)"],
 	"foreground":["black","blue","red","white"]

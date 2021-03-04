@@ -18,7 +18,8 @@ function Default() {
     // what we copy from Setup-file to the default setup at startup (before url) | if default setup is empty...
     this.toStateData  = [
 	[["fragments"],    ["Database","fragments"]],
-	[["summaries"],    ["Database","summaries"]]
+	[["summaries"],    ["Database","summaries"]],
+	[["viewOldData"],  ["Database","viewOldData"]]
     ];
     this.toStateKeys= [
 	[["path"],    ["Path","keys","path"]],

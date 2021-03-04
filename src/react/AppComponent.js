@@ -160,7 +160,7 @@ class App extends Component {
 	    cnt:0
 	};
 
-	this.path=this.getpath();
+	//this.path=this.getpath();
     };
     getpath() {
 	var path="/";

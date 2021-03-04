@@ -10,7 +10,7 @@ function Navigate() {
     this.trash={};          // key trash
     this.maxStore=1000;       // max number of states stored
     this.reset=function(state) { // store state
-	state.Navigate.history={pos:0,track:[]};
+	//state.Navigate.history={pos:0,track:[]};
 	this.store(state);
     };
     this.store=function(state,focus) { // store state

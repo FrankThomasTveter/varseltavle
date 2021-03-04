@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import SelIcon from '@material-ui/icons/Done';
 import NullIcon from '@material-ui/icons/Clear';
+import AddIcon from '@material-ui/icons/Add';
 import SelectValue from './SelectValueComponent';
 import MoveKey     from './MoveKeyComponent';
 import Reload      from './ConfigReloadComponent';
-import Edit     from './EditComponent';
 import {teal_palette} from '../mui/metMuiThemes';
 
 const styles = theme => ({
@@ -33,11 +34,6 @@ const styles = theme => ({
 	}
     },
     reload: {
-	display: 'inline-block',
-        marginRight: 'auto',
-	height:'100%',
-    },
-    edit: {
 	display: 'inline-block',
         marginRight: 'auto',
 	height:'100%',
@@ -75,23 +71,40 @@ function renderMenuItem(classes,state,keyitem,valueitem,valueindex) {
     };
 }
 class SelectValueMenu extends Component {
-    state={anchor:null};
+    state={anchorMain:null,anchorAdd:null,label:""};
+    constructor(props) {
+	super(props);
+	//const {state} = props;
+	this.handleChange=(event) => {
+	    //console.log("handleChange:",event.target.value);
+	    this.setState({label:event.target.value});
+        }
+	this.handleChange=this.handleChange.bind(this);
+    };
     render() {
         const { classes, state, keyitem, title, label, remove, target, focusPoints, focusType } = this.props;
 	this.focusPoints=focusPoints;
 	this.focusType=focusType;
-	this.onClick = event => {
-	    this.setState({ anchor: event.currentTarget });
+	this.onClickMain = event => {
+	    this.setState({ anchorMain: event.currentTarget });
 	    state.Path.setPathFocus(state,keyitem+(this.focusType||""));
 	};
-	this.onClose = () => {this.setState({ anchor: null });};
+	this.onClickAdd = event => {
+	    this.setState({ anchorAdd: event.currentTarget });
+	};
+	this.onClose = () => {
+	    if (this.state.anchorAdd !== null) {
+		this.setState({ anchorAdd: null });
+	    } else {
+		this.setState({ anchorMain: null });
+	    }
+	};
 	this.pushToTable = () => {
 	    //console.log("Setting focus to:",keyitem);
 	    state.Path.setPathFocus(state,keyitem);
 	    state.Navigate.pushSelectToTable(state,keyitem);
 	    this.onClose();
 	};
-	var items=state.Database.getKeyValues(state,keyitem);
 	if (remove !== undefined) {
 	    this.remove = () => {
 		state.Path.setPathFocus(state,keyitem);
@@ -107,6 +120,11 @@ class SelectValueMenu extends Component {
 	    };
 	    this.target="table";
 	};
+	this.onAdd = () => {
+	    //state.Path.setPathFocus(state,keyitem+"_selected");
+	    //console.log("Select->focus:",keyitem+"_selected",label);
+	    state.Path.toggleSelect(state,keyitem,this.state.label);
+	};
 	var icon,lab;
 	if (label==="") {
 	    icon=<NullIcon/>;
@@ -115,17 +133,23 @@ class SelectValueMenu extends Component {
 	    icon=<SelIcon/>;
 	    lab=label;
 	};
-	items.sort(state.Utils.ascending);
 	var moves=[{onclick:this.remove,target:this.target}];
 	if (target!=="table" && state.Path.other.ignore.indexOf(keyitem)===-1) {
 	    moves.push({onclick:this.pushToTable,target:"table"});
 	};
 	var mapFunction= (item,index)=>renderMenuItem(classes,state,keyitem,item,index);
 	var moveFunction= (item,index)=>renderMoveItem(classes,state,item,index,keyitem,this.onClose);
+	var ignore=["MAX("+keyitem+")","MIN("+keyitem+")"];
+	var items=state.Utils.merge(state.Database.getKeyValues(state,keyitem),
+				    state.Path.select.val[keyitem],ignore);
+	
+	if (items.indexOf("")===-1) {items.push("");};
+	items.sort(state.Utils.ascending).reverse();
 	//console.log("Values.rendering",items.length,JSON.stringify(anchor),Boolean(anchor));
+	const chip=<AddIcon onClick={this.onAdd}/>;
+	const input=<input type="text" value={this.state.label} onChange={this.handleChange} autoFocus={true}/>;
 	var cls={button:classes.button};
-	if (items.length > 0) { // items
-	    return (
+	return (
  	      <div key={"selectValue-"+keyitem}>
 	       <Chip
                   icon={icon}
@@ -133,9 +157,9 @@ class SelectValueMenu extends Component {
                   title={title}
                   className={classes.selectchip}
                   variant="outlined"
-                  aria-owns={this.state.anchor ? 'values-menu' : undefined}
+                  aria-owns={this.state.anchorMain ? 'values-menu' : undefined}
                   aria-haspopup="true"
-                  onClick={this.onClick}
+                  onClick={this.onClickMain}
 		  ref={(input)=>{
 		    if (this.focusPoints !== undefined) {
 			var name=keyitem + (this.focusType||"");
@@ -147,60 +171,46 @@ class SelectValueMenu extends Component {
 		      }/>
 	        <Menu
 		    id="values-menu"
-		    anchorEl={this.state.anchor}
-		    open={Boolean(this.state.anchor)}
-		    onClose={this.onClose}
+		    anchorEl={this.state.anchorMain}
+		    open={Boolean(this.state.anchorMain)}
+		    onClose = {this.onClose}
 		    >
 		    {moves.map(moveFunction)}
-		    {mapFunction(state.Database.makeKeytrg(state,keyitem,state.Database.keytrg.Min),-1)}
-		    {items.map(mapFunction)}
 		    {mapFunction(state.Database.makeKeytrg(state,keyitem,state.Database.keytrg.Max),-1)}
-		    {mapFunction("",-1)}
-		    <MenuItem key="reload" onClose={this.onClose} className={classes.reload}>
-		    <Reload state={state} onclose={this.onClose} classes={cls} visible={true}/>
+		    {items.map(mapFunction)}
+		    {mapFunction(state.Database.makeKeytrg(state,keyitem,state.Database.keytrg.Min),-1)}
+		    <MenuItem key="add" onClose={this.onClose}>
+		<Button
+                      className={classes.button}
+                      aria-owns={this.state.anchorAdd ? 'values-add' : undefined}
+                      aria-haspopup="true"
+                      onClick={this.onClickAdd}
+	              title={"Add selected value."}
+		    >
+	  	       {<AddIcon/>}
+                </Button>
 		    </MenuItem>
-		    </Menu>
+		    <MenuItem key="reload" onClose={this.onClose} className={classes.reload}>
+		       <Reload state={state} onclose={this.onClose} classes={cls} visible={true}/>
+		    </MenuItem>
+		</Menu>
+	        <Menu
+		    id="values-add"
+		    anchorEl={this.state.anchorAdd}
+		    open={Boolean(this.state.anchorAdd)}
+		    onClose={this.onClose}
+		    >
+		<MenuItem className={classes.order} key="button">
+		<Chip
+	              className={classes.selchip}
+	              icon={chip}
+	              label={input}
+	              variant="outlined"
+		   />		
+		</MenuItem>
+		 </Menu>
+
 	    </div>);
-	} else { // range
-	    var range=state.Path.getRange(state,keyitem);
-	    //console.log("Range:",JSON.stringify(range));
-	    var setValue=function(range,index,value) {
-		state.Path.setRangeValue(state,range,index,value);
-	    };
-	    var ecls={input:classes.button, edit:classes.edit};
-	    return (
- 	     <div className={classes.values} key={"selectValue-"+keyitem}>
-	       <Chip
-                  icon={icon}
-                  label={lab}
-                  title={title}
-                  className={classes.selectchip}
-                  variant="outlined"
-                  aria-owns={this.state.anchor ? 'values-menu' : undefined}
-                  aria-haspopup="true"
-                  onClick={this.onClick}
-		  ref={(input)=>{
-		    if (this.focusPoints !== undefined) {
-			var name=keyitem + (this.focusType||"");
-			//console.log("###### Found focus point:",name,this.focusType);
-			this.focusPoints[name]=input;
-		    } else {
-			//console.log("SVM-No focus points...");
-		    }}
-		      }/>
-                 <Menu id="values-menu" anchorEl={this.state.anchor} open={Boolean(this.state.anchor)}
-		                        onClose={this.onClose}>
-		   {moves.map(moveFunction)}
-	            <Edit state={state} classes={ecls} label={"Min:"} index={0} range={range}
-		                        setvalue={setValue} onclose={this.onClose}/>
-	            <Edit state={state} classes={ecls} label={"Max:"} index={1} range={range}
-		                        setvalue={setValue} onclose={this.onClose}/>
-	           <MenuItem key="reload" onClose={this.onClose} className={classes.reload}>
-	              <Reload state={state} onclose={this.onClose} classes={cls} visible={true}/>
-	           </MenuItem>
-	         </Menu>
-	    </div>);
-	}
     }
 }
 

@@ -13,7 +13,7 @@ function Database() {
     this.summaries=["summary"];
     this.summary=[];
     this.sumcnt={};
-    this.fragments=[]; // frags to be loaded
+    this.fragments=[];        // frags to be loaded
     this.fragload=[];         // active loaded
     this.fragjson={};         // json[frag]
     this.fragfile={};         // file[frag]
@@ -32,14 +32,15 @@ function Database() {
     this.cdes=1; // key is sorted descending
     this.nasc=2; // key is sorted ascending
     this.ndes=3; // key is sorted descending
-    //this.delay=5*1000;  // step length in ms (film reel period)
-    //this.step=2;        // steps between each server polling
+    //this.delay=5*1000; // step length in ms (film reel period)
+    //this.step=2;       // steps between each server polling
     this.delay=10*1000;  // step length in ms (film reel)
-    this.step=60;        // steps between each server polling
+    this.step=6;         // steps between each server polling
     this.stepCnt=0;      // current step count
     this.loadcnt=0;      // polling count
     this.dbcnt=0;        // records in database
     this.ready=true;     // can we poll server or is another poll running
+    this.viewOldData=false;  //  keep old data?
     this.log="";
     this.mod="";
     this.keytrg={Missing:-1,
@@ -59,6 +60,11 @@ function Database() {
 	state.Utils.init("Database",this);
 	state.File.next(state,response,callbacks);
     }.bind(this);
+    this.toggleDisplayOld=function(state) {
+	//console.log("Show.view before:",this.state.viewMode,JSON.stringify(this.state),JSON.stringify(this.modes));
+	state.Database.viewOldData=!state.Database.viewOldData;
+	state.Show.showAll(state);
+    };
     this.newDb=function(state) {
 	if (state.Database.append && this.db !== null) {
 	    // keep old database...
@@ -120,6 +126,28 @@ function Database() {
 	var hh =  String(now.getHours()).padStart(2, '0');
 	var mi =  String(now.getMinutes()).padStart(2, '0');
 	var ret = ''+yyyy+mm+dd+hh+mi;
+	//console.log("Date:",ret," -> ",yyyy,"/",mm,"/",dd,"T",hh,":",mi);
+	return (ret);
+    };
+    this.getDbDtg=function(state) {
+	var now = new Date();
+	var yyyy = now.getFullYear();
+	var mm = String(now.getMonth() + 1).padStart(2, '0'); //January is 0!
+	var dd = String(now.getDate()).padStart(2, '0');
+	var hh =  String(now.getHours()).padStart(2, '0');
+	//var mi =  String(now.getMinutes()).padStart(2, '0');
+	var ret = ''+yyyy+"-"+mm+"-"+dd+"_"+hh; // 2021-02-03_12
+	//console.log("Date:",ret," -> ",yyyy,"/",mm,"/",dd,"T",hh,":",mi);
+	return (ret);
+    };
+    this.getPrettyDtg=function(state) {
+	var now = new Date();
+	var yyyy = now.getFullYear();
+	var mm = String(now.getMonth() + 1).padStart(2, '0'); //January is 0!
+	var dd = String(now.getDate()).padStart(2, '0');
+	var hh =  String(now.getHours()).padStart(2, '0');
+	var mi =  String(now.getMinutes()).padStart(2, '0');
+	var ret = ''+yyyy+"/"+mm+"/"+dd+" "+hh+":"+mi;
 	//console.log("Date:",ret," -> ",yyyy,"/",mm,"/",dd,"T",hh,":",mi);
 	return (ret);
     };
@@ -219,8 +247,8 @@ function Database() {
 	var lenp=frags.length;
 	for (var ii=0;ii<lenp;ii++) {
 	    var frag=frags[ii];
-	    if (nfrags.indexOf(frag)===-1) { // delete old stuff
-		console.log("Deleting:",frag);
+	    if (nfrags.indexOf(frag)===-1) { // ignore old stuff
+		console.log("Ignoring:",frag);
 		this.cleanFrag(state,frag);
 	    } else { // join data
 		var json=state.Database.fragjson[frag];
@@ -369,7 +397,7 @@ function Database() {
 	    var summary=state.Database.summary.sort();
 	    var lens=summary.length;
 	    for (var jj=0; jj<lens;jj++) {
-		var ss=summary[jj];
+		var ss=summary[jj].replace(/\/+$/, ""); // path must not end with "/"
 		var parts=ss.split("/");
 		if (bdeb) {console.log("Fragment:",jj,JSON.stringify(parts));};
 		mg=Math.max(mg,parts.length);
@@ -385,33 +413,34 @@ function Database() {
 	var name;
 	var item;
 	var ret=[];
-	var lp=pp;
-	var lc=pp;
-	var lg=gg;
-	var ii=pp;
+	var lg=gg; // local granny level
+	var lp=pp; // local parent position
+	var lc=pp; // local child position
+	var ii=Math.min(pp+1,lenf-1); // current position
 	if (bdeb) {console.log(">>>>> Fragments processing: ",gg,pp,cc,lenf-1);};
 	var bdone=(ii > frags.length);
 	while (! bdone) {
-	    if (bdeb) {console.log("Loop par=",lp,"(",pp,") ch=",lc,"(",cc,") ii=",
-				   ii,"(",lenf,") lev=",lg,"(",mg,")");}
+	    //if (bdeb) {console.log("Loop par=",lp,"(",pp,") ch=",lc,"(",cc,") ii=",
+	    //		   ii,"(",lenf,") lev=",lg,"(",mg,")");}
 	    if (this.fragmentMatch(frags[lp],frags[ii],lg)) {
-		if (bdeb) {console.log(" Fragments ",lp,ii,lenf,
-				JSON.stringify(frags[lp]),JSON.stringify(frags[ii])," match",lg,mg);};
-		lc=ii;
-		ii=ii+1;
-		bdone= (lc >= Math.min(cc,lenf-1));
-		if (bdone) { // all matched, increase gg
+		if (bdeb) {console.log(" Fragments ",lg,
+				       JSON.stringify(frags[lp]),JSON.stringify(frags[ii]),
+				       " match at lev=",lg,"(",mg,") pos=",lp,ii,"(",lenf,")");};
+		lc=ii;    // current child position
+		ii=ii+1;  // current position
+		bdone= (lc >= Math.min(cc,lenf-1)); // no more positions (fragments)?
+		if (bdone) { // all matched, increase gg (global granny level)
 		    if (lc===cc && lp===pp) {
-			lg=lg+1;
-			if (lg > mg) { // end of the line 
+			lg=lg+1; // increase level
+			if (lg > mg) { // end of the line, no more levels 
 			    // only one match...
 			    path=this.getName(frags[lp],0,mg);
 			    name=this.getName(frags[lp],gg,mg);//this.getParentName(state,granny,parent);
 			    item={value:path,label:name}
-			    //console.log("+++ total:",JSON.stringify(item));
+			    if(bdeb)console.log("+++ done:",JSON.stringify(item));
 			    ret.push(item);
 			} else {
-			    ii=lp;
+			    ii=Math.min(lp+1,lenf-1);
 			    bdone= (ii > Math.min(cc,lenf-1));
 			}
 		    } else {
@@ -430,8 +459,9 @@ function Database() {
 		    }
 		}
 	    } else if (lg-1 > gg) { // make common parent
-		if (bdeb) {console.log(" Fragments ",lp,ii,lenf,JSON.stringify(frags[lp]),
-				       JSON.stringify(frags[ii])," DO NOT MATCH",gg,lg,mg);};
+		if (bdeb) {console.log(" Fragments ",lg,JSON.stringify(frags[lp]),
+				       JSON.stringify(frags[ii])," DO NOT match at lev=",lg,
+				       "(",gg,") pos=",lp,ii,"(",lenf,")");};
 		path=this.getName(frags[lp],0,lg-1);
 		name=this.getName(frags[lp],gg,lg-1);//this.getParentName(state,granny,parent);
 		item={value:path,label:name};
@@ -620,10 +650,12 @@ function Database() {
 		if (verbose === "verbose") {
 		    state.Html.broadcast(state,"No changes to DB.",'warning');
 		};
-		console.log("DB load unchanged:", state.Database.loadcnt);
+		console.log("DB unchanged:", state.Database.loadcnt,
+			    " (",state.Database.getPrettyDtg(state),")");
 		return;
 	    } else {
-		console.log("DB load changed:  ", state.Database.loadcnt);
+		console.log("DB changed:  ", state.Database.loadcnt,
+			    " (",state.Database.getPrettyDtg(state),")");
 		state.Database.fragdtg=state.Database.indexDtg;
 		state.Database.fragload=newfrags;
 		// collect all data into database
@@ -1236,6 +1268,10 @@ function Database() {
 	    return "";
 	};
     };
+    this.getWhereDbDtg=function(state,where) {
+	var dtg=state.Database.getDbDtg(state);
+	return state.Database.addWhere(where,"dtg>='" + dtg+ "'");
+    };
     this.getWhereValue=function(key,val) {
 	if (val  !== undefined ||
 	    val  !== null ||
@@ -1363,6 +1399,10 @@ function Database() {
     this.getUnique=function(state,whereInn,keys,level) {
 	var whereLev=this.getWhereRange("level",[level,undefined]);
 	var where=this.addWhere(whereInn,whereLev);
+	if (!state.Database.viewOldData) {
+	    where=state.Database.getWhereDbDtg(state,where);
+	    //console.log("Where:",where);
+	};
 	var group=this.getGroup(keys);
 	var cols=this.getCols(keys);
 	var qry="select "+cols+"max(level) AS maxlev FROM alarm"+where+group;
@@ -1371,12 +1411,20 @@ function Database() {
 	return (dd===undefined?[]:dd);
     };
     this.getDocsRank=function(state,where,keys,maxrank) {
+	if (!state.Database.viewOldData) {
+	    where=state.Database.getWhereDbDtg(state,where);
+	    //console.log("Where:",where);
+	};
 	var dd;
 	dd=this.query("select * FROM alarm"+where);
 	return (dd===undefined?[]:dd);
     };
 
     this.getRankCnt=function(state,where,keys,maxrank) {
+	if (!state.Database.viewOldData) {
+	    where=state.Database.getWhereDbDtg(state,where);
+	    //console.log("Where:",where);
+	};
 	where=this.addWhere(where,"rank='" + maxrank.toString()+"'");
 	var sql,dd;
 	var body="* FROM alarm";
@@ -1398,6 +1446,10 @@ function Database() {
 	return (dd===undefined?[]:dd);
     };
     this.getDocsCnt=function(state,where,keys,group) {
+	if (!state.Database.viewOldData) {
+	    where=state.Database.getWhereDbDtg(state,where);
+	    //console.log("Where:",where);
+	};
 	var sql,dd;
 	//console.log("Docs:",JSON.stringify(this.db.tables.alarm.data));
 	var body='count(*) AS cnt, max(level) AS maxlev, max(rank) AS maxrank, min(level) AS minlev, '
@@ -1436,6 +1488,10 @@ function Database() {
 	return (dd===undefined?[]:dd);
     };
     this.getDocs=function(state,where) {
+	if (!state.Database.viewOldData) {
+	    where=state.Database.getWhereDbDtg(state,where);
+	    //console.log("Where:",where);
+	};
 	var query="select * FROM alarm"+where;
 	//query="select * FROM alarm WHERE (_lat=69.00631578947369) AND (_lon=17.206315789473685)";
 	var dd=this.query(query);
@@ -1456,6 +1512,10 @@ function Database() {
 	this.setAppend(state,false);
     };
     this.getKeyCnt=function(state,key,where){
+	if (!state.Database.viewOldData) {
+	    where=state.Database.getWhereDbDtg(state,where);
+	    //console.log("Where:",where);
+	};
 	var sql="select "+key+",count(*) AS cnt FROM alarm"+
 	    where+" GROUP BY "+key;
 	return this.query(sql);

@@ -52,6 +52,16 @@ function Threshold() {
 	//ret.keys=["level","val","lat","lon","max"];
 	return ret;
     };
+    this.getTooltipTitle=function(state,doc,key) {
+	var title="";
+	var thr=doc._thr;
+	if (thr !== undefined) {
+	    title=thr.key + "=" + thr.val + "\nThr=" +
+		JSON.stringify(thr.max) + "\nLevel="+
+		thr.level;
+	};
+	return title
+    };
     this.getMinThreshold=function(doc,thr,mins) {
 	if (this.debug) {console.log("Thresholds:",JSON.stringify(mins));};
 	var doclev=-1; // found thresholds, but will we find a valid level?

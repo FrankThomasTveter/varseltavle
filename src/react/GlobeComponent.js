@@ -8,7 +8,7 @@ import Tooltip from './TooltipDataComponent'
 import MapInfo from './MapInfoComponent'
 import markerRenderer from './markerRenderer';
 
-import './styles.css';
+import './react-globe-styles.css';
 
 const styles = theme => ({
     root: {
