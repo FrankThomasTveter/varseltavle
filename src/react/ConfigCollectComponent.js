@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import SetHomeIcon from '@material-ui/icons/HomeOutlined';
 
 import Auto         from './AutoComponent';
 import CollectSelectMenu   from './CollectSelectMenuComponent';
@@ -31,6 +32,12 @@ const styles = theme => ({
     },
 });
 
+function SetHome(props) {
+    const {state,classes}=props;
+    var onclick=() => {state.Path.setHome(state);};
+    var title="Set home";
+    return <Button className={classes.button} onClick={onclick} title={title}><SetHomeIcon/></Button>;
+};
 class CollectMenu extends Component {
     show(state) {
 	//console.log("Called Config.show...");
@@ -64,6 +71,9 @@ class CollectMenu extends Component {
                         open={Boolean(this.state.anchor)}
                         onClose={this.onClose}
 		     >
+		    <MenuItem className={classes.order} key="sethome" onClose={this.onClose}>
+		       <SetHome state={state} classes={cls}/>
+		    </MenuItem>
 		    <MenuItem className={classes.order} key="auto" onClose={this.onClose}>
 		       <Auto state={state} classes={cls}/>
 		    </MenuItem>

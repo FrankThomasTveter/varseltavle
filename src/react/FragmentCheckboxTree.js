@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import {black_palette, teal_palette} from '../mui/metMuiThemes'
+import {black_palette} from '../mui/metMuiThemes' //, teal_palette
 import CheckboxTree from 'react-checkbox-tree';
 //
 import CheckIcon from '@material-ui/icons/CheckBox';

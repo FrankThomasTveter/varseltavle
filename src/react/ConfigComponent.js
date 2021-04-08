@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import {black_palette} from '../mui/metMuiThemes';  // teal_palette
 
+import Home         from './ConfigHomeComponent';
 import Undo         from './ConfigUndoComponent';
 import Redo         from './ConfigRedoComponent';
 import Mode         from './ConfigModeComponent';
@@ -11,7 +12,6 @@ import Collect      from './ConfigCollectComponent';
 import Reload       from './ConfigReloadComponent';
 import Tooltip      from './ConfigTooltipComponent';
 import Order        from './ConfigOrderComponent';
-import Home         from './ConfigHomeComponent';
 import Film         from './ConfigFilmComponent';
 import Star         from './ConfigStarComponent';
 import Setup        from './ConfigSetupComponent';
@@ -60,6 +60,7 @@ class Config extends Component {
 	//console.log("Rendering Config...");
 	var cls={button:classes.button};
 	return (<div className={classes.horisontal}>
+		<Home state={state} classes={cls} visible={false}/>
 		<Undo state={state} classes={classes} visible={false}/>
                 <Redo state={state} classes={classes} visible={false}/>
 		<Mode state={state} classes={cls} visible={false}/>
@@ -68,7 +69,6 @@ class Config extends Component {
 		<Reload state={state} classes={cls} visible={false}/>
 		<Tooltip state={state} classes={cls} visible={false}/>
 		<Order state={state} classes={cls} visible={false}/>
-		<Home state={state} classes={cls} visible={false}/>
 		<Film state={state} classes={cls} visible={false}/>
 		<Star state={state} classes={cls} visible={false}/>
 		<Setup state={state} classes={cls} visible={false}/>

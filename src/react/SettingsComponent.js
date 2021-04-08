@@ -7,6 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import SettingsIcon from '@material-ui/icons/Settings';
 
+import Home         from './ConfigHomeComponent';
 import Undo         from './ConfigUndoComponent';
 import Redo         from './ConfigRedoComponent';
 import Mode         from './ConfigModeComponent';
@@ -15,7 +16,6 @@ import Collect      from './ConfigCollectComponent';
 import Reload       from './ConfigReloadComponent';
 import Tooltip      from './ConfigTooltipComponent';
 import Order        from './ConfigOrderComponent';
-import Home         from './ConfigHomeComponent';
 import Film         from './ConfigFilmComponent';
 import Star         from './ConfigStarComponent';
 import Setup        from './ConfigSetupComponent';
@@ -75,6 +75,9 @@ class Settings extends Component {
 		    <MenuItem key="reload" onClose={this.onClose}>
 		       <Reload state={state} classes={cls} visible={true}/>
 		    </MenuItem>
+		    <MenuItem key="Home" onClose={this.onClose}>
+		       <Home state={state} classes={cls} visible={true}/>
+		    </MenuItem>
 		    <MenuItem key="undo" onClose={this.onClose}>
 		       <Undo state={state} classes={cls} visible={true}/>
 		    </MenuItem>
@@ -95,9 +98,6 @@ class Settings extends Component {
 		    </MenuItem>
 		    <MenuItem key="Order" onClose={this.onClose}>
 		       <Order state={state} classes={cls} visible={true}/>
-		    </MenuItem>
-		    <MenuItem key="Home" onClose={this.onClose}>
-		       <Home state={state} classes={cls} visible={true}/>
 		    </MenuItem>
                     <MenuItem key="Film" onClose={this.onClose}>
 		       <Film state={state} classes={cls} visible={true}/>
