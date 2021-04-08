@@ -180,11 +180,12 @@ class App extends Component {
     componentDidMount() {
 	var state=this.state;
 	state.Default.init(state);
-	state.Default.loadDefault(state,"",
-				  [state.Default.processDefault,
-				   state.Default.makeStart,
+	state.Default.loadSetupFile(state,"",
+				  [state.Default.processSetupFile,
+				   state.Default.storeStartState,
 				   state.Database.init,
 				   state.Default.checkState,
+				   state.Default.storeHomeState,
 				   state.Database.loadSummary,
 				   state.Database.updateLoop]
 				 );

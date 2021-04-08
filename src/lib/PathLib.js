@@ -174,15 +174,7 @@ function Path() {
 	this.cleanKeys(pkeys,state.Path.select.range);
     };
     this.goHome=function(state) {
-	var buff=state.Utils.cp(state.Path.keys.path);
-	state.Utils.remArray(buff,state.Path.home.path);
-	state.Utils.remArray(state.Path.keys.other,buff);
-	state.Utils.remArray(state.Path.keys.other,state.Path.home.path);
-	state.Utils.prepArray(state.Path.keys.other,buff);
-	state.Path.select.val=state.Utils.cp(state.Path.home.val);
-	state.Path.select.range=state.Utils.cp(state.Path.home.range);
-	state.Path.keys.path=state.Utils.cp(state.Path.home.path);
-	state.Path.table=state.Utils.cp(state.Path.home.table);
+	state.Default.goHome(state)
 	//console.log(">>>>>> Path.goHome: ",JSON.stringify(state.Path.home),JSON.stringify(state.Path.keys.path));
 	state.Utils.pushUrl(state);
 	state.Navigate.store(state);

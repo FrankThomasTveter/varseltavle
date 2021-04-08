@@ -2,6 +2,27 @@
 		    
 function Utils() {
     this.version="1";
+    this.type={"any"  :0,
+	       "force":1,
+	       "fill" :2};
+    this.bdeb=false;
+    this.debug=function(state,val) {
+	if (val!==undefined && val !== null && val) { 
+	    state.Utils.bdeb=true;
+	} else {
+	    state.Utils.bdeb=false;
+	};
+    };
+    this.getType=function(state,type) {
+	var keys=Object.keys(state.Utils.type);
+	var lenk=keys.length;
+	for (var jj=0;jj<lenk;jj++) {
+	    var key=keys[jj];
+	    var val=state.Utils.type[key];
+	    if ( val === type) { return key;}
+	}
+	return "***";
+    };
     this.invertArray=function(arr) {
 	var alen=arr.length;
 	var xlen=Math.floor(alen/2);
@@ -338,105 +359,6 @@ function Utils() {
 	//console.log("cntDocs:",JSON.stringify(elements),key,cnt,elen);
 	return cnt;
     };
-    this.pushUrl=function(state) {
-	var path = window.location.pathname;
-	//console.log("Path:",path);
-	var page = path.split("/").pop();
-	page.split('#').shift();
-	//console.log( page );
-	var url=page+"?setup="+state.Default.setup+"&";
-	//console.log("Actual Keys:",JSON.stringify(state.Path.keys));
-	var uri=state.Default.pushUrl(state)
-	for (var key of Object.keys(uri)) {
-	    var val=uri[key];
-	    //console.log("KV:",key,val);
-	    if (val !== undefined) {
-		var str=encodeURI(JSON.stringify(val)+"&");
-		url=url + key + "=" + str;
-	    }
-	};
-	//console.log("Setting URL to: (",url.length,"):",decodeURI(url));
-	//console.log("New URL: (",url.length,"):",this.prettyJson(uri));
-	window.history.replaceState("", "js", url);
-    };
-	// var urlDatabase=undefined;
-	// if (state.Default.hasChanged(state,["Database","data"]) && state.Database.data!==undefined) {
-	//     if (urlDatabase ===undefined) {urlDatabase={};}
-	//     urlDatabase.data=this.cp(state.Database.data);
-	// };
-	// var urlColors=undefined;
-	// if (state.Default.hasChanged(state,["Colors","colors"]) && false) {
-	//     if (urlColors ===undefined) {urlColors={};}
-	//     urlColors.colors=this.cp(state.Colors.colors);
-	// };
-	// var urlPath=undefined;
-	// if (state.Default.hasChanged(state,["Path","keys"]) && false) {
-	//     if (urlPath ===undefined) {urlPath={};}
-	//     urlPath.keys=this.cp(state.Path.keys);
-	// };
-	// if (state.Default.hasChanged(state,["Path","select"]) && false) {
-	//     if (urlPath ===undefined) {urlPath={};}
-	//     urlPath.select=this.cp(state.Path.select);
-	// };
-	// if (state.Default.hasChanged(state,["Path","tkeys"]) && false) {
-	//     if (urlPath ===undefined) {urlPath={};}
-	//     urlPath.ntarget=state.Path.table.ntarget;
-	// };
-	// if (state.Default.hasChanged(state,["Path","home"]) && false) {
-	//     if (urlPath ===undefined) {urlPath={};}
-	//     urlPath.home=this.cp(state.Path.home);
-	// };
-	// if (state.Default.hasChanged(state,["Path","tooltip"]) && false) {
-	//     if (urlPath ===undefined) {urlPath={};}
-	//     urlPath.tooltip=this.cp(state.Path.tooltip);
-	// };
-	// if (state.Default.hasChanged(state,["Path","list"]) && false) {
-	//     if (urlPath ===undefined) {urlPath={};}
-	//     urlPath.list=this.cp(state.Path.list);
-	// };
-	// if (state.Default.hasChanged(state,["Path","focus"]) && false) {
-	//     if (urlPath ===undefined) {urlPath={};}
-	//     urlPath.focus=this.cp(state.Path.focus);
-	// };
-	// if (state.Default.hasChanged(state,["Path","order"]) && false) {
-	//     if (urlPath ===undefined) {urlPath={};}
-	//     urlPath.order=this.cp(state.Path.order);
-	// };
-	// if (state.Default.hasChanged(state,["Path","film"]) && false) {
-	//     if (urlPath ===undefined) {urlPath={};}
-	//     urlPath.film=this.cp(state.Path.film);
-	//     //console.log("Film:",JSON.stringify(urlPath.film));
-	// };
-	// //console.log("URL Keys:",JSON.stringify(urlPath.keys));
-	// var urlLayout=undefined;
-	// if (state.Default.hasChanged(state,["Layout","priority"]) && false) {
-	//     if (urlLayout ===undefined) {urlLayout={};}
-	//     urlLayout.priority=state.Layout.getPriority(state);
-	// };
-	// if (state.Default.hasChanged(state,["Layout","state"]) && false) {
-	//     if (urlLayout ===undefined) {urlLayout={};}
-	//     urlLayout.state=this.cp(state.Layout.state);
-	// };
-	// var urlSettings=undefined;
-	// if (state.Default.hasChanged(state,["Settings","visible"])) {
-	//     if (urlSettings ===undefined) {urlSettings={};}
-	//     urlSettings.visible=this.cp(state.Settings.visible);
-	// };
-	// if (urlDatabase !== undefined) {
-	//     url=url + "Database=" + encodeURI(JSON.stringify(urlDatabase)+"&");
-	// };
-	// if (urlPath !== undefined) {
-	//     url=url + "Path=" + encodeURI(JSON.stringify(urlPath)+"&");
-	// };
-	// if (urlColors !== undefined) {
-	//     url=url + "Colors=" + encodeURI(JSON.stringify(urlColors)+"&");
-	// };
-	// if (urlLayout !== undefined) {
-	//     url=url + "Layout=" + encodeURI(JSON.stringify(urlLayout)+"&");
-	// };
-	// if (urlSettings !== undefined) {
-	//     url=url + "Settings=" + encodeURI(JSON.stringify(urlSettings)+"&");
-	// };
     this.getUrlVars=function(state) {
 	var vars = {};
 	window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
@@ -653,6 +575,411 @@ function Utils() {
 	};
 	return ret;
     }
+    // copy object-structure
+    this.isEmpty=function(state,obj) { // check if obj has any string/number children
+	var ret=true;
+	var k;
+	if (obj===undefined) {
+	    ret=true;
+	} else {
+	    var typ=typeof obj;
+	    if (typ === "Array") { // check array children
+		for (k in obj) {
+		    if (! this.isEmpty(state,obj[k])) {
+			ret=false;
+			//console.log("    =",typ,ret,k,JSON.stringify(obj[k]));
+			break;
+		    }
+		}
+	    } else if (typ === "object") { // check hash children
+		for (k in obj) {
+		    if (obj.hasOwnProperty(k)) {
+			if (! this.isEmpty(state,obj[k])) { 
+			    ret=false;
+			    //console.log("    =",typ,ret,k,JSON.stringify(obj[k]));
+			    break;
+			}
+		    }
+		}
+	    } else {
+		ret=false;
+	    }
+	}
+	//console.log("Type:",ret,JSON.stringify(obj));
+	return ret;
+    }.bind(this);
+    // map src onto target always
+    this.copyMap=function(state,type,src,trg,map) {
+	if (this.bdeb) {console.log("Map:",JSON.stringify(map),type,this.getType(state,type));}
+	if (type===undefined) {
+	    throw new Error("ERROR: MapForce with no type.");
+	} else if (src===undefined) {
+	    throw new Error("ERROR: MapForce with no src.");
+	} else if (trg===undefined) {
+	    throw new Error("ERROR: MapForce with no trg.");
+	} else if (map===undefined) {
+	    let keys=Object.keys(src);
+	    let lenk=keys.length;
+	    if (this.bdeb) {console.log("   keys:",JSON.stringify(keys));};
+	    for (let ii=0;ii<lenk;ii++) {
+		let key=keys[ii];
+		if (typeof src[key]==="object" &&
+		    src[key] !== null &&
+		    !Array.isArray(src[key])) {
+		    if (trg[key]===undefined) {trg[key]={};};
+		    if (this.bdeb) {console.log("Object cp:",key,JSON.stringify(trg),JSON.stringify(src[key]));}
+		    this.copyMap(state,type,src[key],trg[key]);
+		} else if (((type===this.type.fill &&
+			     trg[key]===undefined) ||
+			    (type!==this.type.fill) ) &&
+			   Array.isArray(src[key])) {
+		    if (this.bdeb) {console.log("Array cp:",key,JSON.stringify(src[key]));}
+		    trg[key]=state.Utils.cp(src[key]);		    
+		} else if ((type===this.type.fill &&
+			 trg[key]===undefined) ||
+			(type!==this.type.fill) ) {
+		    if (this.bdeb) {console.log("Item cp:",key,JSON.stringify(src[key]));}
+		    trg[key]=src[key];		    
+		} else {
+		    if (this.bdeb) {console.log("Omitting:",key,JSON.stringify(src[key]));}
+		}
+	    }
+	} else {
+	    let len=map.length
+	    for (let ii=0;ii<len;ii++){
+		let s=map[ii][0];
+		let t=map[ii][1];
+		if ( (s===undefined || ! Array.isArray(s)) &&
+		     (t===undefined || ! Array.isArray(t)) ) {
+		    s=map[ii];
+		    t=map[ii];
+		} else if (t===undefined) {
+		    t=s;
+		};
+		this.cpMap(state,t,s,trg,src,type)
+	    }
+	}
+    }.bind(this);
+    this.cpMap=function(state,t,s,trg,src,type) {
+	var ss=this.getItem(state,s,src);
+        if (ss !== undefined || type===this.type.force) {
+	    if (this.bdeb) {console.log("Filling:",s,'->',t,! this.isEmpty(state,ss));}
+	    this.setMap(state,t,trg,ss,type);
+	};
+    }.bind(this);
+    this.setMap=function(state,t,trg,ss,type) {
+	var ll=t.length;
+	if (trg===undefined) { 
+	    return;
+	} else if (ll===0) {
+	    trg=ss;
+	    return trg;
+	} else {
+	    var tt=trg;
+	    for (var ii=0;ii<ll-1;ii++) {
+		if (tt[t[ii]]===undefined) { tt[t[ii]]={} };
+		tt=tt[t[ii]];
+	    }
+	    if (type===this.type.force ||
+		type===this.type.any ||
+		(type===this.type.fill && this.isEmpty(state,tt[t[ll-1]]))) {
+		tt[t[ll-1]]=state.Utils.cp(ss)
+	    }
+	    if (this.bdeb) {
+		console.log("Copied:",type,JSON.stringify(t),JSON.stringify(tt[t[ll-1]]));
+	    };
+	}
+    };
+    this.setForce=function(state,t,trg,ss) {
+	var ll=t.length;
+	if (trg===undefined) { 
+	    return;
+	} else if (ll===0) {
+	    trg=ss;
+	    return trg;
+	} else {
+	    var tt=trg;
+	    for (var ii=0;ii<ll-1;ii++) {
+		if (tt[t[ii]]===undefined) { tt[t[ii]]={} };
+		tt=tt[t[ii]];
+	    }
+	    tt[t[ll-1]]=state.Utils.cp(ss)
+	    if (this.debug) {console.log("Force copied:",JSON.stringify(t),JSON.stringify(tt[t[ll-1]]));}
+	    return tt[t[ll-1]];
+	}
+    };
+    this.setFill=function(state,t,trg,ss) {
+	var ll=t.length;
+	if (trg===undefined) { 
+	    return;
+	} else if (ll===0) {
+	    trg=ss;
+	    return trg;
+	} else {
+	    if (this.debug) {console.log("Trg:",JSON.stringify(t),":",JSON.stringify(trg),":",JSON.stringify(ss));}
+	    var tt=trg;
+	    for (var ii=0;ii<ll-1;ii++) {
+		if (tt[t[ii]]===undefined) { tt[t[ii]]={} };
+		tt=tt[t[ii]];
+	    }
+	    if (this.isEmpty(state,tt[t[ll-1]])) {
+		tt[t[ll-1]]=state.Utils.cp(ss);
+	    }
+	    return tt[t[ll-1]];
+	}
+    }.bind(this);
+    this.cpForce=function(state,t,s,trg,src) {
+	var ss=this.getItem(state,s,src);
+	this.setForce(state,t,trg,ss);
+    }.bind(this);
+    this.cpAnything=function(state,t,s,trg,src) {
+	var ss=this.getItem(state,s,src);
+        if (ss !== undefined) {
+	    this.setForce(state,t,trg,ss);
+	};
+    }.bind(this);
+    this.cpFill=function(state,t,s,trg,src) {
+	var ss=this.getItem(state,s,src);
+	if (this.debug) {console.log("Filling:",s,'->',t,! this.isEmpty(state,ss));}
+	//if (! this.isEmpty(state,ss) ) {
+        if (ss !== undefined) {
+	    this.setFill(state,t,trg,ss);
+	}
+    }.bind(this);
+    // map src onto target always
+    this.copyForce=function(state,src,trg,map) {
+	if (src===undefined) {
+	    throw new Error("ERROR: MapForce with no src.");
+	} else if (trg===undefined) {
+	    throw new Error("ERROR: MapForce with no trg.");
+	} else if (map===undefined) {
+	    let keys=Object.keys(src);
+	    let lenk=keys.length;
+	    for (let ii=0;ii<lenk;ii++) {
+		let key=keys[ii];
+		if (typeof src[key]==="object" && src[key] !== null) {
+		    if (trg[key]===undefined) {trg[key]={};};
+		    this.copyForce(state,src[key],trg[key]);
+		} else if (Array.isArray(src[key])) {
+		    trg[key]=state.Utils.cp(src[key]);		    
+		} else {
+		    trg[key]=src[key];		    
+		}
+	    }
+	} else {
+	    let len=map.length
+	    for (let ii=0;ii<len;ii++){
+		let s=map[ii][0];
+		let t=map[ii][1];
+		if ( (s===undefined || ! Array.isArray(s)) &&
+		      (t===undefined || ! Array.isArray(t)) ) {
+		    s=map[ii];
+		    t=map[ii];
+		} else if (t===undefined) {
+		    t=s;
+		};
+		this.cpForce(state,t,s,trg,src)
+	    }
+	}
+    }.bind(this);
+    // map src onto target always
+    this.copyAnything=function(state,src,trg,map) {
+	if (src===undefined) {
+	    throw new Error("ERROR: MapForce with no src.");
+	} else if (trg===undefined) {
+	    throw new Error("ERROR: MapForce with no trg.");
+	} else if (map===undefined) {
+	    let keys=Object.keys(src);
+	    let lenk=keys.length;
+	    for (let ii=0;ii<lenk;ii++) {
+		let key=keys[ii];
+		if (typeof src[key]==="object" && src[key] !== null) {
+		    if (trg[key]===undefined) {trg[key]={};};
+		    this.copyAnything(state,src[key],trg[key]);
+		} else if (Array.isArray(src[key])) {
+		    trg[key]=state.Utils.cp(src[key]);		    
+		} else {
+		    trg[key]=src[key];		    
+		}
+	    }
+	} else {
+	    let len=map.length
+	    for (let ii=0;ii<len;ii++){
+		let s=map[ii][0];
+		let t=map[ii][1];
+		if ( (s===undefined || ! Array.isArray(s)) &&
+		      (t===undefined || ! Array.isArray(t)) ) {
+		    s=map[ii];
+		    t=map[ii];
+		} else if (t===undefined) {
+		    t=s;
+		};
+		this.cpAnything(state,t,s,trg,src)
+	    }
+	}
+    }.bind(this);
+    // map src onto target if target is empty and src is not
+    this.copyFill=function(state,src,trg,map) {
+	if (src===undefined) {
+	    throw new Error("ERROR: MapFill with no src.");
+	} else if (trg===undefined) {
+	    throw new Error("ERROR: MapFill with no trg.");
+	} else if (map===undefined) {
+	    //if (this.cnt++>10) { return;}
+	    let keys=Object.keys(src);
+	    let lenk=keys.length;
+	    if (this.debug) {console.log("   keys:",JSON.stringify(keys));};
+	    for (let ii=0;ii<lenk;ii++) {
+		let key=keys[ii];
+		if (src[key]!==null && typeof src[key]==="object" && ! Array.isArray(src[key])) {
+		    if (trg[key]===undefined) {trg[key]={};};
+		    //console.log(this.cnt,"   ",ii," -> ",key)
+		    if (key==="visible") {console.log("Object cp:",key,JSON.stringify(trg),JSON.stringify(src[key]));}
+		    this.copyFill(state,src[key],trg[key]);
+		} else if (trg[key]===undefined && Array.isArray(src[key])) {
+		    if (key==="visible") {console.log("Array cp:",key,JSON.stringify(src[key]));}
+		    trg[key]=state.Utils.cp(src[key]);		    
+		} else if (trg[key]===undefined) {
+		    if (key==="visible") {console.log("Item cp:",key,JSON.stringify(src[key]));}
+		    trg[key]=src[key];		    
+		}
+	    }
+	} else {
+	    var len=map.length
+	    for (let ii=0;ii<len;ii++){
+		let s=map[ii][0];
+		let t=map[ii][1];
+		if ( (s===undefined || ! Array.isArray(s)) &&
+		     (t===undefined || ! Array.isArray(t)) ) {
+		    s=map[ii];
+		    t=map[ii];
+		} else if (t===undefined) {
+		    t=s;
+		};
+		if (s!==undefined) { // never copy undefined...
+		    this.cpFill(state,t,s,trg,src);
+		};
+	    }
+	}
+    }.bind(this);
+    this.getItem=function(state,s,src) {
+	var ss=src;
+	var ll=s.length;
+	for (var ii=0;ii<ll;ii++) {
+	    if (ss===undefined) { return ss};
+	    ss=ss[s[ii]];
+	}
+	return ss;
+    };
+    this.printItem=function(state,s,src) {
+	console.log("Printing:",JSON.stringify(s));
+	var bok=false;
+	if (s===undefined) {console.log("Invalid map-path...");};
+	if (src===undefined) {console.log("Invalid map-source...");};
+	var ss=this.getItem(state,s,src);
+	//console.log("Filling:",s,'->',t,! this.isEmpty(state,ss),JSON.stringify());
+	//if (! this.isEmpty(state,ss) ) {
+        if (ss !== undefined) {
+	    bok=true;
+	    console.log("Item:",JSON.stringify(s),"->",JSON.stringify(ss));
+	}
+	return bok;
+    }.bind(this);
+    this.printMap=function(state,src,map) {
+	var bok=false;
+	var len=map.length
+	for (var ii=0;ii<len;ii++){
+	    var s=map[ii][0];
+	    var t=map[ii][1];
+	    if ( (s===undefined || ! Array.isArray(s)) &&
+		  (t===undefined || ! Array.isArray(t)) ) {
+		s=map[ii];
+		t=map[ii];
+	    } else if (t===undefined) {
+		t=s;
+	    };
+	    bok=this.printItem(state,s,src) || bok;
+	};
+	if (!bok) {
+	    console.log(">>>> printMap: No mapped-data found...");
+	};
+    };
+    this.getSource=function(map) {
+	var ret=[];
+	var len=map.length;
+	for (var ii=0;ii<len;ii++){
+	    var s=map[ii][0];
+	    var t=map[ii][1];
+	    if (t!==undefined && s !== undefined) {
+		ret.push(s);
+	    } else {
+		ret.push(map[ii]);
+	    }
+	}
+	return ret;
+    };
+    this.invert=function(map) {
+	var ret=[];
+	var len=map.length;
+	for (var ii=0;ii<len;ii++){
+	    var t=map[ii][0];
+	    var s=map[ii][1];
+	    if (t!==undefined && s !== undefined) {
+		ret.push([s,t]);
+	    } else {
+		ret.push(map[ii]);
+	    }
+	}
+	return ret;
+    };
+    this.pushUrl=function(state) {
+	var path = window.location.pathname;
+	//console.log("Path:",path);
+	var page = path.split("/").pop();
+	page.split('#').shift();
+	//console.log( page );
+	var url=page+"?setup="+state.Default.setup+"&";
+	//console.log("Actual Keys:",JSON.stringify(state.Path.keys));
+	var uri=state.Default.pushUrl(state)
+	for (var key of Object.keys(uri)) {
+	    var val=uri[key];
+	    //console.log("KV:",key,val);
+	    if (val !== undefined) {
+		var str=encodeURI(JSON.stringify(val)+"&");
+		url=url + key + "=" + str;
+	    }
+	};
+	//console.log("Setting URL to: (",url.length,"):",decodeURI(url));
+	//console.log("New URL: (",url.length,"):",this.prettyJson(uri));
+	window.history.replaceState("", "js", url);
+    };
+    this.pushUrlDetails=function(state,url,map) {
+	if (url===undefined) {
+	    throw new Error("ERROR: pushUrl with no src.");
+	} else if (map===undefined) {
+	    throw new Error("ERROR: pushUrl with no map.");
+	} else {
+	    var len=map.length
+	    for (var ii=0;ii<len;ii++){
+		var s=map[ii][0];
+		var t=map[ii][1];
+		if ( (s===undefined || ! Array.isArray(s)) &&
+		      (t===undefined || ! Array.isArray(t)) ) {
+		    s=map[ii];
+		    t=map[ii];
+		} else if (t===undefined) {
+		    t=s;
+		};
+		if (state.Default.hasChanged(state,t)) {
+		    var ss=this.getItem(state,t,state);
+		    if (ss !== undefined) {
+			this.setMap(state,t,url,ss,this.type.fill);
+		    }
+		}
+	    }
+	};
+	return url;
+    };
 };
 export default Utils;
     
