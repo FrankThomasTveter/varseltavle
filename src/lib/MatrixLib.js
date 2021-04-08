@@ -57,7 +57,7 @@ function Matrix() {
     };
     this.makeKeyCntMapAreaSql=function(state,where,nrec) {
 	var keys=state.Path.getActiveKeys(state);
-	state.Utils.cpArray(keys,["lat","lon","level","rank"]);
+	state.Utils.cpArray(keys,["lat","lon","level","rank","unit"]);
 	if (keys !== undefined) {
 	    var plen = keys.length;
 	    for (var ii = 0; ii < plen; ii++) {
@@ -119,6 +119,7 @@ function Matrix() {
     	    var doc=docs[ii];
     	    //var vals=[];
 	    var dkeys=Object.keys(doc);
+	    if (dkeys.indexOf("unit") === -1 ) {state.Utils.cpArray(dkeys,["unit"]);}
 	    if (dkeys.indexOf("lat") === -1 ) {state.Utils.cpArray(dkeys,["lat"]);}
 	    if (dkeys.indexOf("lon") === -1 ) {state.Utils.cpArray(dkeys,["lon"]); }
 	    if (dkeys.indexOf("level") === -1 ) {state.Utils.cpArray(dkeys,["level"]); }

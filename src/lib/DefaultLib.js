@@ -45,7 +45,8 @@ function Default() {
 	[["custom"],  ["Custom","maps"]]
     ];
     this.toStateThr  = [
-	[["thrs"],    ["Threshold","thrs"]]
+	[["thrs"],    ["Threshold","thrs"]],
+	[["default","thrs"], ["Threshold","def"]]
     ];
     this.toStateColors= [
 	[["colors"],  ["Colors","colors"]]

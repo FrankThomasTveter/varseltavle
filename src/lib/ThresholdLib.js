@@ -3,6 +3,7 @@
 function Threshold() {
     this.thrs=undefined; // threshold parameter levels, set by Default
     this.debug=false;
+    this.def={};
     //this.imax=0;        // threshold item types
     //this.ithr=1;
     //this.ikey=2;
@@ -41,13 +42,17 @@ function Threshold() {
 	    //console.log("Doclev:",doclev," max:",docmax,jj,mlen,maxs[doclev],maxs[mlen-1],maxs[0]);
 	};
 	if (this.debug) {console.log("Level:",docmax,doclev,JSON.stringify(maxs));}
+	var lat=(thr["lat"]===undefined)?this.def["lat"]:thr["lat"];
+	var lon=(thr["lon"]===undefined)?this.def["lon"]:thr["lon"];
+	var unit=(thr["unit"]===undefined)?this.def["unit"]:thr["unit"];
 	var ret={};
 	ret.level=doclev;
 	ret.rank=rank;
 	ret.val=docmax
 	ret.key=thr["key"];
-	ret.lat=doc[thr["lat"]];
-	ret.lon=doc[thr["lon"]];
+	ret.lat=doc[lat];
+	ret.lon=doc[lon];
+	ret.unit=doc[unit];
 	ret.max=maxs;
 	//ret.keys=["level","val","lat","lon","max"];
 	return ret;
@@ -76,13 +81,17 @@ function Threshold() {
 	}
 	var rank=0; // universal rank
 	if (doclev > 0) {rank=(Number(mins[0])-docmin)/(Number(mins[0])-Number(mins[mlen-1]));};
+	var lat=(thr["lat"]===undefined)?this.def["lat"]:thr["lat"];
+	var lon=(thr["lon"]===undefined)?this.def["lon"]:thr["lon"];
+	var unit=(thr["unit"]===undefined)?this.def["unit"]:thr["unit"];
 	var ret={};
 	ret.level=doclev;
 	ret.rank=rank;
 	ret.val=docmin
 	ret.key=thr["key"];
-	ret.lat=doc[thr["lat"]];
-	ret.lon=doc[thr["lon"]];
+	ret.lat=doc[lat];
+	ret.lon=doc[lon];
+	ret.unit=doc[unit];
 	ret.min=mins;
 	//ret.keys=["level","val","lat","lon","min"];
 	return ret;
@@ -161,7 +170,7 @@ function Threshold() {
 	};
 	if (ithrs === undefined && ret===undefined) {
 	    ret=this.getDefaultThreshold();
-	    console.log("GetThresholds using defaults...",JSON.stringify(ret));
+	    //console.log("GetThresholds using defaults...",JSON.stringify(ret));
 	};
 	//console.log("GetThresholds done...",JSON.stringify(ret));
 	return ret;
@@ -177,13 +186,14 @@ function Threshold() {
 	    doc.rank=thr.rank;
 	    doc.lat=parseFloat(thr.lat);
 	    doc.lon=parseFloat(thr.lon);
+	    doc.unit=thr.unit;
 	    doc.alarm_val=thr.val;
 	    doc.alarm_key=thr.key;
 	    doc._thr=thr;
 	    //console.log("Doc:",JSON.stringify(doc));
 	}
 	return [];
-    };
+    }.bind(this);
     this.setEssentials=function(state,doc) {
 	//var debug = (doc.Phenomenon==="Regn" && doc.Duration==="12t" && doc.Region==="Innlandet" && doc.dtg==="2019-06-26_11");
 	var thr=this.getThresholds(state,doc);
@@ -192,6 +202,7 @@ function Threshold() {
 	doc.rank=thr.rank;
 	doc.lat=parseFloat(thr.lat);
 	doc.lon=parseFloat(thr.lon);
+	doc.unit=thr.unit;
     };
     // call after this.setThresholds
     this.getLevel=function(state,doc) {
