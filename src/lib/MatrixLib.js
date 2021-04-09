@@ -9,6 +9,7 @@ function Matrix() {
     this.popSingle=2000;//0000;
     this.popSeries=2000;//0000;
     this.maxLevel=-1;
+    this.showLevels=1; // level shown in tooltip
     this.init=function(state){
 	var par="Matrix";
 	state.Utils.init(par,this);
@@ -17,6 +18,12 @@ function Matrix() {
 	this.values={};
 	this.keyCnt={};
     };
+    this.getShowLevels=function(state) {
+	return state.Matrix.showLevels;
+    };
+    this.setShowLevels=function(state,lev) {
+	state.Matrix.showLevels=lev;
+    };
     this.getLevels=function(state) {
 	//console.log("Matrix maxLevel:",state.Matrix.maxLevel);
 	var ret=[];
@@ -24,7 +31,7 @@ function Matrix() {
 	    ret.push(ii);
 	}
 	return ret;
-    }
+    };
     this.cntKey=function(state,key,nrec,where) {
 	var val;
 	if (this.values[key]  === undefined) {
@@ -498,8 +505,17 @@ function Matrix() {
     };
     this.printElements=function(matrix) {};
 /////////////////////
+    this.isTooltipDoc=function(state,doc,maxlev) {
+	var dlev=state.Threshold.getLevel(state,doc);
+	if (dlev <= maxlev) { // return true if undefined...
+	    return false;
+	} else {
+	    return true;
+	};
+    }
     this.isInterestingTooltipDoc=function(state,docs,doc,dlev,drank) {
-	if ((dlev > 0 && dlev < state.Threshold.getMaxLevel(doc) && 
+	if ((dlev > 0  &&
+	     dlev < state.Threshold.getMaxLevel(doc) && 
 	     docs.length < 3) || docs.length < 1) {
 	    return true;
 	} else {
@@ -759,7 +775,7 @@ function Matrix() {
     this.getTooltipTitle=function(state,doc,key) {
 	return state.Threshold.getTooltipTitle(state,doc,key);
     };
-    this.getInfo=function(state,elements) {
+    this.getTooltipInfo=function(state,elements) {
 	var tooltip={}; // list of maxrank-docs
 	var cnt=0;
 	var maxlev=-1;
@@ -770,6 +786,7 @@ function Matrix() {
 	} else {
 	    //console.log("getInfo element:",JSON.stringify(elements));
 	    var elen=elements.length;
+	    // find maxlev...
 	    for (var ee=0;ee<elen;ee++) {
 		cnt=cnt+elements[ee].cnt;
 		if (elements[ee].maxlev === undefined || elements[ee].minlev === undefined) {
@@ -783,14 +800,14 @@ function Matrix() {
 		//console.log(">>> New tooltip:",ee,maxlev,JSON.stringify(tooltip));
 		//console.log("RRR Result tooltip:",ee,maxlev,JSON.stringify(tooltip));
 	    }
-	    docs=this.getTooltipDocs(state,tooltip);
+	    docs=this.getTooltipDocs(state,tooltip,maxlev-this.showLevels);
 	    //console.log("Tooltip docs:",JSON.stringify(tooltip),JSON.stringify(docs));
 	}
 	//console.log("getInfo maxlev:",maxlev,cnt);
 	return {cnt:cnt,
 		minlev:minlev,
 		maxlev:maxlev,
-		tooltip:this.sortTooltipDocs(state,docs)};
+		docs:this.sortTooltipDocs(state,docs)};
     }
     this.mergeTooltipElement=function(state,nel,mel,pos) {
 	if (nel === undefined) {return;} // nothing to merge
@@ -812,7 +829,7 @@ function Matrix() {
 	    };
 	}
     };
-    this.getTooltipDocs=function(state,el,pos) {
+    this.getTooltipDocs=function(state,el,maxlev,pos) {
 	var docs=[];
 	var ipos=pos;
 	if (ipos === undefined) {ipos=state.Path.tooltip.select.length;}
@@ -822,11 +839,18 @@ function Matrix() {
 		var lenv=vals.length;
 		for (var ii=0;ii<lenv;ii++) {
 		    var val=vals[ii];
-		    var ndocs=this.getTooltipDocs(state,el[val],ipos-1);
+		    var ndocs=this.getTooltipDocs(state,el[val],maxlev,ipos-1);
 		    state.Utils.cpArray(docs,ndocs);
 		}
 	    } else if (el.docs !== undefined) {
-		state.Utils.cpArray(docs,el.docs);
+		var dlen=el.docs.length;
+		for (var jj=0;jj < dlen; jj++) {
+		    var doc=el.docs[jj];
+		    if (this.isTooltipDoc(state,doc,maxlev)) {
+			docs.push(doc);
+		    }
+		};
+		//state.Utils.cpArray(docs,el.docs);
 	    };
 	};
 	return docs;

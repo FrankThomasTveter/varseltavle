@@ -6,7 +6,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 //import Chip from '@material-ui/core/Chip';
 
-import Icon from '@material-ui/icons/Apps';
+import Icon from '@material-ui/icons/Help';
 import {teal_palette} from '../mui/metMuiThemes';
 
 const styles = theme => ({
@@ -31,82 +31,82 @@ const styles = theme => ({
     },
 });
 
-function DimIcon (props) {
-    const {state,dim} = props; //classes,
+function LevIcon (props) {
+    const {state,lev} = props; //classes,
     //console.log("Classes:",JSON.stringify(classes));
-    var cdim=state.Path.getDim(state);
-    if (dim === cdim) {
+    var clev=state.Matrix.getShowLevels(state);
+    if (lev === clev) {
 	return (<Icon/>);
     } else {
 	return null;
     }
 };
 
-function renderDim (state,classes,onclose,dim,index) {
+function renderLev (state,classes,onclose,lev,index) {
     var onclick = (event) => {
-	state.Path.setDim(state,dim);
+	state.Matrix.setShowLevels(state,lev);
 	onclose();
     };
     var cls={root:classes.button};
-    return (<MenuItem key={dim} onClose={onclose}>
-	       <Button classes={cls} onClick={onclick} title={dim}>
-	          {dim} <DimIcon state={state} classes={classes} dim={dim}/>
+    return (<MenuItem key={lev} onClose={onclose}>
+	       <Button classes={cls} onClick={onclick} title={lev}>
+	          {lev} <LevIcon state={state} classes={classes} lev={lev}/>
 	       </Button>
 	    </MenuItem>);
 };
 
-class Dim extends Component {
+class Lev extends Component {
     state = {anchor: null,};
     render() {
 	const {classes, state, visible}=this.props;
 	var title;
-	var cdim=state.Path.getDim(state);
-	if (visible !== undefined && ! visible && state.Settings.isInvisible(state,"Dim")) {
+	var clev=state.Matrix.getShowLevels(state);
+	if (visible !== undefined && ! visible && state.Settings.isInvisible(state,"Lev")) {
 	    return null;
 	} else if (visible !== undefined) {
-	    var dims=[0,1,2,3,4];
-	    state.Custom.addMaps(state,dims);
+	    var levs=[1,2,3,4];
+	    state.Custom.addMaps(state,levs);
 	    this.onClose = () => {this.setState({ anchor: null });};
 	    this.onClick = (event) => {this.setState({ anchor: event.currentTarget });};
-	    title="Select number of dims";
-	    var mapFunction= (dim,index)=>renderDim(state,classes,this.onClose,dim,index);
+	    title="Select number of tooltip show levels";
+	    var mapFunction= (lev,index)=>renderLev(state,classes,this.onClose,lev,index);
 	    return (<div className={classes.view}>
 		    <Button
                       className={classes.button}
-                      aria-owns={this.state.anchor ? 'dim-menu' : undefined}
+                      aria-owns={this.state.anchor ? 'lev-menu' : undefined}
                       aria-haspopup="true"
                       onClick={this.onClick}
-	              title={"Select dim."}
+	              title={"Select lev."}
 		   >
-		    {cdim} <Icon/>
+		    {clev} <Icon/>
                    </Button>
 	          <Menu
-                   id="dim-menu"
+                   id="lev-menu"
 	           anchorEl={this.state.anchor}
                    open={Boolean(this.state.anchor)}
                    onClose={this.onClose}
 	          >
-		    {dims.map(mapFunction)}
+		    {levs.map(mapFunction)}
 	          </Menu>
 		    </div>);
 	} else {
-	    title="Show dim";
-	    var onclick = (event) => {state.Settings.toggle(state,"Dim");}
-	    if (state.Settings.isInvisible(state,"Dim")) {
-		return (<Button key="dim" className={classes.buttonInvisible} onClick={onclick} title={title}>
-			{cdim}<Icon/>
+	    title="Show tooltip show level";
+	    var onclick = (event) => {state.Settings.toggle(state,"Lev");}
+	    if (state.Settings.isInvisible(state,"Lev")) {
+		return (<Button key="lev" className={classes.buttonInvisible} onClick={onclick} title={title}>
+			{clev}<Icon/>
 			</Button>);
 	    } else {
-		return (<Button key="dim" className={classes.button} onClick={onclick} title={title}>
-			{cdim}<Icon/>
+		return (<Button key="lev" className={classes.button} onClick={onclick} title={title}>
+			{clev}<Icon/>
 			</Button>);
 	    };
 	}
     }
 };
-Dim.propTypes = {
+Lev.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles)(Dim);
+export default withStyles(styles)(Lev);

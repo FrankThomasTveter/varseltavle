@@ -19,16 +19,16 @@ const styles = theme => ({
 });
 
 function TableDetails(props){
-    const {state,data,tooltip}=props; //state,element
-    var keys=state.Cell.getTooltipKeys(state,data,tooltip);   // keys in tooltip
+    const {state,data,docs}=props; //state,element
+    var keys=state.Cell.getTooltipKeys(state,data,docs);   // keys in docs
     var ckeys=state.Cell.getClickableTooltipKeys(state,data); // clickable tooltip keys
     //console.log ("TableDetails tooltip-keys:",JSON.stringify(state.Path.tooltip));
     //console.log("TableDetails keys:",JSON.stringify(keys),JSON.stringify(state.Path.keys));
-    //console.log("TableDetails tooltip:",JSON.stringify(tooltip));
+    //console.log("TableDetails tooltip:",JSON.stringify(docs));
     var key=JSON.stringify(data.keys);
     var tkeys=data.keys;
     return (<div key={key}>
-	    <TooltipTable state={state} keys={keys} ckeys={ckeys} subs={tooltip} tkeys={tkeys}/>
+	    <TooltipTable state={state} keys={keys} ckeys={ckeys} docs={docs} tkeys={tkeys}/>
 	    </div>
 	   );
 };
@@ -50,7 +50,7 @@ class Tooltip extends Component {
 	var available=info.available;
 	//console.log("Available:",JSON.stringify(available));
 	if (available) {
-	    return (<TableDetails state={state} data={data} tooltip={info.tooltip}/>);
+	    return (<TableDetails state={state} data={data} docs={info.docs}/>);
 	} else {
 	    var onclick=() => {state.Cell.addTooltip(state,data);update();this.forceUpdate();}//printData(data);
 	    return (<InfoDetails state={state} data={data} onclick={onclick} info={info}/>);

@@ -25,6 +25,7 @@ import Archive      from './ConfigArchiveComponent';
 import ViewOld      from './ConfigViewOldDataComponent';
 import Font         from './ConfigFontComponent';
 import Dims         from './ConfigDimComponent';
+import Levs         from './ConfigLevComponent';
 import Focus        from './ConfigFocusComponent';
 import FullScreen   from './ConfigFullScreenComponent';
 import SettingsMenu from './SettingsMenuComponent';
@@ -125,6 +126,9 @@ class Settings extends Component {
 		    </MenuItem>
                     <MenuItem key="dims" onClose={this.onClose}>
 		       <Dims state={state} classes={cls} visible={true}/>
+		    </MenuItem>
+                    <MenuItem key="levs" onClose={this.onClose}>
+		       <Levs state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="focus" onClose={this.onClose}>
 		       <Focus state={state} classes={cls} visible={true}/>

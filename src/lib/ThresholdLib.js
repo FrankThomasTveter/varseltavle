@@ -25,8 +25,12 @@ function Threshold() {
     };
     this.getMaxThreshold=function(doc,thr,maxs) {
 	if (this.debug) {console.log("Thresholds:",JSON.stringify(maxs));};
+	var key=(thr["key"]===undefined)?this.def["key"]:thr["key"];
+	var lat=(thr["lat"]===undefined)?this.def["lat"]:thr["lat"];
+	var lon=(thr["lon"]===undefined)?this.def["lon"]:thr["lon"];
+	var unit=(thr["unit"]===undefined)?this.def["unit"]:thr["unit"];
 	var doclev=-1; // found thresholds, but will we find a valid level?
-	var val = doc[thr["key"]];
+	var val = doc[key];
 	var docmax=Number(val);
 	var mlen=maxs.length;
 	// get new level
@@ -42,14 +46,11 @@ function Threshold() {
 	    //console.log("Doclev:",doclev," max:",docmax,jj,mlen,maxs[doclev],maxs[mlen-1],maxs[0]);
 	};
 	if (this.debug) {console.log("Level:",docmax,doclev,JSON.stringify(maxs));}
-	var lat=(thr["lat"]===undefined)?this.def["lat"]:thr["lat"];
-	var lon=(thr["lon"]===undefined)?this.def["lon"]:thr["lon"];
-	var unit=(thr["unit"]===undefined)?this.def["unit"]:thr["unit"];
 	var ret={};
 	ret.level=doclev;
 	ret.rank=rank;
 	ret.val=docmax
-	ret.key=thr["key"];
+	ret.key=key;
 	ret.lat=doc[lat];
 	ret.lon=doc[lon];
 	ret.unit=doc[unit];
@@ -69,8 +70,12 @@ function Threshold() {
     };
     this.getMinThreshold=function(doc,thr,mins) {
 	if (this.debug) {console.log("Thresholds:",JSON.stringify(mins));};
+	var key=(thr["key"]===undefined)?this.def["key"]:thr["key"];
+	var lat=(thr["lat"]===undefined)?this.def["lat"]:thr["lat"];
+	var lon=(thr["lon"]===undefined)?this.def["lon"]:thr["lon"];
+	var unit=(thr["unit"]===undefined)?this.def["unit"]:thr["unit"];
 	var doclev=-1; // found thresholds, but will we find a valid level?
-	var val = doc[thr["key"]];
+	var val = doc[key];
 	var docmin=Number(val);
 	// get new level
 	var mlen=mins.length;
@@ -81,14 +86,11 @@ function Threshold() {
 	}
 	var rank=0; // universal rank
 	if (doclev > 0) {rank=(Number(mins[0])-docmin)/(Number(mins[0])-Number(mins[mlen-1]));};
-	var lat=(thr["lat"]===undefined)?this.def["lat"]:thr["lat"];
-	var lon=(thr["lon"]===undefined)?this.def["lon"]:thr["lon"];
-	var unit=(thr["unit"]===undefined)?this.def["unit"]:thr["unit"];
 	var ret={};
 	ret.level=doclev;
 	ret.rank=rank;
 	ret.val=docmin
-	ret.key=thr["key"];
+	ret.key=key;
 	ret.lat=doc[lat];
 	ret.lon=doc[lon];
 	ret.unit=doc[unit];

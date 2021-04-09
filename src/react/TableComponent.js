@@ -155,7 +155,7 @@ function renderDataCell(classes,state,colkey,colvalues,rowkey,rowval,rowindex,ro
 	//var onclick=() => state.Navigate.selectItem(state,colkey,rowkey,colvalues[index],rowval,colwhere,rowwhere,cnt,1);
 	var onclick=() => state.Navigate.selectElements(state,elements);
 
-	//var info=state.Matrix.getInfo(state,elements);
+	//var info=state.Matrix.getTooltipInfo(state,elements);
 	//var color=state.Colors.getLevelBgColor(info.maxlev);
 	//console.log("Rendering data cell ...",info.maxlev,color);
 	return (<DataCell classes={classes} state={state} key={`col-${index}`} rowindex={rowindex} index={index} onclick={onclick}

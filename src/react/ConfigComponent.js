@@ -21,6 +21,7 @@ import Archive      from './ConfigArchiveComponent';
 import ViewOld      from './ConfigViewOldDataComponent';
 import Font         from './ConfigFontComponent';
 import Dims         from './ConfigDimComponent';
+import Levs         from './ConfigLevComponent';
 import Focus        from './ConfigFocusComponent';
 import FullScreen   from './ConfigFullScreenComponent';
 import About        from './ConfigAboutComponent';
@@ -78,6 +79,7 @@ class Config extends Component {
 		<ViewOld state={state} classes={cls} visible={false}/>
 		<Font state={state} classes={cls} visible={false}/>
 		<Dims state={state} classes={cls} visible={false}/>
+		<Levs state={state} classes={cls} visible={false}/>
 		<Focus state={state} classes={cls} visible={false}/>
 		<FullScreen state={state} classes={cls} visible={false}/>
 		<About state={state} classes={cls} visible={false}/>

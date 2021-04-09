@@ -86,7 +86,7 @@ function Cell() {
 		//console.log("Element:",ee,JSON.stringify(elements[ee]),lene);
 	    };
 	}
-	var info=state.Matrix.getInfo(state,elements);
+	var info=state.Matrix.getTooltipInfo(state,elements);
 	info.available=available;
 	return info;
     };

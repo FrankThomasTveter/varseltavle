@@ -79,38 +79,36 @@ function FirstDataCell (props) {
 //{rowval}
 function DataCell(props) {
     const {classes,val,onclick,fgcolor,bgcolor,title}=props;//state,rowindex,
-    var rval=val;
-    if (isNaN(rval)) {
-	rval=val;
-    } else {
-	rval=parseFloat(rval,0).toFixed(2);
-    };// title="test"
-    return <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} style={{color:fgcolor,backgroundColor:bgcolor}} onClick={onclick} title={title}>{rval}</div>
+    return <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} style={{color:fgcolor,backgroundColor:bgcolor}} onClick={onclick} title={title}>{val}</div>
 }
-function renderDataCell(classes,state,key,ckeys,tkeys,sub,rowindex,colindex) {
-    var maxlev=sub["level"]||0;
+function renderDataCell(classes,state,key,ckeys,tkeys,doc,rowindex,colindex) {
+    var maxlev=doc.level||0;
     var bgcolor=state.Colors.getLevelBgColor(maxlev);
     var fgcolor=state.Colors.getLevelFgColor(maxlev);
     var rowkey=key;
-    var rowval=sub[key];
+    var rowval=doc[key];
+    var rowunit=doc.unit;
+    var rowval2=(isNaN(rowval))?rowval:parseFloat(rowval,0).toFixed(2);
+    var rowlab=(rowkey==="alarm_val")?rowval2+" "+rowunit:rowval2;
+    console.log("Render cell:",rowkey,rowunit,rowval);
     var rowwhere=state.Database.getWhereValue(rowkey,rowval);
-    var title=state.Matrix.getTooltipTitle(state,sub,key);
+    var title=state.Matrix.getTooltipTitle(state,doc,key);
     var onclick=(ckeys.indexOf(rowkey)===-1?undefined: () => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1)});
-    return (<DataCell classes={classes} state={state} key={`${rowindex}-${colindex}`} val={sub[key]} rowindex={rowindex} fgcolor={fgcolor} bgcolor={bgcolor} onclick={onclick} title={title}/>);
+    return (<DataCell classes={classes} state={state} key={`${rowindex}-${colindex}`} val={rowlab} rowindex={rowindex} fgcolor={fgcolor} bgcolor={bgcolor} onclick={onclick} title={title}/>);
 }
 //{{rowkey:'test1',colkey:'test2',title:title}}
-function dataRow(classes,state,key,ckeys,tkeys,subs,rowindex) {
+function dataRow(classes,state,key,ckeys,tkeys,docs,rowindex) {
     //return null; // no entries, ignore row...
-    var mapFunction= (sub,colindex)=>renderDataCell(classes,state,key,ckeys,tkeys,sub,rowindex,colindex);
+    var mapFunction= (doc,colindex)=>renderDataCell(classes,state,key,ckeys,tkeys,doc,rowindex,colindex);
     return (<div className={classes.divTableRow} key={rowindex.toString()}>
 	    <FirstDataCell classes={classes} state={state} key={'k-'+rowindex} rowval={key} tkeys={tkeys}/>
-	    {subs.map(mapFunction)}
+	    {docs.map(mapFunction)}
 	    </div>);
 };
 // ---------------- Details
 function Details(props) {
-    const { classes, state, keys, ckeys, tkeys, subs } = props; // classes, element
-    var mapFunction= (key,rowindex)=>dataRow(classes,state,key,ckeys,tkeys,subs,rowindex);
+    const { classes, state, keys, ckeys, tkeys, docs } = props; // classes, element
+    var mapFunction= (key,rowindex)=>dataRow(classes,state,key,ckeys,tkeys,docs,rowindex);
     return (<div className={classes.divTable}>
 	       <div className={classes.divTableBody}>
 	          {keys.map(mapFunction)}
@@ -135,13 +133,13 @@ class TooltipTable extends Component {
 	};
     };
     render() {
-	const { state, classes, keys, ckeys, tkeys, subs } = this.props;
+	const { state, classes, keys, ckeys, tkeys, docs } = this.props;
 	//console.log("##### Rendering TooltipTable.");
 	if (tkeys===undefined || ckeys===undefined) {
 	    return null;
 	} else {
 	    return (<div ref={el=>{this.element(el)}} className={classes.root}  style={{width: '100%', height: '100%'}}>
-		    <Details state={state} classes={classes} element={this} keys={keys} ckeys={ckeys} tkeys={tkeys} subs={subs}/>
+		    <Details state={state} classes={classes} element={this} keys={keys} ckeys={ckeys} tkeys={tkeys} docs={docs}/>
 	            </div>);
 	};
     }

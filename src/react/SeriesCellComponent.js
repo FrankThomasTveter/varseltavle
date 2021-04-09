@@ -51,7 +51,7 @@ function SeriesCell(props) {
 	    return <div className={classes.divTableCell} style={style0}/>
 	}
     };
-    var info=state.Matrix.getInfo(state,elements);
+    var info=state.Matrix.getTooltipInfo(state,elements);
     //var cnt=info.cnt;
     var maxlev=info.maxlev;
     //var minlev=info.minlev;
