@@ -216,7 +216,7 @@ function Path() {
     this.setSnapshot=function(state,snapshot) { // store state
 	state.Utils.restore(state,state.Path,snapshot);
 	if (state.Path.keys.trash===undefined) { state.Path.keys.trash=[];};
-	if (snapshot.focus===undefined) {state.Path.focus.auto=false;};
+	if (snapshot.focus===undefined) {state.Path.focus.auto=true;};
 	//console.log("Snapshot:",
 	//	    JSON.stringify(snapshot.focus),
 	//	    JSON.stringify(state.Path.focus),
