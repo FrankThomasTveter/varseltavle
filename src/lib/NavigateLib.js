@@ -44,8 +44,25 @@ function Navigate() {
 	    state.React.Config.show();
 	};
     };
+    this.canRedoPath=function(state) {
+	return (state.Path.keys.path.length > 0);
+    };
+    this.redoPath=function(state) {
+	var len=state.Path.keys.path.length;
+	if (len>0) {
+	    var key=state.Path.keys.path[len-1];
+	    //console.log("Undoing:",key);
+	    //this.onClickPath(state,"path",key);
+	    if (state.Auto.pushSelectToTable(state,key)) {	    
+		state.Path.table.ntarget=Math.min(state.Path.table.ntarget+1,
+						  state.Path.maxtarget);
+		state.Path.table.nkeys=Math.min(state.Path.table.nkeys+1,
+						state.Path.table.ntarget);
+	    }
+	}
+    }
     this.canUndoHistory=function(state) {
-	return (state.Navigate.history.pos);
+	return (state.Navigate.history.pos && state.Navigate.history.pos>0);
     };
     this.undoHistory=function(state) {
 	//console.log(">>>>>> Undo:",this.canUndo(state));
@@ -66,25 +83,6 @@ function Navigate() {
 	    this.undoHistory(state);
 	};
     };
-    this.canRedoPath=function(state) {
-	return (state.Path.keys.path.length > 0);
-    };
-    this.redoPath=function(state) {
-	//console.log(">>>>>> Undo:",this.canUndo(state));
-	var len=state.Path.keys.path.length;
-	//console.log("Undoing Path:",len,JSON.stringify(state.Path.keys.path));
-	if (len>0) {
-	    var key=state.Path.keys.path[len-1];
-	    //console.log("Undoing:",key);
-	    //this.onClickPath(state,"path",key);
-	    if (state.Auto.pushSelectToTable(state,key)) {	    
-		state.Path.table.ntarget=Math.min(state.Path.table.ntarget+1,
-						  state.Path.maxtarget);
-		state.Path.table.nkeys=Math.min(state.Path.table.nkeys+1,
-						state.Path.table.ntarget);
-	    }
-	}
-    }
     this.canRedoHistory=function(state) {
 	return (state.Navigate.history.pos < state.Navigate.history.track.length-1);
     };

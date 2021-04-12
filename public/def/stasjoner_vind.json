@@ -1,52 +1,64 @@
 {
     "thrs":{
 	"Phenomenon":{
-	    "Middelvind":{"Type":{"Fiskebank":{"lat":"maxlat","lon":"maxlon", "key":"a1000", ">": [0,17.2,24.5] },
-	                          "Metarea19":{"lat":"maxlat","lon":"maxlon", "key":"a1000", ">": [0,17.2,24.5] },
-                              "Kyst":     {"lat":"maxlat","lon":"maxlon", "key":"a100", ">": [0,13.9,24.5] },
-                              "Fylke":    {"lat":"maxlat","lon":"maxlon", "key":"a100", ">": [0,13.9,24.5] }}},
-	    "Vindkast":[{"Method":{"mb0":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,2,10,25] },
-				  "p50":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,2,10,25] },
-				  "p65":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,10,25] },
-				   "p100":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,25] }}}],
-	    "Styrtregn":{"Duration":{ "1t" :{"Method":{"mb0":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,15,25,35] },
-						       "p50":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,15,25,35] },
-						       "p65":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,25,35] },
-						       "p100":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,35] }}},
-                                      "3t" :{"Method":{"mb0":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,30,40,50] },
-						       "p50":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,30,40,50] },
-						       "p65":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,40,50] },
-						       "p100":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,50] }}}}
+	    "Middelvind":{"Type":{"Fiskebank":{"key":"a1000", ">": [0,17.2,24.5] },
+	                          "Metarea19":{"key":"a1000", ">": [0,17.2,24.5] },
+                              "Kyst":     {"key":"a100", ">": [0,13.9,24.5] },
+                              "Fylke":    {"key":"a100", ">": [0,13.9,24.5] }}},
+	    "Vindkast":[{"Method":{"mb0":{"key":"max", ">": [0,2,10,25] },
+				  "p50":{"key":"max", ">": [0,2,10,25] },
+				  "p65":{"key":"max", ">": [0,10,25] },
+				   "p100":{"key":"max", ">": [0,25] }}}],
+	    "Styrtregn":{"Duration":{ "1t" :{"Method":{"mb0":{"key":"max", ">": [0,15,25,35] },
+						       "p50":{"key":"max", ">": [0,15,25,35] },
+						       "p65":{"key":"max", ">": [0,25,35] },
+						       "p100":{"key":"max", ">": [0,35] }}},
+                                      "3t" :{"Method":{"mb0":{"key":"max", ">": [0,30,40,50] },
+						       "p50":{"key":"max", ">": [0,30,40,50] },
+						       "p65":{"key":"max", ">": [0,40,50] },
+						       "p100":{"key":"max", ">": [0,50] }}}}
 			},
-	    "Regn":{"Method":[{"mb0":{"lat":"maxlat","lon":"maxlon", "key":"a100", ">": [0,5,10,25] },
-			       "p50":{"lat":"maxlat","lon":"maxlon", "key":"a100", ">": [0,5,10,25] },
-			       "p65":{"lat":"maxlat","lon":"maxlon", "key":"a100", ">": [0,10,25] },
-                               "p100":{"lat":"maxlat","lon":"maxlon", "key":"a100", ">": [0,25] }},
-			      {"mb0":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,5,10,25] },
-			       "p50":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,5,10,25] },
-			       "p65":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,10,25] },
-                               "p100":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,25] }}
+	    "Regn":{"Method":[{"mb0":{"key":"a100", ">": [0,5,10,25] },
+			       "p50":{"key":"a100", ">": [0,5,10,25] },
+			       "p65":{"key":"a100", ">": [0,10,25] },
+                               "p100":{"key":"a100", ">": [0,25] }},
+			      {"mb0":{"key":"max", ">": [0,5,10,25] },
+			       "p50":{"key":"max", ">": [0,5,10,25] },
+			       "p65":{"key":"max", ">": [0,10,25] },
+                               "p100":{"key":"max", ">": [0,25] }}
 			     ]
 		   },
-	    "Skogbrann":{"lat":"maxlat","lon":"maxlon", "key":"a100", ">": [0,20,40] },
-	    "Ising på skip":{"Type":{"Fiskebank":{"lat":"maxlat","lon":"maxlon", "key":"f70", ">": [0,0.5,1.34] },
-	                             "Metarea19":{"lat":"maxlat","lon":"maxlon", "key":"f70", ">": [0,0.5,1.34] },
-                                 "Kyst":     {"lat":"maxlat","lon":"maxlon", "key":"f95", ">": [0,0.5,1.34] },
-                                 "Fylke":    {"lat":"maxlat","lon":"maxlon", "key":"f95", ">": [0,0.5,1.34] }}},
-	    "Polare lavtrykk":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0.0,0.05] },
-	    "Turbulens":{"lat":"maxlat","lon":"maxlon", "key":"max", ">": [0,2.0,3.5] }
+	    "Skogbrann":{"key":"a100", ">": [0,20,40] },
+	    "Ising på skip":{"Type":{"Fiskebank":{"key":"f70", ">": [0,0.5,1.34] },
+	                             "Metarea19":{"key":"f70", ">": [0,0.5,1.34] },
+                                 "Kyst":     {"key":"f95", ">": [0,0.5,1.34] },
+                                 "Fylke":    {"key":"f95", ">": [0,0.5,1.34] }}},
+	    "Polare lavtrykk":{"key":"max", ">": [0.0,0.05] },
+	    "Turbulens":{"key":"max", ">": [0,2.0,3.5] }
 	}
     },
+    "default":{"thrs":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
     "summaries":["summary_stasjoner"],
     "fragments":[".*vind.*G[1234]"],
     "colors":{
 	"background":["rgb(182,219,255)","rgb(255,182,119)","rgb(36,255,36)","rgb(0,0,0)"],
 	"foreground":["black","blue","red","white"]
     },
-    "other":[
-	"Region","date","dtg","Place","Method","Duration","Phenomenon","Partner",
-	"Type","Station","Model","Issued","Output","ILS_direction","Unit"
-    ],
+    "keys":{
+	"other":[
+	    "Region","date","dtg","Place","Method","Duration","Phenomenon","Partner",
+	    "Type","Station","Model","Issued","Output","ILS_direction","Unit"
+	],
+	"trash":["cnt","lat","lon",
+		 "max","maxlat","maxlon",
+		 "min","minlat","minlon",
+		 "epoch","level","value",
+		 "Unit","a1600","a1000",
+		 "a400","a100","f70","gust","yrp","rr","DMC",
+		 "f90","f95","f98","lead","day","rrmax"
+		],
+	"select":{"val":{},"where":{},"cnt":{},"range":{}}
+    },
     "order":{
 	"Duration":["1t","3t","6t","12t","24t"],
 	"Output":["1t","3t","6t","12t","24t"],
@@ -66,17 +78,8 @@
     "Aerodrome":["ENBL","ENSD","ENOV","ENVA","ENBN","ENMS","ENST","ENRA","ENEV","ENSH","ENLK","ENDU","ENTC","ENHK",
     "ENHF","ENHV","ENMH","ENSB"]
     },
-    "trash":["cnt","lat","lon",
-	     "max","maxlat","maxlon",
-	     "min","minlat","minlon",
-	     "epoch","level","value",
-	     "Unit","a1600","a1000",
-             "a400","a100","f70","gust","yrp","rr","DMC",
-             "f90","f95","f98","lead","day","rrmax"
-	    ],
     "priority":["dtg","date","Unit","Type","Model","Partner","Output","Duration",
 		"Phenomenon","Airport","Station","Place","Region","Method","Issued"],
-    "select":{"val":{},"where":{},"cnt":{},"range":{}},
     "state":{"viewMode":0,"cellMode":0,"layoutMode":0},
     "home":{"path":[],"val":{"Partner":[]}},
     "tooltip":{"keys":["Phenomenon","Region","Duration","Airport","alarm_key","alarm_val","Unit","Model","Method","Output","dtg","lat","lon","max"],

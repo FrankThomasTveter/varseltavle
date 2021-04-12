@@ -22,18 +22,18 @@ function Default() {
 	[["summaries"],    ["Database","summaries"]],
 	[["viewOldData"],  ["Database","viewOldData"]]
     ];
-    this.toStateKeys= [
-	[["path"],    ["Path","keys","path"]],
+    this.toStatePath= [
+	[["keys","path"],    ["Path","keys","path"]],
 	[["ndim"],    ["Path","table","ntarget"]]
     ];
     this.toStateSelect= [
-	[["select"],  ["Path","select"]]
+	[["keys","select"],  ["Path","select"]]
     ];
     this.toStateOther  = [
-	[["other"],   ["Path","keys","other"]]
+	[["keys","other"],   ["Path","keys","other"]]
     ];
     this.toStateTrash  = [
-	[["trash"],   ["Path","keys","trash"]]
+	[["keys","trash"],   ["Path","keys","trash"]]
     ];
     this.toStateHome= [
 	[["home"],    ["Path","home"]]
@@ -66,10 +66,14 @@ function Default() {
 	[["polygons","seperator"],["Polygon","seperator"]],
 	[["polygons","keys"],     ["Polygon","keys"]]
     ];	
-    this.toStatePath = [
+    this.toStateFocus = [
 	[["focus"],  ["Path","focus"]],
-	[["film"],   ["Path","film"]],
 	[["list"],   ["Path","list"]]
+    ];
+    this.toStateFilm = [
+	[["film","index"],   ["Path","film","index"]],
+	[["film","reel"],    ["Path","film","reel"]],
+	[["film","play"],    ["Path","film","play"]]
     ];
     this.toStateLooks = [
 	[["order"],              ["Path","order"]],
@@ -83,6 +87,20 @@ function Default() {
     this.toStateSvg = [
 	[["svg"],     ["Svg","config"]]
     ];
+    this.invert=function(map) {
+	var ret=[];
+	var len=map.length;
+	for (var ii=0;ii<len;ii++){
+	    var t=map[ii][0];
+	    var s=map[ii][1];
+	    if (t!==undefined && s !== undefined) {
+		ret.push([s,t]);
+	    } else {
+		ret.push(map[ii]);
+	    }
+	}
+	return ret;
+    };
     this.getTarget=function(map) {
 	var ret=[];
 	var len=map.length;
@@ -97,11 +115,11 @@ function Default() {
 	}
 	return ret;
     };
+    this.statePath=this.getTarget(this.toStatePath);
     this.stateData=this.getTarget(this.toStateData);
-    this.stateKeys=this.getTarget(this.toStateKeys);
+    this.stateTrash=this.getTarget(this.toStateTrash);
     this.stateSelect=this.getTarget(this.toStateSelect);
     this.stateOther=this.getTarget(this.toStateOther);
-    this.stateTrash=this.getTarget(this.toStateTrash);
     this.stateHome=this.getTarget(this.toStateHome);
     this.stateVisible=this.getTarget(this.toStateVisible);
     this.stateCustom=this.getTarget(this.toStateCustom);
@@ -109,7 +127,8 @@ function Default() {
     this.stateColors=this.getTarget(this.toStateColors);
     this.stateTooltip=this.getTarget(this.toStateTooltip);
     this.stateTooltips=this.getTarget(this.toStateTooltips);
-    this.statePath=this.getTarget(this.toStatePath);
+    this.stateFocus=this.getTarget(this.toStateFocus);
+    this.stateFilm=this.getTarget(this.toStateFilm);
     this.stateLooks=this.getTarget(this.toStateLooks);
     this.stateSvg=this.getTarget(this.toStateSvg);
     //
@@ -135,14 +154,18 @@ function Default() {
 		alert("Default '"+state.Default.setup+"' contains Invalid SETUP:"+e.name+":"+e.message);
 	    }
 	    if (setup !== undefined) { // URL and hardcoded values are loaded
-		//console.log("Initial STATE:",JSON.stringify(state.Settings.visible));
-		//console.log("Initial CURRENT:  ",JSON.stringify(state.Default.current.visible));
-		//  hard copy current to hardcode+url-state
-		//console.log("Summaries start:",JSON.stringify(setup.fragments),
+		// console.log("Initial STATE:",JSON.stringify(state.Settings.visible));
+		// console.log("Initial CURRENT:  ",JSON.stringify(state.Default.current.visible));
+		// Hard copy current to hardcode+url-state
+		// console.log("Summaries start:",JSON.stringify(setup.fragments),
 		//	    JSON.stringify(state.Database.fragments));
-		state.Utils.copyMap(state, state.Utils.type.any, setup, state, state.Default.toStateData); // copy setup if available
-		//console.log("Summaries setup:",JSON.stringify(state.Database.fragments));
-		state.Utils.copyMap(state, state.Utils.type.any, state.Default.current, state, state.Default.stateData);   // copy url if available
+		// Copy setup if available
+		state.Utils.copyMap(state, state.Utils.type.any, setup, state, state.Default.toStateData);
+		state.Utils.copyMap(state, state.Utils.type.any, setup, state, state.Default.toStateFilm);
+		// console.log("Summaries setup:",JSON.stringify(state.Database.fragments));
+		// Copy url if available
+		state.Utils.copyMap(state, state.Utils.type.any, state.Default.current, state, state.Default.stateData);
+		state.Utils.copyMap(state, state.Utils.type.any, state.Default.current, state, state.Default.stateData);
 		//console.log("Summaries url:",JSON.stringify(state.Database.fragments));
 		if (state.Default.start !== undefined) { // get previous values
 		    // copy previous state...
@@ -150,14 +173,14 @@ function Default() {
 		    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.start, state, state.Default.stateOther);
 		    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.start, state, state.Default.stateVisible);
 		    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.start, state, state.Default.stateCustom);
-		    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.start, state, state.Default.stateKeys);
+		    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.start, state, state.Default.statePath);
 
 		}
 		// soft copy new setup to current
 		state.Utils.copyMap(state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStateData);
 		state.Utils.copyMap(state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStateOther);
 		state.Utils.copyMap(state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStateCustom);
-		state.Utils.copyMap(state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStateKeys);
+		state.Utils.copyMap(state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStatePath);
 		state.Utils.copyMap(state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStateVisible);
 		// hard copy setup to current (state.Default.forceToStateDefaults)
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateSelect);
@@ -166,7 +189,8 @@ function Default() {
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateTooltip);
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateCustom);
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateHome);
-		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStatePath);
+		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateFocus);
+		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateFilm);
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateLooks);
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateSvg);
 		// soft copy current to state (state.Default.fillStateDefaults)
@@ -175,7 +199,7 @@ function Default() {
 		state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.current, state, state.Default.stateCustom);
 		state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.current, state, state.Default.stateOther);
 		state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.current, state, state.Default.stateThr);
-		state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.current, state, state.Default.stateKeys);
+		state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.current, state, state.Default.statePath);
 		state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.current, state, state.Default.stateSelect);
 		state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.current, state, state.Default.stateColors);
 		state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.current, state, state.Default.stateTooltips);
@@ -200,18 +224,19 @@ function Default() {
 	    state.Default.start={};
 	    //console.log("Starting:",JSON.stringify(state.Default.start));
 	    // soft copy hardcode-state to start (fillStateDefaults2)
+	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.statePath);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateData);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateKeys);
+	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateTrash);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateSelect);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateOther);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateTrash);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateHome);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateVisible);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateCustom);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateThr);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateColors);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateTooltips);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.statePath);
+	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateFocus);
+	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateFilm);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateLooks);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.start, state.Default.stateSvg);
 	    //console.log("Done:",JSON.stringify(state.Default.start.visible));
@@ -237,7 +262,7 @@ function Default() {
     this.storeHomeState=function(state,response,callbacks) {
 	if (state.Default.home === undefined) {
 	    state.Default.home={};
-	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.home, state.Default.stateKeys);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.home, state.Default.statePath);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.home, state.Default.stateSelect);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.home, state.Default.stateOther);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.home, state.Default.stateTrash);
@@ -247,9 +272,7 @@ function Default() {
     this.goHome=function(state) {
 	console.log("Home:",JSON.stringify(state.Default.home));
 	if (state.Default.home !== undefined) {
-	    state.Utils.debug(state,true);
-	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.home, state, state.Default.stateKeys);
-	    state.Utils.debug(state,false);
+	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.home, state, state.Default.statePath);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.home, state, state.Default.stateSelect);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.home, state, state.Default.stateOther);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.home, state, state.Default.stateTrash);
@@ -266,7 +289,7 @@ function Default() {
 	    state.Default.current={};
 	    // soft copy setup to current (state.Default.fillToStateDefaults)
 	    state.Utils.copyMap( state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStateData);
-	    state.Utils.copyMap( state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStateKeys);
+	    state.Utils.copyMap( state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStatePath);
 	    state.Utils.copyMap( state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStateSelect);
 	    state.Utils.copyMap( state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStateOther);
 	    state.Utils.copyMap( state, state.Utils.type.fill, setup, state.Default.current, state.Default.toStateTrash);
@@ -279,7 +302,8 @@ function Default() {
 	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateVisible);
 	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateCustom);
 	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateHome);
-	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStatePath);
+	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateFocus);
+	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateFilm);
 	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateLooks);
 	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.current, state.Default.toStateSvg);
 	    // soft copy start to current (state.Default.fillStateDefaults)
@@ -289,16 +313,18 @@ function Default() {
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateVisible);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateCustom);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateThr);
-	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateKeys);
+	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.statePath);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateSelect);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateColors);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateTooltips);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateHome);
-	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.statePath);
+	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateFocus);
+	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateFilm);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateLooks);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.start,state.Default.current,state.Default.stateSvg);
 	    // soft copy current to state (focus)
-	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, state, state.Default.statePath);
+	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, state, state.Default.stateFocus);
+	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, state, state.Default.stateFilm);
 	    // hard copy current to state (state.Default.fillStateDefaults)
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.current, state, state.Default.stateData);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.current, state, state.Default.stateOther);
@@ -306,7 +332,7 @@ function Default() {
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.current, state, state.Default.stateVisible);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.current, state, state.Default.stateCustom);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.current, state, state.Default.stateThr);
-	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.current, state, state.Default.stateKeys);
+	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.current, state, state.Default.statePath);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.current, state, state.Default.stateSelect);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.current, state, state.Default.stateColors);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.current, state, state.Default.stateTooltips);
@@ -331,7 +357,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, current, state.Default.stateVisible);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, current, state.Default.stateCustom);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, current, state.Default.stateThr);
-	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, current, state.Default.stateKeys);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, current, state.Default.statePath);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, current, state.Default.stateSelect);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, current, state.Default.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.current, current, state.Default.stateTooltips);
@@ -341,6 +367,7 @@ function Default() {
 	// hard copy state to local (state.Default.forceToStateTrash)
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, state.Default.stateTrash);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, state.Default.stateHome);
+	state.Utils.copyMap(state, state.Utils.type.force, state, current, state.Default.stateFilm);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, state.Default.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, state.Default.stateData);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, state.Default.stateCustom);
@@ -354,7 +381,8 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.invert(state.Default.toStateVisible));
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.invert(state.Default.toStateCustom));
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.invert(state.Default.toStateHome));
-	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.invert(state.Default.toStatePath));
+	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.invert(state.Default.toStateFocus));
+	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.invert(state.Default.toStateFilm));
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.invert(state.Default.toStateLooks));
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.invert(state.Default.toStateSvg));
 	// soft copy local to setup (state.Default.fillToStateDefaults)
@@ -405,17 +433,18 @@ function Default() {
     };
     this.pushUrl=function(state) {
 	var url={};
-	state.Utils.pushUrlDetails(state,url,this.stateKeys);
+	state.Utils.pushUrlDetails(state,url,this.statePath);
 	state.Utils.pushUrlDetails(state,url,this.stateData);
+	state.Utils.pushUrlDetails(state,url,this.stateTrash);
 	state.Utils.pushUrlDetails(state,url,this.stateColors);
 	state.Utils.pushUrlDetails(state,url,this.stateOther);
-	state.Utils.pushUrlDetails(state,url,this.stateTrash);
 	state.Utils.pushUrlDetails(state,url,this.stateSelect);
 	state.Utils.pushUrlDetails(state,url,this.stateHome);
 	state.Utils.pushUrlDetails(state,url,this.stateTooltips);
 	state.Utils.pushUrlDetails(state,url,this.stateLooks);
 	state.Utils.pushUrlDetails(state,url,this.stateVisible);
-	state.Utils.pushUrlDetails(state,url,this.statePath);
+	state.Utils.pushUrlDetails(state,url,this.stateFocus);
+	state.Utils.pushUrlDetails(state,url,this.stateFilm);
 	return url;
     }
 };

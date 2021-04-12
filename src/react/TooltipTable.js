@@ -90,7 +90,7 @@ function renderDataCell(classes,state,key,ckeys,tkeys,doc,rowindex,colindex) {
     var rowunit=doc.unit;
     var rowval2=(isNaN(rowval))?rowval:parseFloat(rowval,0).toFixed(2);
     var rowlab=(rowkey==="alarm_val")?rowval2+" "+rowunit:rowval2;
-    console.log("Render cell:",rowkey,rowunit,rowval);
+    //console.log("Render cell:",rowkey,rowunit,rowval);
     var rowwhere=state.Database.getWhereValue(rowkey,rowval);
     var title=state.Matrix.getTooltipTitle(state,doc,key);
     var onclick=(ckeys.indexOf(rowkey)===-1?undefined: () => {state.Navigate.selectKey(state,rowkey,rowval,rowwhere,1)});

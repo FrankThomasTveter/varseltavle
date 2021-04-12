@@ -214,7 +214,7 @@ function Path() {
 	return snap;
     };
     this.setSnapshot=function(state,snapshot) { // store state
-	state.Utils.restore(state.Path,snapshot);
+	state.Utils.restore(state,state.Path,snapshot);
 	if (state.Path.keys.trash===undefined) { state.Path.keys.trash=[];};
 	if (snapshot.focus===undefined) {state.Path.focus.auto=false;};
 	//console.log("Snapshot:",
@@ -308,6 +308,7 @@ function Path() {
 	    //console.log("Next film",film.play,pos,film.index,len);
 	    var snapshot=reel[pos];
 	    this.setSnapshot(state,snapshot);
+	    state.Navigate.store(state);	    
 	    this.setLabel(state,snapshot.label);
 	    this.setMapTitle(state,snapshot.label);
 	    //console.log("NextFilm A:",JSON.stringify(state.Path.focus));
@@ -378,7 +379,8 @@ function Path() {
 		state.Path.select.val[key]=vals;
 	    } else {
 		state.Path.select.val[key].push(val); // add item
-	    }
+	    };
+	    state.Navigate.store(state);	    
 	    state.Database.setWhere(state,key,state.Path.select.val[key]);
 	    state.Show.showPath(state);
 	    //console.log("Finally Vals:",key,JSON.stringify(state.Path.select.val[key]));

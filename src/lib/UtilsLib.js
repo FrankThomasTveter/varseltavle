@@ -19,7 +19,8 @@ function Utils() {
 	for (var jj=0;jj<lenk;jj++) {
 	    var key=keys[jj];
 	    var val=state.Utils.type[key];
-	    if ( val === type) { return key;}
+	    if ( val === type) {
+		return key;}
 	}
 	return "***";
     };
@@ -275,12 +276,16 @@ function Utils() {
 	    }
 	}
     };
-    this.restore=function(arr,obj) {
-	for (var key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
-		arr[key]=this.cp(obj[key]);
-	    }
-	};
+    this.restore=function(state,arr,obj) { // restore state from snapshot
+	//console.log("Restoring:",JSON.stringify(obj));
+	//this.debug(state,true);
+	this.copyMap(state,this.type.any,obj,arr);
+	//this.debug(state,false);
+	// for (var key in obj) {
+        //     if (Object.prototype.hasOwnProperty.call(obj, key)) {
+	// 	arr[key]=this.cpSoft(arr[key],obj[key]);
+	//     }
+	// };
     };
     this.cp=function(obj) {
 	if (obj === null || typeof (obj) !== 'object' || 'isActiveClone' in obj)
@@ -623,22 +628,30 @@ function Utils() {
 	    if (this.bdeb) {console.log("   keys:",JSON.stringify(keys));};
 	    for (let ii=0;ii<lenk;ii++) {
 		let key=keys[ii];
-		if (typeof src[key]==="object" &&
+		if (this.bdeb) {console.log("Src:",key,JSON.stringify(src[key]),JSON.stringify(trg[key]));}
+		if (typeof src[key]==="object" && // next level
 		    src[key] !== null &&
 		    !Array.isArray(src[key])) {
 		    if (trg[key]===undefined) {trg[key]={};};
 		    if (this.bdeb) {console.log("Object cp:",key,JSON.stringify(trg),JSON.stringify(src[key]));}
 		    this.copyMap(state,type,src[key],trg[key]);
-		} else if (((type===this.type.fill &&
-			     trg[key]===undefined) ||
-			    (type!==this.type.fill) ) &&
-			   Array.isArray(src[key])) {
-		    if (this.bdeb) {console.log("Array cp:",key,JSON.stringify(src[key]));}
+		} else if ( Array.isArray(src[key]) && (type===this.type.fill && trg[key]===undefined)) {
+		    if (this.bdeb) {console.log("Fill array cp:",key,JSON.stringify(src[key]));}
 		    trg[key]=state.Utils.cp(src[key]);		    
-		} else if ((type===this.type.fill &&
-			 trg[key]===undefined) ||
-			(type!==this.type.fill) ) {
-		    if (this.bdeb) {console.log("Item cp:",key,JSON.stringify(src[key]));}
+		} else if ( Array.isArray(src[key]) && (type===this.type.force)  ) {
+		    if (this.bdeb) {console.log("Force array cp:",key,JSON.stringify(src[key]));}
+		    trg[key]=state.Utils.cp(src[key]);		    
+		} else if ( Array.isArray(src[key]) && (type===this.type.any) ) {
+		    if (this.bdeb) {console.log("Any array cp:",key,JSON.stringify(src[key]));}
+		    trg[key]=state.Utils.cp(src[key]);		    
+		} else if (type===this.type.fill && trg[key]===undefined) {
+		    if (this.bdeb) {console.log("Fill cp:",key,JSON.stringify(src[key]));}
+		    trg[key]=src[key];		    
+		} else if (type===this.type.force) {
+		    if (this.bdeb) {console.log("Force cp:",key,JSON.stringify(src[key]));}
+		    trg[key]=src[key];		    
+		} else if (type===this.type.any) {
+		    if (this.bdeb) {console.log("Any cp:",key,JSON.stringify(src[key]));}
 		    trg[key]=src[key];		    
 		} else {
 		    if (this.bdeb) {console.log("Omitting:",key,JSON.stringify(src[key]));}
@@ -912,20 +925,6 @@ function Utils() {
 	    var t=map[ii][1];
 	    if (t!==undefined && s !== undefined) {
 		ret.push(s);
-	    } else {
-		ret.push(map[ii]);
-	    }
-	}
-	return ret;
-    };
-    this.invert=function(map) {
-	var ret=[];
-	var len=map.length;
-	for (var ii=0;ii<len;ii++){
-	    var t=map[ii][0];
-	    var s=map[ii][1];
-	    if (t!==undefined && s !== undefined) {
-		ret.push([s,t]);
 	    } else {
 		ret.push(map[ii]);
 	    }
