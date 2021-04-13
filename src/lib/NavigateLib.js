@@ -71,7 +71,7 @@ function Navigate() {
 	//console.log("Setting snapshot:",this.snapshotToString(state,snapshot));
 	state.Path.setSnapshot(state,snapshot);
 	this.refreshHistory(state);
-	state.Path.setMapTitle(state,"");
+	state.Path.setTitle(state);
 	state.Show.show(state);
     };
     this.canUndo=function(state) {
@@ -96,7 +96,7 @@ function Navigate() {
 	//console.log("Setting snapshot:",this.snapshotToString(state,snapshot));
 	state.Path.setSnapshot(state,snapshot);
 	this.refreshHistory(state);
-	state.Path.setMapTitle(state,"");
+	state.Path.setTitle(state);
 	state.Show.show(state);
     };
     this.redo=function(state) {
@@ -121,7 +121,7 @@ function Navigate() {
 	state.Html.setFootnote(state,"Extracting data.");
 	state.Html.setProgress(state, true);
 	//console.log("Showing:",JSON.stringify(state.Path.other));
-	state.Path.setMapTitle(state,"");
+	state.Path.setTitle(state);
 	state.Show.show(state,reload);
     };
     /// move key between tables ////////////////////////////////
@@ -224,7 +224,7 @@ function Navigate() {
 	state.Html.setFootnote(state,"Extracting data.");
 	state.Html.setProgress(state, true);
 	state.Navigate.store(state);
-	state.Path.setMapTitle(state,"");
+	state.Path.setTitle(state);
 	state.Show.show(state,reload);
     };
     this.onClickRestValue=function(state,val,key,where) {
@@ -233,7 +233,7 @@ function Navigate() {
 	    state.Html.setFootnote(state,"Extracting data.");
 	    state.Html.setProgress(state, true);
 	    state.Navigate.store(state);
-	    state.Path.setMapTitle(state,"");
+	    state.Path.setTitle(state);
 	    state.Show.show(state);
 	};
 	//console.log("onClickRestValue done:",val,key,JSON.stringify(state.Path.keys));
@@ -419,7 +419,7 @@ function Navigate() {
     // 	state.Html.setFootnote(state,"Extracting data.");
     // 	state.Html.setProgress(state, true);
     // 	//console.log("Showing:",JSON.stringify(state.Path.other));
-    // 	state.Path.setMapTitle(state,"");
+    // 	state.Path.setTitle(state);
     // 	state.Show.show(state,reload);
     // };
     this.switchTableKey=function(state,key) {
@@ -435,7 +435,7 @@ function Navigate() {
 	    state.Navigate.store(state);
 	    var reload=(src[0]!==colkey && src[0]!==rowkey);
 	    //console.log("Switched:",JSON.stringify(src[0]),colkey,rowkey,reload);
-	    state.Path.setMapTitle(state,"");
+	    state.Path.setTitle(state);
 	    state.Show.show(state,reload);
 	}	
     };
@@ -583,7 +583,7 @@ function Navigate() {
 	state.Html.setFootnote(state,"Extracting data.");
 	state.Html.setProgress(state, true);
 	state.Navigate.store(state);
-	state.Path.setMapTitle(state,"");
+	state.Path.setTitle(state);
 	state.Show.show(state);		
     };
     this.selectCustom=function(state,layout,colkey,rowkey,colval,rowval,colwhere,rowwhere,colcnt,rowcnt) {
@@ -609,7 +609,7 @@ function Navigate() {
 		state.Html.setFootnote(state,"Extracting data.");
 		state.Html.setProgress(state, true);
 		state.Navigate.store(state);
-		state.Path.setMapTitle(state,"");
+		state.Path.setTitle(state);
 		state.Show.show(state);
 	    }
 	    //console.log("Found criteria:",JSON.stringify(criteria));
@@ -648,7 +648,7 @@ function Navigate() {
 	    state.Html.setFootnote(state,"Extracting data.");
 	    state.Html.setProgress(state, true);
 	    state.Navigate.store(state);
-	    state.Path.setMapTitle(state,"");
+	    state.Path.setTitle(state);
 	    state.Show.show(state);
 	}
 	//console.log("Selectitem Done:",rowwhere,colwhere);
@@ -673,7 +673,7 @@ function Navigate() {
 	state.Html.setFootnote(state,"Extracting data.");
 	state.Html.setProgress(state, true);
 	state.Navigate.store(state);
-	state.Path.setMapTitle(state,"");
+	state.Path.setTitle(state);
 	state.Show.show(state);
     };
     this.selectKey=function(state,key,val,where,cnt) {
@@ -687,7 +687,7 @@ function Navigate() {
 	    state.Html.setFootnote(state,"Extracting data.");
 	    state.Html.setProgress(state, true);
 	    state.Navigate.store(state);
-	    state.Path.setMapTitle(state,"");
+	    state.Path.setTitle(state);
 	    state.Show.show(state);
 	} else if (state.Path.table.nkeys < 2) {
 	    //console.log("Static-SelectKey:",key,val,where,cnt);

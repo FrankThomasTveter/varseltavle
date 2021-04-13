@@ -386,10 +386,6 @@ class GeoJsonMap extends Component {
   }
 }
 
-
-
-
-
 //	      <Polygon positions={[[60,10],[61,10],[60.5,9],[60,10]]} color="red"/>
 
 GeoJsonMap.propTypes = {

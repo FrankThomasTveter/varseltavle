@@ -39,7 +39,7 @@ class ReelAdd extends Component {
 	this.handleChange=(event) => {
 	    //console.log("handleChange:",event.target.value);
 	    state.Path.setLabel(state,event.target.value);
-	    state.Path.setMapTitle(state,event.target.value);
+	    state.Path.setTitle(state,event.target.value);
 	    state.Show.showMapInfo(state,true);
 	    this.setState({label:event.target.value});
         }

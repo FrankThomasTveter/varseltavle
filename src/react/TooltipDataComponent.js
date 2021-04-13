@@ -34,10 +34,14 @@ function TableDetails(props){
 };
 function InfoDetails(props) {
     const {onclick,info}=props; // state,element,data,
-    return (<div onClick={onclick} style={{cursor:'pointer'}}>
-	    Cnt:{info.cnt} Level:{info.maxlev}
-	    </div>
-	   );
+    if (info.cnt===0) {
+	return null;
+    } else {
+	return (<div onClick={onclick} style={{cursor:'pointer'}}>
+		Cnt:{info.cnt} Level:{info.maxlev}
+		</div>
+	       );
+    };
 };
 //function printData(data) {
 //    console.log("############## Data:",JSON.stringify(Object.keys(data)));

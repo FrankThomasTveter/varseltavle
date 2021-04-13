@@ -270,7 +270,7 @@ function Default() {
 	state.File.next(state,"",callbacks);
     };
     this.goHome=function(state) {
-	console.log("Home:",JSON.stringify(state.Default.home));
+	//console.log("Home:",JSON.stringify(state.Default.home));
 	if (state.Default.home !== undefined) {
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.home, state, state.Default.statePath);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.home, state, state.Default.stateSelect);

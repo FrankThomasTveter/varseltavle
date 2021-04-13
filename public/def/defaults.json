@@ -212,7 +212,7 @@
 	    {"label":"Vindkast","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Vindkast"]}}},
 	    {"label":"Regn","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued","Duration"]},"select":{"val":{"Phenomenon":["Regn"]}}},
 	    {"label":"Styrtregn","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued","Duration"]},"select":{"val":{"Phenomenon":["Styrtregn"]}}},
-	    {"label":"Snø","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Snø"]}}},
+	    {"label":"Snø","keys":{"path":["Phenomenon"],"other":["date","Height","dtg","Region","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Snø"]}}},
 	    {"label":"Vannstand","keys":{"path":["Phenomenon"],"other":["date","Station","dtg","Method","Issued"]},"select":{"val":{"Phenomenon":["Vannstand"]}}},
 	    {"label":"Skogbrann","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Skogbrann"]}}},
 	    {"label":"Ising på skip","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Ising på skip"]}}},

@@ -2,7 +2,7 @@
 
 function Path() {
     this.maxtarget=3;
-    this.table={nkeys:2, ntarget:2, nmanual: undefined};
+    this.table={nkeys:2, ntarget:2, nmanual: undefined,title:""};
     this.keys={path:[],  // selected keys
 	       other:[], // keys available for selection
 	       trash:[]  // invisible keys
@@ -22,7 +22,7 @@ function Path() {
     this.select={val:{},where:{},cnt:{},range:{}};  // current selection criteria
     this.where={};         // current cache for where expressions
     this.home={path:[],val:{},range:{},table:{nkeys:2,ntarget:2}};  // initial home for data...
-    this.film={ index:null, reel:[], play:false, label:"", title:"" } ;// reel={label:"",path:[],val:{},range:{}} 
+    this.film={ index:null, reel:[], play:false, label:""} ;// reel={label:"",path:[],val:{},range:{}} 
     this.tooltip={keys:[],   // keys that will be displayed (in addition to row/col-keys)
 		  select:[], // extra level of keys to distinguish reports
 		  sort:[],   // which keys should be sorted?
@@ -176,6 +176,8 @@ function Path() {
     this.goHome=function(state) {
 	state.Default.goHome(state)
 	//console.log(">>>>>> Path.goHome: ",JSON.stringify(state.Path.home),JSON.stringify(state.Path.keys.path));
+	state.Path.setLabel(state);
+	state.Path.setTitle(state);
 	state.Utils.pushUrl(state);
 	state.Navigate.store(state);
 	state.Navigate.refreshHistory(state);
@@ -235,7 +237,7 @@ function Path() {
 	if (snapshot === undefined) {
 	    snapshot=this.getSnapshort(state);
 	};
-	snapshot.label=film.label;
+	snapshot.label=this.getLabel(state);
 	reel.push(snapshot);
 	state.Utils.pushUrl(state);
 	return reel.length-1;
@@ -280,7 +282,7 @@ function Path() {
 	    film.index=null;
 	}
 	if (label===undefined) {label="";};
-	film.label=label;
+	state.Path.setLabel(state,label);
 	//console.log("Removing :",pos,label,reel.length);
 	state.Show.showFilm(state);
 	state.Utils.pushUrl(state);
@@ -310,8 +312,9 @@ function Path() {
 	    this.setSnapshot(state,snapshot);
 	    state.Navigate.store(state);	    
 	    this.setLabel(state,snapshot.label);
-	    this.setMapTitle(state,snapshot.label);
+	    this.setTitle(state,snapshot.label);
 	    //console.log("NextFilm A:",JSON.stringify(state.Path.focus));
+	    state.Utils.pushUrl(state);
 	    state.Show.show(state);
 	    //console.log("NextFilm B:",JSON.stringify(state.Path.focus));
 	    return snapshot.label;
@@ -325,20 +328,26 @@ function Path() {
 	    return this.nextFilm(state,film.index);
 	}
     };
-    this.setMapTitle=function(state,label) {
-	var film=state.Path.film;
+    this.setTitle=function(state,label) {
+	var table=state.Path.table;
 	//console.log("Setting map title:",label);
-	state.Utils.pushUrl(state);
-	film.title=label;
+	if (label === undefined) {
+	    table.title="";
+	} else {
+	    table.title=label;
+	};
     };
-    this.getMapTitle=function(state) {
-	var film=state.Path.film;
-	return film.title;
+    this.getTitle=function(state) {
+	var table=state.Path.table;
+	return table.title;
     };
     this.setLabel=function(state,label) {
 	var film=state.Path.film;
-	state.Utils.pushUrl(state);
-	film.label=label;
+	if (label === undefined) {
+	    film.label="";
+	} else {
+	    film.label=label;
+	}
     };
     this.getLabel=function(state) {
 	var film=state.Path.film;
