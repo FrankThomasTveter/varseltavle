@@ -521,18 +521,23 @@ function Database() {
 	var ret=[];
 	var lens=state.Database.summary.length;
 	var lenf=state.Database.fragments.length;
+	var regs=[];
 	for (var ii=0;ii<lenf;ii++) {
 	    let frag=state.Database.fragments[ii]||"data";
-	    //console.log("Fragment:",ii,frag,lens);
-	    var reg = new RegExp(frag);
-	    for (var jj=0;jj<lens;jj++) {
-		let sum=state.Database.summary[jj]||"";
+	    regs.push(new RegExp(frag));
+	};
+	for (var jj=0;jj<lens;jj++) {
+	    let sum=state.Database.summary[jj]||"";
+	    var found=false;
+	    for (var ii=0;ii<lenf;ii++) {
+	    	var reg = regs[ii];
 		let mm=sum.match(reg);
 		if (mm !== undefined && mm !== null && mm.length>0) {
 		    //console.log("Summary:",jj,sum,frag,JSON.stringify(mm));
-		    ret.push(sum);
+		    found=true;
 		}
-	    }
+	    };
+	    if (found) {ret.push(sum);}
 	};
 	if (ret.length===0) {
 	    console.log("No valid DB-fragments specified!");
@@ -637,6 +642,8 @@ function Database() {
 	    var last=state.Database.lastLoad(state);
 	    var olddata= (last !== undefined && last !== state.Database.loadcnt);
 	    var oldfrag= state.Utils.matchArray(newfrags,oldfrags);
+	    //console.log("Old fragments:",JSON.stringify(oldfrags));
+	    //console.log("New fragments:",JSON.stringify(newfrags));
 	    var olddtg= (state.Database.fragdtg===undefined &&
 			 state.Database.indexDtg===undefined ) ||
 		state.Database.fragdtg === state.Database.indexDtg;
@@ -963,7 +970,7 @@ function Database() {
 		    delayKeys.push(key);
 		}
             }
-	    console.log("Home keys:",JSON.stringify(homeKeys)," delayed:",JSON.stringify(delayKeys));
+	    //console.log("Home keys:",JSON.stringify(homeKeys)," delayed:",JSON.stringify(delayKeys));
 	    // extract data from json-file and insert into data-array...
 	    // var rcnt=
 	    this.dbcnt=this.dbcnt+this.extractData(state,data,{},"",json.data,homeKeys,home);
