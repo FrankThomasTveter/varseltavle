@@ -7,13 +7,13 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import SettingsIcon from '@material-ui/icons/Settings';
 
+import Reload       from './ConfigReloadComponent';
 import Home         from './ConfigHomeComponent';
 import Undo         from './ConfigUndoComponent';
 import Redo         from './ConfigRedoComponent';
 import Mode         from './ConfigModeComponent';
 import ViewPath     from './ConfigViewPathComponent';
 import Collect      from './ConfigCollectComponent';
-import Reload       from './ConfigReloadComponent';
 import Tooltip      from './ConfigTooltipComponent';
 import Order        from './ConfigOrderComponent';
 import Film         from './ConfigFilmComponent';
@@ -30,8 +30,13 @@ import Focus        from './ConfigFocusComponent';
 import FullScreen   from './ConfigFullScreenComponent';
 import SettingsMenu from './SettingsMenuComponent';
 import About        from './ConfigAboutComponent';
+import QRCode       from './ConfigQRComponent';
 
 const styles = theme => ({
+    tableOrder: {
+	display: 'inline-block',
+        marginRight: 'auto',
+    },
     settings: {
         marginRight: 'auto',
 	color:'red',
@@ -56,7 +61,8 @@ class Settings extends Component {
 	this.onClose = () => {this.setState({ anchor: null });};
 	this.onClick = (event) => {this.setState({ anchor: event.currentTarget });};
 	var cls={button:classes.button};
-	return (<div>
+	//		<Menu   settings={{float:'right'}}
+	return (<div className={classes.tableOrder}>
 		  <Button
 		    className={classes.button}
                     aria-owns={this.state.anchor ? 'settings-menu' : undefined}
@@ -66,8 +72,8 @@ class Settings extends Component {
 		   >
 		   {<SettingsIcon />}
                   </Button>
-	          <Menu
-		   settings={{float:'right'}}
+	        <Menu
+		   className={classes.tableOrder}
                    id="settings-menu"
 	           anchorEl={this.state.anchor}
                    open={Boolean(this.state.anchor)}
@@ -141,6 +147,9 @@ class Settings extends Component {
 		    </MenuItem>
 		    <MenuItem key="about" onClose={this.onClose}>
 		        <About state={state} classes={cls} visible={true}/>
+		    </MenuItem>
+		    <MenuItem key="qr" onClose={this.onClose}>
+		       <QRCode state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		</Menu>
 		</div>

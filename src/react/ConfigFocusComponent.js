@@ -7,9 +7,6 @@ import AutoFocusIcon from '@material-ui/icons/CenterFocusStrong';
 import ManualFocusIcon from '@material-ui/icons/CenterFocusWeak';
 
 const styles = theme => ({
-    view: {
-        marginLeft: 'auto',
-    },
     button:{
 	color:'white'
     },
@@ -34,7 +31,7 @@ class Focus extends Component {
 	} else if (visible !== undefined) {
 	    onclick = (event) => {state.Path.toggleFocus(state);if (state.Path.inFocus(state)) {state.Show.showFocus(state)}};
             title="Focus map on data";
-	    return (
+	    return (<div className={classes.view}>
 		   <Button
                       className={classes.button}
                       onClick={onclick}
@@ -42,12 +39,12 @@ class Focus extends Component {
 		    >
 	  	       {<FocusIconMode state={state}/>}
                     </Button>
-	    );
+		    </div>);
 	} else {
             onclick=() => {state.Settings.toggle(state,"Focus");};
             title="Show focus";
             if (state.Settings.isInvisible(state,"Focus")) {
-		return (
+		return (<div className={classes.view}>
 		   <Button
                       className={classes.buttonInvisible}
                       onClick={onclick}
@@ -55,9 +52,9 @@ class Focus extends Component {
 		    >
 	  	       {<FocusIconMode state={state}/>}
                     </Button>
-		);
+			</div>);
 	    } else {
-		return (
+		return (<div className={classes.view}>
 		   <Button
                       className={classes.button}
                       onClick={onclick}
@@ -65,7 +62,7 @@ class Focus extends Component {
 		    >
 	  	       {<FocusIconMode state={state}/>}
                     </Button>
-		);
+		</div>);
 	    };
 	};
     }

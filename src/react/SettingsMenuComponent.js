@@ -5,15 +5,15 @@ import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 
+import Reload       from './ConfigReloadComponent';
+import Home         from './ConfigHomeComponent';
 import Undo         from './ConfigUndoComponent';
 import Redo         from './ConfigRedoComponent';
 import Mode         from './ConfigModeComponent';
 import ViewPath     from './ConfigViewPathComponent';
 import Collect      from './ConfigCollectComponent';
-import Reload       from './ConfigReloadComponent';
 import Tooltip      from './ConfigTooltipComponent';
 import Order        from './ConfigOrderComponent';
-import Home         from './ConfigHomeComponent';
 import Film         from './ConfigFilmComponent';
 import Star         from './ConfigStarComponent';
 import Setup        from './ConfigSetupComponent';
@@ -27,6 +27,7 @@ import Levs         from './ConfigLevComponent';
 import Focus        from './ConfigFocusComponent';
 import FullScreen   from './ConfigFullScreenComponent';
 import About        from './ConfigAboutComponent';
+import QRCode       from './ConfigQRComponent';
 
 import SettingsIcon from '@material-ui/icons/Visibility';
 
@@ -78,6 +79,12 @@ class SettingsMenu extends Component {
                         open={Boolean(this.state.anchor)}
                         onClose={this.onClose}
 		     >
+		    <MenuItem className={classes.order} key="reload" onClose={this.onClose}>
+		       <Reload state={state} classes={cls}/>
+		    </MenuItem>
+		    <MenuItem className={classes.order} key="home" onClose={this.onClose}>
+		       <Home state={state} classes={cls}/>
+		    </MenuItem>
 		    <MenuItem className={classes.order} key="undo" onClose={this.onClose}>
 		       <Undo state={state} classes={cls}/>
 		    </MenuItem>
@@ -93,17 +100,11 @@ class SettingsMenu extends Component {
 		    <MenuItem className={classes.order} key="key" onClose={this.onClose}>
 		       <Collect state={state} classes={cls}/>
 		    </MenuItem>
-		    <MenuItem className={classes.order} key="reload" onClose={this.onClose}>
-		       <Reload state={state} classes={cls}/>
-		    </MenuItem>
 		    <MenuItem className={classes.order} key="tooltip" onClose={this.onClose}>
 		       <Tooltip state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="order" onClose={this.onClose}>
 		       <Order state={state} classes={cls}/>
-		    </MenuItem>
-		    <MenuItem className={classes.order} key="home" onClose={this.onClose}>
-		       <Home state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="film" onClose={this.onClose}>
 		       <Film state={state} classes={cls}/>
@@ -143,6 +144,9 @@ class SettingsMenu extends Component {
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="about" onClose={this.onClose}>
 		       <About state={state} classes={cls}/>
+		    </MenuItem>
+		    <MenuItem className={classes.order} key="qr" onClose={this.onClose}>
+		       <QRCode state={state} classes={cls}/>
 		    </MenuItem>
 	             </Menu>
 		</div>

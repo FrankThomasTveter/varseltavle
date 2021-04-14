@@ -30,38 +30,41 @@ class Reload extends Component {
 		onclick = (event) => {state.Show.show(state,true);onclose();};
 	    };
 	    title="Reload table";
-	    return (<Button
-		key="reload"
-		className={classes.button}
-		onClick={onclick}
-		title={title}
-		>
-		{<ReloadIcon state={state}/>}
-		</Button>
-	       );
+	    return (<div className={classes.view}>
+		    <Button
+		    key="reload"
+		    className={classes.button}
+		    onClick={onclick}
+		    title={title}
+		    >
+		    {<ReloadIcon state={state}/>}
+		    </Button>
+		    </div>);
 	} else {
 	    onclick = () => {state.Settings.toggle(state,"Reload");};
 	    title="Show Reload"
 	    if (state.Settings.isInvisible(state,"Reload")) {
-		return (<Button
-		key="reload"
-		className={classes.buttonInvisible}
-		onClick={onclick}
-		title={title}
-		>
-		{<ReloadIcon state={state}/>}
-		</Button>
-		   );
+		return (<div className={classes.view}>
+			<Button
+			key="reload"
+			className={classes.buttonInvisible}
+			onClick={onclick}
+			title={title}
+			>
+			{<ReloadIcon state={state}/>}
+			</Button>
+			</div>);
 	    } else {
-		return (<Button
-		key="reload"
-		className={classes.button}
-		onClick={onclick}
-		title={title}
-		>
-		{<ReloadIcon state={state}/>}
-		</Button>
-		   );
+		return (<div className={classes.view}>
+			<Button
+			key="reload"
+			className={classes.button}
+			onClick={onclick}
+			title={title}
+			>
+			{<ReloadIcon state={state}/>}
+			</Button>
+		       </div>);
 	    };
 	}
     }

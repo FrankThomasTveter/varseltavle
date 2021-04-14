@@ -9,9 +9,6 @@ import NoViewPolygonIcon from '@material-ui/icons/InvertColorsOff';
 //import NoViewPolygonIcon from '@material-ui/icons/VisibilityOff';
 
 const styles = theme => ({
-    view: {
-        marginLeft: 'auto',
-    },
     button:{
 	color:'white'
     },
@@ -37,7 +34,7 @@ class View extends Component {
 	} else if (visible !== undefined) {
 	    onclick= () => state.Polygon.togglePolygon(state);
 	    title="Show polygon";
-	    return (
+	    return (<div className={classes.view}>
 		<Button
 	           className={classes.button}
                    onClick={onclick}
@@ -45,28 +42,30 @@ class View extends Component {
 		 >
 	  	    {<ViewPolygonIconMode state={state}/>}
                  </Button>
-	    );
+	    </div>);
 	} else {
 	    onclick=() => {state.Settings.toggle(state,"ViewPolygon");};
 	    title="Show View";
 	    if (state.Settings.isInvisible(state,"ViewPolygon")) {
-		return (<Button
+		return (<div className={classes.view}>
+			<Button
 			className={classes.buttonInvisible}
 			onClick={onclick}
 			title={title}
 			>
 	  		{<ViewPolygonIconMode state={state}/>}
 			</Button>
-		       );
+		       </div>);
 	    } else {
-		return (<Button
+		return (<div className={classes.view}>
+			<Button
 			className={classes.button}
 			onClick={onclick}
 			title={title}
 			>
 	  		{<ViewPolygonIconMode state={state}/>}
 			</Button>
-		       );
+		       </div>);
 	    }
 	}
     }

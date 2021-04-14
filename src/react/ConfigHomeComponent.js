@@ -41,14 +41,22 @@ class Home extends Component {
 	    this.onClose = ()=>{this.setState({ anchor: null });};
 	    title="Home settings";
 	    var cls={button:classes.button};
-	    return (<GoHome state={state} classes={cls}/>);
+	    return (<div className={classes.view}>
+		    <GoHome state={state} classes={cls}/>
+		    </div>);
 	} else {
 	    onclick = ()=>{state.Settings.toggle(state,"Home");}
 	    title="Show Home";
 	    if (state.Settings.isInvisible(state,"Home")) {
-		return <Button key="home" className={classes.buttonInvisible} onClick={onclick} title={title}><HomeIcon/></Button>;
+		return (<div className={classes.view}>
+			<Button key="home" className={classes.buttonInvisible}
+			onClick={onclick} title={title}><HomeIcon/></Button>
+			</div>);
 	    } else {
-		return <Button key="home" className={classes.button} onClick={onclick} title={title}><HomeIcon/></Button>;
+		return (<div className={classes.view}>
+			<Button key="home" className={classes.button}
+			onClick={onclick} title={title}><HomeIcon/></Button>
+			</div>);
 	    };
 	}
     }

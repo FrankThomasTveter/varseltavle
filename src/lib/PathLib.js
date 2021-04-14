@@ -2,7 +2,7 @@
 
 function Path() {
     this.maxtarget=3;
-    this.table={nkeys:2, ntarget:2, nmanual: undefined,title:""};
+    this.table={nkeys:2, ntarget:2, nmanual: undefined, title:"", label:""};
     this.keys={path:[],  // selected keys
 	       other:[], // keys available for selection
 	       trash:[]  // invisible keys
@@ -22,7 +22,7 @@ function Path() {
     this.select={val:{},where:{},cnt:{},range:{}};  // current selection criteria
     this.where={};         // current cache for where expressions
     this.home={path:[],val:{},range:{},table:{nkeys:2,ntarget:2}};  // initial home for data...
-    this.film={ index:null, reel:[], play:false, label:""} ;// reel={label:"",path:[],val:{},range:{}} 
+    this.film={ index:null, reel:[], play:false} ;// reel={label:"",path:[],val:{},range:{}} 
     this.tooltip={keys:[],   // keys that will be displayed (in addition to row/col-keys)
 		  select:[], // extra level of keys to distinguish reports
 		  sort:[],   // which keys should be sorted?
@@ -342,16 +342,16 @@ function Path() {
 	return table.title;
     };
     this.setLabel=function(state,label) {
-	var film=state.Path.film;
+	var table=state.Path.table;
 	if (label === undefined) {
-	    film.label="";
+	    table.label="";
 	} else {
-	    film.label=label;
+	    table.label=label;
 	}
     };
     this.getLabel=function(state) {
-	var film=state.Path.film;
-	return film.label;
+	var table=state.Path.table;
+	return table.label;
     };
     this.setFilmLabel=function(state,pos,label) {
 	var film=state.Path.film;

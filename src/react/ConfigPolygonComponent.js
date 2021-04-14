@@ -50,8 +50,8 @@ function ModeButton (props) {
 	title="Copy to clipboard";
     } else {
 	title="Copy to file";
-    };
-    return   (<MenuItem key={"copy"}  className={classes.polygon} onClose={onclose}>
+    };//polygon
+    return (<MenuItem key={"copy"}  className={classes.polygon} onClose={onclose}>
 	         <Button
 	            className={classes.button}
 	            onClick={onclick}
@@ -92,8 +92,8 @@ class PolygonMenu extends Component {
 	    this.onClose  = () => {this.setState({ anchor: null });};
 	    this.onClose = this.onClose.bind(this);
 	    var mapFunction= (item,index)=>renderDownload(classes,state,item,index,this.onClose);
-	    //var cls={button:classes.button};
-	    return (<div className={classes.tablePolygon}>
+	    //var cls={button:classes.button}; // classes.tablePolygon
+	    return (<div className={classes.view}>
 		    <Button
                     className={classes.button}
                     aria-owns={this.state.anchor ? 'tablefiles-menu' : undefined}
@@ -119,9 +119,15 @@ class PolygonMenu extends Component {
 	    var onclick = () => {state.Settings.toggle(state,"Polygon");};
 	    var title="Show Polygon";
 	    if (state.Settings.isInvisible(state,"Polygon")) {
-		return <Button key="polygon" className={classes.buttonInvisible} onClick={onclick} title={title}><PolygonIcon/></Button>;
+		return (<div className={classes.view}>
+			<Button key="polygon" className={classes.buttonInvisible}
+			onClick={onclick} title={title}><PolygonIcon/></Button>
+			</div>);
 	    } else {
-		return <Button key="polygon" className={classes.button} onClick={onclick} title={title}><PolygonIcon/></Button>;
+		return (<div className={classes.view}>
+			<Button key="polygon" className={classes.button}
+			onClick={onclick} title={title}><PolygonIcon/></Button>
+			</div>);
 	    }
 	}
     }

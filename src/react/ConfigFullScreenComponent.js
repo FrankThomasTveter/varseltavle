@@ -7,9 +7,6 @@ import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import NoFullscreenIcon from '@material-ui/icons/FullscreenExit';
 
 const styles = theme => ({
-    view: {
-        marginLeft: 'auto',
-    },
     button:{
 	color:'white'
     },
@@ -34,7 +31,7 @@ class Fullscreen extends Component {
 	} else if (visible !== undefined) {
 	    onclick = (event) => state.Layout.toggleFullScreen(state);
 	    title="Toggle Full Screen";
-	    return (
+	    return (<div className={classes.view}>
 		<Button
 	              key="screen" 
                       className={classes.button}
@@ -43,12 +40,12 @@ class Fullscreen extends Component {
 		    >
 	  	       {<FullscreenIconMode state={state}/>}
                     </Button>
-	    );
+		    </div>);
 	} else {
 	    onclick=() => {state.Settings.toggle(state,"FullScreen");};
 	    title="Show Screen";
 	    if (state.Settings.isInvisible(state,"FullScreen")) {
-		return (
+		return (<div className={classes.view}>
 		<Button
 	              key="screen" 
                       className={classes.buttonInvisible}
@@ -57,9 +54,9 @@ class Fullscreen extends Component {
 		    >
 	  	       {<FullscreenIconMode state={state}/>}
                     </Button>
-		);
+			</div>);
 	    } else {
-		return (
+		return (<div className={classes.view}>
 		<Button
 	              key="screen" 
                       className={classes.button}
@@ -68,7 +65,7 @@ class Fullscreen extends Component {
 		    >
 	  	       {<FullscreenIconMode state={state}/>}
                     </Button>
-		);
+			</div>);
 	    }
 	};
     }

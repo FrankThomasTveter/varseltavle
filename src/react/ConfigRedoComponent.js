@@ -33,14 +33,24 @@ class Redo extends Component {
 	    onclick=() => state.Navigate.redo(state);
 	    var disredo=! state.Navigate.canRedo(state);
 	    title="Redo";
-	    return <Button key="redo" className={classes.button} disabled={disredo} onClick={onclick} title={title}><RedoIcon/></Button>;
+	    return (<div className={classes.view}>
+		    <Button key="redo" className={classes.button}
+		    disabled={disredo} onClick={onclick}
+		    title={title}><RedoIcon/></Button>
+		    </div>);
 	} else {
 	    onclick=() => {state.Settings.toggle(state,"Redo");};
 	    title="Show Redo";
 	    if (state.Settings.isInvisible(state,"Redo")) {
-		return <Button key="redo" className={classes.buttonInvisible} onClick={onclick} title={title}><RedoIcon/></Button>;
+		return (<div className={classes.view}>
+			<Button key="redo" className={classes.buttonInvisible}
+			onClick={onclick} title={title}><RedoIcon/></Button>
+			</div>);
 	    } else {
-		return <Button key="redo" className={classes.button} onClick={onclick} title={title}><RedoIcon/></Button>;
+		return (<div className={classes.view}>
+			<Button key="redo" className={classes.button}
+			onClick={onclick} title={title}><RedoIcon/></Button>
+			</div>);
 	    };
 	}
     }

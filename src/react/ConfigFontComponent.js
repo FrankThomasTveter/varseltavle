@@ -30,14 +30,23 @@ class Font extends Component {
 	} else if (visible !== undefined) {
 	    onclick=() => {state.Layout.changeFont(state);};
 	    title="Change font";
-	    return <Button key="font" className={classes.button} onClick={onclick} title={title}><FontIcon/></Button>;
+	    return (<div className={classes.view}>
+		    <Button key="font" className={classes.button}
+		    onClick={onclick} title={title}><FontIcon/></Button>
+		    </div>);
 	} else {
 	    onclick=() => {state.Settings.toggle(state,"Font");};
 	    title="Show font";
 	    if (state.Settings.isInvisible(state,"Font")) {
-		return <Button key="font" className={classes.buttonInvisible} onClick={onclick} title={title}><FontIcon/></Button>;
+		return (<div className={classes.view}>
+			<Button key="font" className={classes.buttonInvisible}
+			onClick={onclick} title={title}><FontIcon/></Button>
+			</div>);
 	    } else {
-		return <Button key="font" className={classes.button} onClick={onclick} title={title}><FontIcon/></Button>;
+		return (<div className={classes.view}>
+			<Button key="font" className={classes.button}
+			onClick={onclick} title={title}><FontIcon/></Button>
+			</div>);
 	    }
 	}
     }

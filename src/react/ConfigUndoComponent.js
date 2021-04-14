@@ -33,14 +33,24 @@ class Undo extends Component {
 	    onclick=() => state.Navigate.undo(state);
 	    var disundo=! state.Navigate.canUndo(state);
 	    title="Undo";
-	    return <Button key="undo" className={classes.button} disabled={disundo} onClick={onclick} title={title}><UndoIcon/></Button>;
+	    return (<div className={classes.view}>
+		    <Button key="undo" className={classes.button}
+		    disabled={disundo} onClick={onclick}
+		    title={title}><UndoIcon/></Button>
+		    </div>);
 	} else {
 	    onclick=() => {state.Settings.toggle(state,"Undo");};
 	    title="Show Undo";
 	    if (state.Settings.isInvisible(state,"Undo")) {
-		return <Button key="undo" className={classes.buttonInvisible} onClick={onclick} title={title}><UndoIcon/></Button>;
+		return (<div className={classes.view}>
+			<Button key="undo" className={classes.buttonInvisible}
+			onClick={onclick} title={title}><UndoIcon/></Button>
+			</div>);
 	    } else {
-		return <Button key="undo" className={classes.button} onClick={onclick} title={title}><UndoIcon/></Button>;
+		return (<div className={classes.view}>
+			<Button key="undo" className={classes.button}
+			onClick={onclick} title={title}><UndoIcon/></Button>
+			</div>);
 	    };
 	};
     }

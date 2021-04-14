@@ -208,15 +208,15 @@
     "film": {
 	"index": null,
 	"reel": [
-	    {"label":"Middelvind","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Middelvind"]}}},
-	    {"label":"Vindkast","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Vindkast"]}}},
-	    {"label":"Regn","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued","Duration"]},"select":{"val":{"Phenomenon":["Regn"]}}},
-	    {"label":"Styrtregn","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued","Duration"]},"select":{"val":{"Phenomenon":["Styrtregn"]}}},
-	    {"label":"Snø","keys":{"path":["Phenomenon"],"other":["date","Height","dtg","Region","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Snø"]}}},
-	    {"label":"Vannstand","keys":{"path":["Phenomenon"],"other":["date","Station","dtg","Method","Issued"]},"select":{"val":{"Phenomenon":["Vannstand"]}}},
+	    {"label":"Middelvind","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Middelvind"]}}},
+	    {"label":"Vindkast","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Vindkast"]}}},
+	    {"label":"Regn","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued","Duration"]},"select":{"val":{"Phenomenon":["Regn"]}}},
+	    {"label":"Styrtregn","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued","Duration"]},"select":{"val":{"Phenomenon":["Styrtregn"]}}},
+	    {"label":"Snø","keys":{"path":["Phenomenon"],"other":["date","Height","dtg","Type","Region","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Snø"]}}},
+	    {"label":"Vannstand","keys":{"path":["Phenomenon"],"other":["date","Station","dtg","Type","Method","Issued"]},"select":{"val":{"Phenomenon":["Vannstand"]}}},
 	    {"label":"Skogbrann","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Skogbrann"]}}},
-	    {"label":"Ising på skip","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Ising på skip"]}}},
-	    {"label":"Polare lavtrykk","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Polare lavtrykk"]}}},
+	    {"label":"Ising på skip","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Ising på skip"]}}},
+	    {"label":"Polare lavtrykk","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Polare lavtrykk"]}}},
 	    {"label":"Turbulens","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Airport","Method","Issued"]},"select":{"val":{"Phenomenon":["Turbulens"]}}}
 		],
 	"play": false

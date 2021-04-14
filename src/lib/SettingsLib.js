@@ -6,7 +6,7 @@ function Settings() {
 		   "Reload","Home","Film","Star","Key",
 		   "Order","Tooltip","Font","Dim","Lev","File",
 		   "ViewPolygon","Polygon","ViewOldData",
-		   "Archive","Focus","FullScreen","About"];
+		   "Archive","Focus","FullScreen","About","Qr"];
     // list of visible controls...
     this.visible=[];//["Undo","Redo","Mode","ViewPath"];
     this.init=function(state){

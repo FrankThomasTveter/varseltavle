@@ -931,7 +931,15 @@ function Utils() {
 	}
 	return ret;
     };
+    this.getUrlPath=function(state) {
+	var path=window.location.href;
+	return (path);
+    };
     this.pushUrl=function(state) {
+	var url=this.getUrl(state);
+	window.history.replaceState("", "js", url);
+    };
+    this.getUrl=function(state) {
 	var path = window.location.pathname;
 	//console.log("Path:",path);
 	var page = path.split("/").pop();
@@ -950,7 +958,7 @@ function Utils() {
 	};
 	//console.log("Setting URL to: (",url.length,"):",decodeURI(url));
 	//console.log("New URL: (",url.length,"):",this.prettyJson(uri));
-	window.history.replaceState("", "js", url);
+	    return url;
     };
     this.pushUrlDetails=function(state,url,map) {
 	if (url===undefined) {

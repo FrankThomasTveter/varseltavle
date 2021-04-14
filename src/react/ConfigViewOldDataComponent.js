@@ -7,9 +7,6 @@ import ViewOldDataIcon from '@material-ui/icons/Timer';
 import NoViewOldDataIcon from '@material-ui/icons/TimerOff';
 
 const styles = theme => ({
-    view: {
-        marginLeft: 'auto',
-    },
     button:{
 	color:'white'
     },
@@ -34,7 +31,7 @@ class View extends Component {
 	} else if (visible !== undefined) {
 	    onclick= () => state.Database.toggleDisplayOld(state);
 	    title="Show old data";
-	    return (
+	    return (<div className={classes.view}>
 		<Button
 	           className={classes.button}
                    onClick={onclick}
@@ -42,28 +39,30 @@ class View extends Component {
 		 >
 	  	    {<ViewOldDataIconMode state={state}/>}
                  </Button>
-	    );
+	    </div>);
 	} else {
 	    onclick=() => {state.Settings.toggle(state,"ViewOldData");};
 	    title="Show View";
 	    if (state.Settings.isInvisible(state,"ViewOldData")) {
-		return (<Button
+		return (<div className={classes.view}>
+			<Button
 			className={classes.buttonInvisible}
 			onClick={onclick}
 			title={title}
 			>
 	  		{<ViewOldDataIconMode state={state}/>}
 			</Button>
-		       );
+		       </div>);
 	    } else {
-		return (<Button
+		return (<div className={classes.view}>
+			<Button
 			className={classes.button}
 			onClick={onclick}
 			title={title}
 			>
 	  		{<ViewOldDataIconMode state={state}/>}
 			</Button>
-		       );
+		       </div>);
 	    }
 	}
     }
