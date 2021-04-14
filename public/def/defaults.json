@@ -1,5 +1,5 @@
 {
-    "thrs":{
+    "thrs":[{
 	"Phenomenon":{
 	    "Middelvind":{"Type":{"Fiskebank":{"key":"a1000", ">": [0,17.2,24.5] },
 	                          "Metarea19":{"key":"a1000", ">": [0,17.2,24.5] },
@@ -181,12 +181,12 @@
                                  "Fylke":    {"key":"f95", ">": [0,0.5,1.34] }}},
 	    "Polare lavtrykk":{"key":"max", ">": [0.0,0.05] },
 	    "Turbulens":{"key":"max", ">": [0,2.0,3.5] }
-	},
-	"Method":{"efi":{"key":"max", ">": [0,0.7,0.99] },"sot":{"key":"max", ">": [0,1.0,1.5] }}
-    },
+	}},
+	{"Method":{"efi":{"key":"max", ">": [-1,0.95,0.99] },"sot":{"key":"max", ">": [-5,2.0,2.5] }}}
+    ],
     "default":{"thrs":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
     "summaries":["summary"],
-    "fragments":["^.*(?!efi)(?!sot).*$"],
+    "fragments":["track","turbulens","snowfall","ising_skip","middelvind","regn","skogbrann"],
     "viewOldData":false,
     "colors":{
 	"background":["rgb(182,219,255)","rgb(255,182,119)","rgb(36,255,36)","rgb(0,0,0)"],
@@ -243,7 +243,7 @@
     "priority":["dtg","date","Height","Unit","Type","Model","Partner","Output","Duration",
 		"Phenomenon","Airport","Station","Place","Region","Method","Issued"],
     "state":{"viewMode":0,"cellMode":0,"layoutMode":0},
-    "home":{"path":[],"val":{"Partner":[]}},
+    "home":{"path":["Method"],"val":{"Method":["mb0","p100","p65","p50","prb",""]}},
     "tooltip":{"keys":["Phenomenon","Region","Duration","Airport","alarm_key","alarm_val","Unit","Model","Method","Output","dtg","lat","lon","max"],
 	       "select":["Phenomenon","Duration"],
 	       "sort":["Phenomenon","Duration","Region"],

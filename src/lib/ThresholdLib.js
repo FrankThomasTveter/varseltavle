@@ -196,7 +196,7 @@ function Threshold() {
 	}
 	return [];
     }.bind(this);
-    this.setEssentials=function(state,doc) {
+    this.importVariables=function(state,doc) {
 	//var debug = (doc.Phenomenon==="Regn" && doc.Duration==="12t" && doc.Region==="Innlandet" && doc.dtg==="2019-06-26_11");
 	var thr=this.getThresholds(state,doc);
 	doc.level=String(thr.level);

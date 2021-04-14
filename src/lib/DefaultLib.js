@@ -36,7 +36,9 @@ function Default() {
 	[["keys","trash"],   ["Path","keys","trash"]]
     ];
     this.toStateHome= [
-	[["home"],    ["Path","home"]]
+	[["home","path"],    ["Path","home","path"]],
+	[["home","val"],    ["Path","home","val"]],
+	[["home","range"],    ["Path","home","range"]]
     ];
     this.toStateVisible  = [
 	[["visible"], ["Settings","visible"]]

@@ -926,13 +926,13 @@ function Database() {
     this.dbInsert=function(state,json) {
 	var ii,key;
 	try {
-	    // set home
+	    // preprocess
 	    var docs=json.data;
 	    var len=docs.length
 	    for (ii=0;ii<len;ii++) {
 		var doc=docs[ii];
 		doc["cnt"]=ii;
-		state.Threshold.setEssentials(state,doc);
+		state.Threshold.importVariables(state,doc);
 	    };
 	    // get modified date
 	    //console.log("Setting time.");
@@ -947,6 +947,7 @@ function Database() {
 	    // put data into databse
 	    //console.log("inserting");
 	    var data=[];
+	    // get home key targets... (max, min)
 	    var home=state.Path.home.val;
 	    var hkeys=state.Path.home.path;//Object.keys(home);
 	    var homeKeys=[];
@@ -962,7 +963,7 @@ function Database() {
 		    delayKeys.push(key);
 		}
             }
-	    //console.log("Home keys:",JSON.stringify(homeKeys)," delayed:",JSON.stringify(delayKeys));
+	    console.log("Home keys:",JSON.stringify(homeKeys)," delayed:",JSON.stringify(delayKeys));
 	    // extract data from json-file and insert into data-array...
 	    // var rcnt=
 	    this.dbcnt=this.dbcnt+this.extractData(state,data,{},"",json.data,homeKeys,home);
