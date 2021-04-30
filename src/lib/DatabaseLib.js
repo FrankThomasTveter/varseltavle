@@ -970,12 +970,15 @@ function Database() {
 		    delayKeys.push(key);
 		}
             }
-	    //console.log("Home keys:",JSON.stringify(homeKeys)," delayed:",JSON.stringify(delayKeys));
-	    // extract data from json-file and insert into data-array...
-	    // var rcnt=
-	    this.dbcnt=this.dbcnt+this.extractData(state,data,{},"",json.data,homeKeys,home);
-	    //console.log("Database count:",rcnt);
-	    //console.log("Data:",JSON.stringify(data));
+	    // this is where data comes into the system, strange things may happen...
+	    try {
+		//console.log("Home keys:",JSON.stringify(homeKeys)," delayed:",JSON.stringify(delayKeys));
+		this.dbcnt=this.dbcnt+this.extractData(state,data,{},"",json.data,homeKeys,home);
+	    } catch (e) {
+		//console.log("Data:",JSON.stringify(data));
+		console.log("Extract error: "+e);
+		throw (e);
+	    };
 	    // put data-array into database...
 	    this.dataToDb(state,data);
 	    //var nrec=this.sanityCheck(state)	    // sanity check
@@ -1529,7 +1532,7 @@ function Database() {
 	return this.query(sql);
     };
     this.whatIsIt=function(object) { // determine object type
-	if (object  === null) {
+	if (object === undefined || object  === null ) {
 	    return "null";
 	} else if (object.constructor  === this.arrayConstructor) {
 	    return "Array";
