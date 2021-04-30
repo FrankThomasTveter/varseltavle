@@ -3,7 +3,7 @@
 function Colors() {
     this.colors=undefined; // loaded from defaults file...
     this.init=function(state){
-	state.Utils.init("Colors",this);
+	//state.Utils.init("Colors",this);
     };
     this.setLevelBgColor=function(state,level,color) {
 	this.colors.background[level]=color;

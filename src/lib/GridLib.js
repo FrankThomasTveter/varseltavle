@@ -7,8 +7,8 @@ function Grid() {
     this.res={};
     this.area={};
     this.init=function(state){
-	var par="Grid";
-	state.Utils.init(par,this);
+	//var par="Grid";
+	//state.Utils.init(par,this);
     };
     this.roundup=function(val) {
 	return Math.ceil(val*1000)/1000;

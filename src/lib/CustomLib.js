@@ -4,8 +4,8 @@ function Custom() {
     this.bdeb=false;
     this.maps={};
     this.init=function(state){
-	var par="Custom";
-	state.Utils.init(par,this);
+	//var par="Custom";
+	//state.Utils.init(par,this);
 	//console.log("Custom:",JSON.stringify(this.list));
     };
     this.getLayoutMode=function(state) {

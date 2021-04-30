@@ -38,7 +38,7 @@ function getTextHeight(fontname, fontsize){
 };
 
 function QrIcon(props) {
-    const {state,classes,width}=props;
+    const {state,width}=props; //classes,
     var url=state.Utils.getUrlPath(state);
     console.log("Got path:",url);
     if (width !== undefined) {
@@ -49,7 +49,6 @@ function QrIcon(props) {
 };
 function QrItem(props) {
     const {state,classes,width}=props;
-    var title="QR code";
     var h=window.innerHeight*0.5;
     var w=window.innerWidth*0.5;
     var ww =Math.min(w,h,width);
@@ -73,7 +72,6 @@ class QrMenu extends Component {
 	    this.onClick = event => {this.setState({ anchor: event.currentTarget });};
 	    this.onClose = () => {this.setState({ anchor: null });};
 	    title="Show link as QR-code";
-	    var cls={button:classes.button};
 	    return (<div className={classes.view}>
 		   <Button
                       className={classes.button}

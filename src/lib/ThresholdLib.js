@@ -10,7 +10,7 @@ function Threshold() {
     //this.ilev=3;
     //this.ival=4;
     this.init=function(state){
-	state.Utils.init("Threshold",this);
+	//state.Utils.init("Threshold",this);
     };
     this.getMaxLevel=function(doc) {
 	if (doc._thr !== undefined) {

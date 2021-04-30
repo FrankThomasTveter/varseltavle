@@ -44,7 +44,7 @@ function Path() {
     this.focusChanged=false;
     this.pathFocus=undefined;
     this.init=function(state){
-	state.Utils.init("Path",this);
+	//state.Utils.init("Path",this);
 	//console.log("Path initialised:",JSON.stringify(this.select));
     };
     this.isNumeric=function(key) {

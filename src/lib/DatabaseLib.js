@@ -38,6 +38,7 @@ function Database() {
     this.step=6;         // steps between each server polling
     this.stepCnt=0;      // current step count
     this.loadcnt=0;      // polling count
+    this.loadfile=0;      // polling count
     this.dbcnt=0;        // records in database
     this.ready=true;     // can we poll server or is another poll running
     this.viewOldData=false;  //  keep old data?
@@ -50,16 +51,9 @@ function Database() {
 		 Max:3
 		};
     this.db=null;
-    this.init=function(state,response,callbacks){
-        state.Colors.init(state);
-        state.Path.init(state);
-        state.Layout.init(state);
-        state.Threshold.init(state);
-        state.Custom.init(state);
-        state.Settings.init(state);
-	state.Utils.init("Database",this);
-	state.File.next(state,response,callbacks);
-    }.bind(this);
+    this.init=function(state){
+	//state.Utils.init("Database",this);
+    };
     this.toggleDisplayOld=function(state) {
 	//console.log("Show.view before:",this.state.viewMode,JSON.stringify(this.state),JSON.stringify(this.modes));
 	state.Database.viewOldData=!state.Database.viewOldData;
@@ -302,6 +296,7 @@ function Database() {
 	}
     };
     this.loadSummary=function(state, response, callbacks ) {
+	if (this.bdeb) {console.log("Loading summary.");};
 	state.Database.summary=[];
 	state.Database.sumcnt={};
 	var sequence = Promise.resolve();
@@ -340,7 +335,7 @@ function Database() {
 	    state.File.next(state,"",callbacks);
 	})
 	//console.log("Polygons:",JSON.stringify(state.Polygon.names));
-    };
+    }.bind(this);
     // extract parent path relative to granny
     this.getParentName=function(state,granny,parent) {
 	var grn = new RegExp("^" + granny + "(?<name>.*)$");
@@ -522,8 +517,8 @@ function Database() {
 	var lens=state.Database.summary.length;
 	var lenf=state.Database.fragments.length;
 	var regs=[];
-	for (var ii=0;ii<lenf;ii++) {
-	    let frag=state.Database.fragments[ii]||"data";
+	for (var kk=0;kk<lenf;kk++) {
+	    let frag=state.Database.fragments[kk]||"data";
 	    regs.push(new RegExp(frag));
 	};
 	for (var jj=0;jj<lens;jj++) {
@@ -551,6 +546,7 @@ function Database() {
 	// loop over all register files, read content, load data...
 	// Start off with a promise that always resolves
 	state.Database.loadcnt=state.Database.loadcnt+1;
+	state.Database.loadfile=0
 	var sequence = Promise.resolve();
 	// loop over register files and collect promises
 	var newfrags=[];
@@ -598,8 +594,9 @@ function Database() {
 			var path=frag+"/"+file;
 			state.Database.fragfile[frag]=file;
 			if (ii===0) {
-			    state.Html.broadcast(state,"Loading "+lenf+" DB-fragments.");
+			    state.Html.broadcast(state,"Checking "+lenf+" DB-fragments.");
 			};
+			state.Database.loadfile=state.Database.loadfile+1;
 			//console.log("Loading: "+path);
 			return state.File.getJSON(path);
 		    }
@@ -661,8 +658,11 @@ function Database() {
 			    " (",state.Database.getPrettyDtg(state),")");
 		return;
 	    } else {
+		state.Html.broadcast(state,"Loaded "+state.Database.loadfile
+				     +" DB-fragments.");
 		console.log("DB changed:  ", state.Database.loadcnt,
-			    " (",state.Database.getPrettyDtg(state),")");
+			    " (",state.Database.getPrettyDtg(state),") ->",
+			    state.Database.loadfile," frags");
 		state.Database.fragdtg=state.Database.indexDtg;
 		state.Database.fragload=newfrags;
 		// collect all data into database

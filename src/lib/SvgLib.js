@@ -5,7 +5,7 @@ function Svg() {
     this.def="<svg viewBox=\"0 0 26.458333 26.458332\" height=\"Size\" width=\"Size\"><g style=\"display:inline\" transform=\"translate(0,-270.54166)\"><path id=\"path3715\" d=\"m 1.3229166,294.35417 c 3.9687498,-7.05556 7.9374996,-14.11111 11.9062494,-21.16667 3.96875,7.05556 7.937499,14.11111 11.906249,21.16667 -7.937499,0 -15.8749989,0 -23.8124984,0 z\" style=\"fill:none;fill-rule:evenodd;stroke:bg;stroke-width:1.32291663;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1\" /></g></svg>";
     this.config={key:null,svgs:{}};// which key should be on the abscissa
     this.init=function(state){
-	state.Utils.init("Svg",this);
+	//state.Utils.init("Svg",this);
     };
     this.getKey=function(state) {
 	return this.config.key;

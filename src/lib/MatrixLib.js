@@ -11,8 +11,8 @@ function Matrix() {
     this.maxLevel=-1;
     this.showLevels=1; // level shown in tooltip
     this.init=function(state){
-	var par="Matrix";
-	state.Utils.init(par,this);
+	//var par="Matrix";
+	//state.Utils.init(par,this);
     };
     this.initKeyCnt=function(state) {
 	this.values={};

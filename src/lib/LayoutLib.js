@@ -4,7 +4,7 @@ function Layout() {
     this.rotate=undefined;  // should labels on x-axis be rotated?
     this.priority=undefined;// which key should be on the abscissa
     this.init=function(state){
-	state.Utils.init("Layout",this);
+	//state.Utils.init("Layout",this);
     };
     this.fullscreen=false;
     this.fonts=["12px Fixed","18px Fixed","24px Fixed","36px Fixed","48px Fixed"

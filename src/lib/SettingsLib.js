@@ -10,7 +10,7 @@ function Settings() {
     // list of visible controls...
     this.visible=[];//["Undo","Redo","Mode","ViewPath"];
     this.init=function(state){
-	state.Utils.init("Settings",this);
+	//state.Utils.init("Settings",this);
     };
     this.makeVisible=function(state,control) {
 	var cid=this.controls.indexOf(control);

@@ -89,30 +89,6 @@ function Utils() {
 	    console.log("Invalid setup...");
 	}
     };
-    this.init=function(par,setup){
-	var url=this.getUrlVars();
-	if (par in url) {
-	    //if (par==="Path") {
-		//console.log("Path start:", JSON.stringify(setup.select));
-	    //}
-	    //console.log(par,url);
-	    var code;
-	    try {
-		code=decodeURIComponent(url[par]);
-		//console.log("Processing url:",par,JSON.stringify(newsetup));
-		var newsetup=JSON.parse(code);
-		this.smear(setup,newsetup);
-	    } catch (e) { // is a value, not json
-		setup[par]=url[par];
-	    }
-	    //if (par==="Path") {
-		//console.log("Path after:", JSON.stringify(setup.select));
-	    //}
-	} else {
-	    console.log("No '"+par+"' in URL.",JSON.stringify(Object.keys(url||{})));
-	}
-
-    };
     this.clean=function(arr,max) {
 	if (max === undefined) {max=0;};
 	//console.log("Arr:",JSON.stringify(arr),max);
@@ -369,7 +345,7 @@ function Utils() {
 	window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
 				     function(m,key,value) {
 					 //console.log("URL item:",key," ",value)
-					 vars[key] = value;
+					 vars[key] = decodeURIComponent(value);
 				     });
 	return vars;
     };
@@ -971,7 +947,7 @@ function Utils() {
 		var s=map[ii][0];
 		var t=map[ii][1];
 		if ( (s===undefined || ! Array.isArray(s)) &&
-		      (t===undefined || ! Array.isArray(t)) ) {
+		     (t===undefined || ! Array.isArray(t)) ) {
 		    s=map[ii];
 		    t=map[ii];
 		} else if (t===undefined) {
@@ -986,6 +962,30 @@ function Utils() {
 	    }
 	};
 	return url;
+    };
+    this.loadUrlDetails=function(state,setup,map) {
+	var url=this.getUrlVars();
+	this.copyMap(state,this.type.fill,url,setup,map);
+    };
+    this.init=function(par,setup){
+	var url=this.getUrlVars();
+	if (par in url) {
+	    var code;
+	    try {
+		code=url[par];
+		//console.log("Processing url:",par,JSON.stringify(newsetup));
+		var newsetup=JSON.parse(code);
+		this.smear(setup,newsetup);
+	    } catch (e) { // is a value, not json
+		setup[par]=url[par];
+	    }
+	    //if (par==="Path") {
+		//console.log("Path after:", JSON.stringify(setup.select));
+	    //}
+	} else {
+	    console.log("No '"+par+"' in URL.",JSON.stringify(Object.keys(url||{})));
+	}
+
     };
 };
 export default Utils;

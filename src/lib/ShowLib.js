@@ -2,8 +2,8 @@
 
 function Show() {
     this.init=function(state){
-	var par="Show";
-	state.Utils.init(par,this);
+	//var par="Show";
+	//state.Utils.init(par,this);
     };
     this.showMode=function(state) { // show data on screen
 	if (state.React.Mode !== undefined) {
