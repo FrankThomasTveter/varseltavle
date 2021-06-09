@@ -345,7 +345,14 @@ function Utils() {
 	window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
 				     function(m,key,value) {
 					 //console.log("URL item:",key," ",value)
-					 vars[key] = decodeURIComponent(value);
+					 var str=decodeURIComponent(value); //Component
+					 try {
+					     vars[key]=JSON.parse(str);
+					     //console.log("Found json:",key,vars[key]);
+					 } catch (e) {
+					     vars[key]=str;
+					     //console.log("Found scalar:",key,vars[key]);
+					 };
 				     });
 	return vars;
     };
@@ -589,6 +596,20 @@ function Utils() {
 	//console.log("Type:",ret,JSON.stringify(obj));
 	return ret;
     }.bind(this);
+    // get map element
+    this.getMapItem=function(state,map,ii) {
+	let s=map[ii][0];
+	let t=map[ii][1];
+	if ( (s===undefined || ! Array.isArray(s)) &&
+	     (t===undefined || ! Array.isArray(t)) ) {
+	    s=map[ii];
+	    t=map[ii];
+	} else if (t===undefined) {
+	    t=s;
+	};
+	return {"src":s,"trg":t};
+    }
+
     // map src onto target always
     this.copyMap=function(state,type,src,trg,map) {
 	if (this.bdeb) {console.log("Map:",JSON.stringify(map),type,this.getType(state,type));}
@@ -636,16 +657,8 @@ function Utils() {
 	} else {
 	    let len=map.length
 	    for (let ii=0;ii<len;ii++){
-		let s=map[ii][0];
-		let t=map[ii][1];
-		if ( (s===undefined || ! Array.isArray(s)) &&
-		     (t===undefined || ! Array.isArray(t)) ) {
-		    s=map[ii];
-		    t=map[ii];
-		} else if (t===undefined) {
-		    t=s;
-		};
-		this.cpMap(state,t,s,trg,src,type)
+		let mm=this.getMapItem(state,map,ii);
+		this.cpMap(state,mm.trg,mm.src,trg,src,type)
 	    }
 	}
     }.bind(this);
@@ -758,16 +771,8 @@ function Utils() {
 	} else {
 	    let len=map.length
 	    for (let ii=0;ii<len;ii++){
-		let s=map[ii][0];
-		let t=map[ii][1];
-		if ( (s===undefined || ! Array.isArray(s)) &&
-		      (t===undefined || ! Array.isArray(t)) ) {
-		    s=map[ii];
-		    t=map[ii];
-		} else if (t===undefined) {
-		    t=s;
-		};
-		this.cpForce(state,t,s,trg,src)
+		let mm=this.getMapItem(state,map,ii);
+		this.cpForce(state,mm.trg,mm.src,trg,src)
 	    }
 	}
     }.bind(this);
@@ -794,16 +799,8 @@ function Utils() {
 	} else {
 	    let len=map.length
 	    for (let ii=0;ii<len;ii++){
-		let s=map[ii][0];
-		let t=map[ii][1];
-		if ( (s===undefined || ! Array.isArray(s)) &&
-		      (t===undefined || ! Array.isArray(t)) ) {
-		    s=map[ii];
-		    t=map[ii];
-		} else if (t===undefined) {
-		    t=s;
-		};
-		this.cpAnything(state,t,s,trg,src)
+		let mm=this.getMapItem(state,map,ii);
+		this.cpAnything(state,mm.trg,mm.src,trg,src)
 	    }
 	}
     }.bind(this);
@@ -836,17 +833,9 @@ function Utils() {
 	} else {
 	    var len=map.length
 	    for (let ii=0;ii<len;ii++){
-		let s=map[ii][0];
-		let t=map[ii][1];
-		if ( (s===undefined || ! Array.isArray(s)) &&
-		     (t===undefined || ! Array.isArray(t)) ) {
-		    s=map[ii];
-		    t=map[ii];
-		} else if (t===undefined) {
-		    t=s;
-		};
-		if (s!==undefined) { // never copy undefined...
-		    this.cpFill(state,t,s,trg,src);
+		let mm=this.getMapItem(state,map,ii);
+		if (mm.src!==undefined) { // never copy undefined...
+		    this.cpFill(state,mm.trg,mm.src,trg,src);
 		};
 	    }
 	}
@@ -871,39 +860,28 @@ function Utils() {
         if (ss !== undefined) {
 	    bok=true;
 	    console.log("Item:",JSON.stringify(s),"->",JSON.stringify(ss));
+	} else {
+	    console.log("Missing Item:",JSON.stringify(s),"->",JSON.stringify(src));
 	}
 	return bok;
     }.bind(this);
     this.printMap=function(state,src,map) {
 	var bok=false;
-	var len=map.length
-	for (var ii=0;ii<len;ii++){
-	    var s=map[ii][0];
-	    var t=map[ii][1];
-	    if ( (s===undefined || ! Array.isArray(s)) &&
-		  (t===undefined || ! Array.isArray(t)) ) {
-		s=map[ii];
-		t=map[ii];
-	    } else if (t===undefined) {
-		t=s;
-	    };
-	    bok=this.printItem(state,s,src) || bok;
+	var lenm=map.length
+	for (var ii=0;ii<lenm;ii++){
+	    let mm=this.getMapItem(state,map,ii);
+	    bok=this.printItem(state,mm.src,src) || bok;
 	};
 	if (!bok) {
-	    console.log(">>>> printMap: No mapped-data found...");
+	    console.log(">>>> printMap: No mapped-data found..."+lenm);
 	};
     };
-    this.getSource=function(map) {
+    this.getSource=function(state,map) {
 	var ret=[];
 	var len=map.length;
 	for (var ii=0;ii<len;ii++){
-	    var s=map[ii][0];
-	    var t=map[ii][1];
-	    if (t!==undefined && s !== undefined) {
-		ret.push(s);
-	    } else {
-		ret.push(map[ii]);
-	    }
+	    let mm=this.getMapItem(state,map,ii);
+	    ret.push(mm.src);
 	}
 	return ret;
     };
@@ -928,7 +906,9 @@ function Utils() {
 	    var val=uri[key];
 	    //console.log("KV:",key,val);
 	    if (val !== undefined) {
-		var str=encodeURI(JSON.stringify(val)+"&");
+		var raw=JSON.stringify(val);
+		//console.log("Raw:",raw, JSON.parse(raw));
+		var str=encodeURIComponent(raw)+"&";
 		url=url + key + "=" + str;
 	    }
 	};
@@ -936,27 +916,22 @@ function Utils() {
 	//console.log("New URL: (",url.length,"):",this.prettyJson(uri));
 	    return url;
     };
-    this.pushUrlDetails=function(state,url,map) {
+    this.pushChanged=function(state,url,map) {
+	//console.log("PushUrlDetails:",url,JSON.stringify(map));
 	if (url===undefined) {
 	    throw new Error("ERROR: pushUrl with no src.");
 	} else if (map===undefined) {
 	    throw new Error("ERROR: pushUrl with no map.");
 	} else {
 	    var len=map.length
+	    //console.log("PushUrlDetails...",map.length);
 	    for (var ii=0;ii<len;ii++){
-		var s=map[ii][0];
-		var t=map[ii][1];
-		if ( (s===undefined || ! Array.isArray(s)) &&
-		     (t===undefined || ! Array.isArray(t)) ) {
-		    s=map[ii];
-		    t=map[ii];
-		} else if (t===undefined) {
-		    t=s;
-		};
-		if (state.Default.hasChanged(state,t)) {
-		    var ss=this.getItem(state,t,state);
+		//console.log("PushUrlDetails...",ii,map.length);
+		let mm=this.getMapItem(state,map,ii);
+		if (state.Default.hasChanged(state,mm.trg)) {
+		    var ss=this.getItem(state,mm.trg,state);
 		    if (ss !== undefined) {
-			this.setMap(state,t,url,ss,this.type.fill);
+			this.setMap(state,mm.trg,url,ss,this.type.fill);
 		    }
 		}
 	    }

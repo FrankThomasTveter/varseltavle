@@ -1,2 +1,4 @@
-[#]*[#]
-*~
+public/data
+public/simplified
+public/summary*
+test

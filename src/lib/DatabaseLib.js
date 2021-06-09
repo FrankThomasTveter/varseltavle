@@ -1000,6 +1000,7 @@ function Database() {
 	    //state.Path.checkTableKeys(state);
 	    state.Html.broadcast(state,"Loaded "+this.dbcnt+" records into database");
 	    //console.log("Database is ready.");
+	    state.Default.storeStartState(state);
 	} catch (e) {
 	    alert("Db-insert error:"+e);
 	    throw (e);

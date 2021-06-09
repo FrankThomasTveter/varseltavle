@@ -186,10 +186,9 @@ class App extends Component {
         state.Threshold.init(state);
         state.Custom.init(state);
         state.Settings.init(state);
-	state.Utils.init(state);
 	state.Default.loadSetupFile(state,"",
 				  [state.Default.processSetupFile,
-				   state.Default.storeStartState,
+				   state.Default.storeInitState,
 				   state.Default.loadUrl,
 				   state.Default.mergeState,
 				   state.Default.checkState,

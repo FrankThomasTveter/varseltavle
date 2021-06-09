@@ -1,10 +1,10 @@
 //console.log("Loading DefaultLib.js");
 function Default() {
-    this.debug=true;
+    this.debug=false;
     this.setupdir="def/"; // defaults directory
     this.setup="defaults.json"; // defaults file, contains default setup...
     this.path="test.json";
-    this.config={setup:{}, url:{}, start:{}, current:{}, home:{}};
+    this.config={setup:{}, url:{}, init:{}, start:{}, current:{}, home:{}};
     this.cnt=0;
     this.init=function(state){ // executed before anything else...
 	state.Utils.init("setup",this);
@@ -20,8 +20,8 @@ function Default() {
 	[["ndim"],    ["Path","table","ntarget"]]
     ];
     this.toStateData  = [
-	[["fragments"],    ["Database","fragments"]],
 	[["summaries"],    ["Database","summaries"]],
+	[["fragments"],    ["Database","fragments"]],
 	[["viewOldData"],  ["Database","viewOldData"]]
     ];
     this.toStateTrash  = [
@@ -202,68 +202,71 @@ function Default() {
 	    state.File.next(state,"",callbacks);
 	}
     }.bind(this);
-    // copy critical state objects before URL is loaded...
-    this.storeStartState=function(state,response,callbacks) { // executed before URL is loaded...
-	if (this.debug) {console.log("Storing start state.");};
-	if (state.Default.config.start === undefined) {
-	    state.Default.config.start={};
-	    //console.log("Starting:",JSON.stringify(state.Default.config.start));
-	    // soft copy hardcode-state to start (fillStateDefaults2)
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.statePath);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateData);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateTrash);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateSelect);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateOther);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateHome);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateVisible);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateCustom);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateThr);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateColors);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateTooltip);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateTooltips);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateFocus);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateFilm);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateLooks);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state, state.Default.config.start, this.stateSvg);
-	    //console.log("Done:",JSON.stringify(state.Default.config.start.visible));
+    // initial state before url is loaded
+    this.storeInitState=function(state, response, callbacks) { // executed before URL is loaded...
+	if (this.debug) {console.log("Storing init state.");};
+	if (state.Utils.isEmpty(state,state.Default.config.init)) {
+	    state.Default.config.init={};
+	    //console.log("Initing:",JSON.stringify(state.Default.config.init));
+	    // soft copy hardcode-state to init (fillStateDefaults2)
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.statePath);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateData);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateTrash);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateSelect);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateOther);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateHome);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateVisible);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateCustom);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateThr);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateColors);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateTooltip);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateTooltips);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateFocus);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateFilm);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateLooks);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateSvg);
+	    //console.log("Done:",JSON.stringify(state.Default.config.init.visible));
 	    //console.log("State:",JSON.stringify(state.Settings.visible));
 	    //state.Default.save(state);
-	}
+	};
 	//console.log(">>>>>>>>>>>State:",JSON.stringify(state.Layout.state));
-	//console.log(">>>>>>>>>>>Start:",JSON.stringify(state.Default.config.start.Layout.state));
+	//console.log(">>>>>>>>>>>Init:",JSON.stringify(state.Default.config.init.Layout.state));
 	state.File.next(state,"",callbacks);
     }.bind(this);
     // load url parameters
     this.loadUrl=function(state, response, callbacks) {
-	if (this.debug) {console.log("Loading URL.");};
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.statePath);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateData);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateTrash);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateSelect);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateOther);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateHome);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateVisible);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateColors);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateTooltips);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateFocus);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateLooks);
-	state.Utils.loadUrlDetails(state,state.Default.config.url,this.stateFilm);
+	if (this.debug) {console.log("Processing URL.");};
+	var url=state.Utils.getUrlVars();
+	console.log("Url:",JSON.stringify(url));
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.statePath);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateData);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateTrash);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateSelect);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateOther);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateHome);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateVisible);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateColors);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateTooltips);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateFocus);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateLooks);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateFilm);
 	state.File.next(state,"",callbacks);
     }.bind(this);
     this.pushUrl=function(state) {
 	var url={};
-	state.Utils.pushUrlDetails(state,url,this.statePath);
-	state.Utils.pushUrlDetails(state,url,this.stateData);
-	state.Utils.pushUrlDetails(state,url,this.stateTrash);
-	state.Utils.pushUrlDetails(state,url,this.stateSelect);
-	state.Utils.pushUrlDetails(state,url,this.stateOther);
-	state.Utils.pushUrlDetails(state,url,this.stateHome);
-	state.Utils.pushUrlDetails(state,url,this.stateVisible);
-	state.Utils.pushUrlDetails(state,url,this.stateColors);
-	state.Utils.pushUrlDetails(state,url,this.stateTooltips);
-	state.Utils.pushUrlDetails(state,url,this.stateFocus);
-	state.Utils.pushUrlDetails(state,url,this.stateLooks);
-	state.Utils.pushUrlDetails(state,url,this.stateFilm);
+	state.Utils.pushChanged(state,url,this.statePath);
+	//console.log("Url:",JSON.stringify(url));
+	state.Utils.pushChanged(state,url,this.stateData);
+	state.Utils.pushChanged(state,url,this.stateTrash);
+	state.Utils.pushChanged(state,url,this.stateSelect);
+	state.Utils.pushChanged(state,url,this.stateOther);
+	state.Utils.pushChanged(state,url,this.stateHome);
+	state.Utils.pushChanged(state,url,this.stateVisible);
+	state.Utils.pushChanged(state,url,this.stateColors);
+	state.Utils.pushChanged(state,url,this.stateTooltips);
+	state.Utils.pushChanged(state,url,this.stateFocus);
+	state.Utils.pushChanged(state,url,this.stateLooks);
+	state.Utils.pushChanged(state,url,this.stateFilm);
 	return url;
     }.bind(this);
     // combine available information
@@ -271,6 +274,23 @@ function Default() {
 	if (this.debug) {console.log("Merging state.");};
 	var merge={};
 	// fill merge with setup
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.statePath);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateData);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateTrash);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateSelect);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateOther);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateHome);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateVisible);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateCustom);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateThr);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateColors);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateTooltip);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateTooltips);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateFocus);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateFilm);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateLooks);
+	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateSvg);
+	//
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.statePath);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.stateData);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.stateTrash);
@@ -339,21 +359,21 @@ function Default() {
 	//console.log("STATE:  ",JSON.stringify(state.Settings.visible));
 	// fill merge with init
 	// fill state with merge
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.statePath);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateData);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateTrash);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateSelect);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateOther);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateHome);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateVisible);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateCustom);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateThr);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateColors);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateTooltips);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateFocus);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateFilm);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateLooks);
-	state.Utils.copyMap(state, state.Utils.type.fill, merge, state, this.stateSvg);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.statePath);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateData);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateTrash);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateSelect);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateOther);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateHome);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateVisible);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateCustom);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateThr);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateColors);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateTooltips);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateFocus);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateFilm);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateLooks);
+	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateSvg);
 	state.File.next(state,"",callbacks);
     }.bind(this);
     // replace critical objects after URL has been loaded...
@@ -388,6 +408,36 @@ function Default() {
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.home, state, this.stateOther);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.home, state, this.stateTrash);
 	};
+    }.bind(this);
+    // copy state as soon as first dataset is loaded...
+    this.storeStartState=function(state) { // executed before URL is loaded...
+	if (this.debug) {console.log("Storing start state.");};
+	if (state.Utils.isEmpty(state,state.Default.config.start)) {
+	    state.Default.config.start={};
+	    //console.log("Starting:",JSON.stringify(state.Default.config.start));
+	    // soft copy hardcode-state to start (fillStateDefaults2)
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.statePath);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateData);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateTrash);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateSelect);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateOther);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateHome);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateVisible);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateCustom);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateThr);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateColors);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateTooltip);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateTooltips);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateFocus);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateFilm);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateLooks);
+	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateSvg);
+	    //console.log("Done:",JSON.stringify(state.Default.config.start.visible));
+	    //console.log("State:",JSON.stringify(state.Settings.visible));
+	    //state.Default.save(state);
+	};
+	//console.log(">>>>>>>>>>>State:",JSON.stringify(state.Layout.state));
+	//console.log(">>>>>>>>>>>Start:",JSON.stringify(state.Default.config.start.Layout.state));
     }.bind(this);
     this.resetSetup=function(state,response,callbacks) {
 	try {
@@ -515,18 +565,38 @@ function Default() {
 	state.Html.broadcast(state,"Setup was downloaded.");
     };
     this.hasChanged=function(state,pth) {
-	var src=state.Default.config.start;
+	var init=state.Default.config.init;
+	var url=state.Default.config.url;
+	var start=state.Default.config.start;
+	//console.log("Url:",url);
+	//console.log("Start:",JSON.stringify(state.Default.config.start));
 	var trg=state;
 	var lenp=pth.length;
+	//console.log("hasChanged ",lenp,JSON.stringify(pth));
 	for (var ii=0;ii<lenp;ii++) {
-	    var p=pth[ii];
-	    if (src[p] !== undefined) {
-		src=src[p];
+ 	    var p=pth[ii];
+	    if (init !== undefined && init[p] !== undefined) {
+		init=init[p];
 	    } else {
+		init=undefined;
+	    }
+	    if (url !== undefined && url[p] !== undefined) {
+		url=url[p];
+	    } else {
+		url=undefined;
 		//console.log("Missing Defaults-key:","'"+p+"'",
-		//	    "(path=",JSON.stringify(pth),") Default root=",
-		//	    JSON.stringify(Object.keys(src)));
-		return true;
+		//	    "(path=",JSON.stringify(pth)," ",ii,") Default root=",
+		//	    JSON.stringify(Object.keys(url)));
+		//return true;
+	    }
+	    if (start !== undefined && start[p] !== undefined) {
+		start=start[p];
+	    } else {
+		start=undefined;
+		//console.log("Missing Defaults-key:","'"+p+"'",
+		//	    "(path=",JSON.stringify(pth)," ",ii,") Default root=",
+		//	    JSON.stringify(Object.keys(start)));
+		//return true;
 	    }
 	    if (trg[p] !== undefined) {
 		trg=trg[p];
@@ -535,10 +605,18 @@ function Default() {
 		return true;
 	    }
 	}
-	var s=JSON.stringify(src);
-	var t=JSON.stringify(trg);
-	//console.log("Checking:\'",JSON.stringify(pth),"\'\n\'",s,"\'\n",t,"->",s!==t);
-	return s!==t;
+	//var i=JSON.stringify(init);
+	//var u=JSON.stringify(url);
+	//var s=JSON.stringify(start);
+	//var t=JSON.stringify(trg);
+	if (url !== undefined) {
+	    return true; // changes to url...
+	} else if (JSON.stringify(start) !== JSON.stringify(trg)) {
+	    return true; // changes relative to start state
+	} else {
+	    //console.log("No change:",JSON.stringify(pth),u,s,t);
+	    return false; // no url and same as start state
+	}
     };
 };
 export default Default;
