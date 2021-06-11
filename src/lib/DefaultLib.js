@@ -77,6 +77,7 @@ function Default() {
     ];
     this.toStateLooks = [
 	[["order"],              ["Path","order"]],
+	[["title"],              ["Layout","title"]],
 	[["priority"],           ["Layout","priority"]],
 	[["state","viewMode"],   ["Layout","state","viewMode"]],
 	[["state","cellMode"],   ["Layout","state","cellMode"]],

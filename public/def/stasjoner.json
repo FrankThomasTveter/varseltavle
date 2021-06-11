@@ -1,4 +1,5 @@
 {
+    "title":"Stasjoner",
     "thrs":{
 	"Phenomenon":{
 	    "Middelvind":{"Type":{"Fiskebank":{"key":"a1000", ">": [0,17.2,24.5] },
@@ -39,7 +40,7 @@
     },
     "default":{"thrs":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
     "summaries":["summary_stasjoner"],
-    "fragments":[".*G[234]"],
+    "fragments":[".*G[2]"],
     "colors":{
 	"background":["rgb(36,230,36)","rgb(0,109,219)","rgb(73,0,146)","rgb(146,0,0)"],
 	"foreground":["black","white","white","white"]

@@ -3,6 +3,7 @@
 function Layout() {
     this.rotate=undefined;  // should labels on x-axis be rotated?
     this.priority=undefined;// which key should be on the abscissa
+    this.title="";
     this.init=function(state){
 	//state.Utils.init("Layout",this);
     };

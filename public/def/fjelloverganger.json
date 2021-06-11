@@ -1,4 +1,5 @@
 {
+    "title":"Fjelloverganger",
     "thrs":[{
 	"Phenomenon":{
 	    "Middelvind":{"Type":{"Fjellovergang":{"key":"max", ">": [0,17.2,24.5] }}},

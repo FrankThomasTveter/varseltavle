@@ -11,14 +11,13 @@ const styles = theme => ({
     },
 });
 
-//	color: 'white',
-
 class LocationComponent extends Component {
     constructor(props) {
 	super(props);
 	const {state} = props;
 	state.React.Location=this;
     };
+
     showLocation(state) {
 	//console.log("Showing LocationComponent.",JSON.stringify(state.Path.keys));
 	this.forceUpdate();
@@ -26,9 +25,11 @@ class LocationComponent extends Component {
     render() {
         const { classes, state } = this.props;
 	var title=state.Path.getTitle(state);
-	//console.log("###### Title:",title);
+	if (state.Layout.title !== undefined && state.Layout.title !== "") {
+	    document.title = state.Layout.title;
+	}
         return (
-            <div className={classes.location}>
+	    <div className={classes.location}>
      		{title}
             </div>
         );

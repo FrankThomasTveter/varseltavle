@@ -1,4 +1,5 @@
 {
+    "title":"Stasjoner-vind",
     "thrs":{
 	"Phenomenon":{
 	    "Vindkast":{"Method":{"mb0":{">": [0,2,10,25] },
@@ -9,7 +10,7 @@
     },
     "default":{"thrs":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
     "summaries":["summary_stasjoner"],
-    "fragments":[".*vind.*G[1234]"],
+    "fragments":[".*vind.*G[12]"],
     "colors":{
 	"background":["rgb(36,230,36)","rgb(0,109,219)","rgb(73,0,146)","rgb(146,0,0)"],
 	"foreground":["black","white","white","white"]

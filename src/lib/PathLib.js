@@ -197,6 +197,9 @@ function Path() {
 		  select:state.Utils.cp(state.Path.select),
 		  table:state.Utils.cp(state.Path.table)
 		 };
+	if (this.table.ntarget !== 2) {
+	    snap.ntarget=this.table.ntarget;
+	}
 	snap.focus=state.Utils.cp(state.Path.focus);
 	if (snap.keys.path.other !== undefined) {
 	    //console.log("Snapshort:",JSON.stringify(snap.keys.path));
@@ -211,6 +214,9 @@ function Path() {
 		  order:state.Utils.cp(state.Path.order),
 		  table:state.Utils.cp(state.Path.table)
 		 };
+	if (this.table.ntarget !== 2) {
+	    snap.ntarget=this.table.ntarget;
+	}
 	snap.focus=state.Utils.cp(state.Path.focus);
 	if (focus!==undefined) {snap.focus.auto=focus;};
 	return snap;
@@ -218,6 +224,14 @@ function Path() {
     this.setSnapshot=function(state,snapshot) { // store state
 	state.Utils.restore(state,state.Path,snapshot);
 	if (state.Path.keys.trash===undefined) { state.Path.keys.trash=[];};
+	if (snapshot.ntarget === undefined) {
+	    this.table.ntarget=2;
+	} else {
+	    this.table.ntarget=snapshot.ntarget;
+	}
+
+
+
 	if (snapshot.focus===undefined) {state.Path.focus.auto=true;};
 	//console.log("Snapshot:",
 	//	    JSON.stringify(snapshot.focus),
@@ -425,7 +439,8 @@ function Path() {
 		}
 	    }
 	);
-	//console.log("Pathlib getTitle keys:",JSON.stringify(keys),title);
+	if (title === "") { title=state.Layout.title;};
+	//console.log("Pathlib getTitle keys:",JSON.stringify(keys),title,state.Layout.title);
 	return title;
     };
     this.makeCnt=function(state,key) {

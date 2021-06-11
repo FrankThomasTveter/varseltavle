@@ -180,6 +180,7 @@
     "default":{"thrs":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
     "summaries":["summary"],
     "fragments":["track","turbulens","snowfall","ising_skip","middelvind","regn","skogbrann","vannstand","vindkast"],
+    "title":"Fylker",
     "viewOldData":false,
     "colors":{
 	"background":["rgb(182,219,255)","rgb(255,182,119)","rgb(36,255,36)","rgb(0,0,0)"],
@@ -201,7 +202,7 @@
     "film": {
 	"index": null,
 	"reel": [
-	    {"label":"Middelvind","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Middelvind"]}}},
+	    {"label":"Middelvind","keys":{"path":["Phenomenon"],"other":["Type","Region","date","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Middelvind"]}}},
 	    {"label":"Vindkast","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Vindkast"]}}},
 	    {"label":"Regn","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued","Duration"]},"select":{"val":{"Phenomenon":["Regn"]}}},
 	    {"label":"Styrtregn","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued","Duration"]},"select":{"val":{"Phenomenon":["Styrtregn"]}}},

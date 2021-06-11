@@ -1,4 +1,5 @@
 {
+    "title":"Bergen",
     "thrs":{
 	"Phenomenon":{
 	    "Styrtregn":{"Duration":{ "1t" :{"Area":{"BergenSentrum":{"key":"max", ">": [0,10,17,20] },

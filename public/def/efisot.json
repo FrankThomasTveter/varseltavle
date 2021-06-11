@@ -1,4 +1,5 @@
 {
+    "title":"EFI/SOT",
     "thrs":[{
 	"Phenomenon":{
 	    "Middelvind":{"Type":{"Fiskebank":{"key":"a1000", ">": [0,17.2,24.5] },
@@ -194,7 +195,7 @@
     },
     "keys":{"other":["Phenomenon","date","dtg","Height","Partner",
 		    "Type","Station","Airport","Station","Place",
-		    "Region","Model","Method","Issued","Duration",
+		     "Region","Range","Model","Method","Issued","Duration",
 		    "Output","ILS_direction","Unit"],
 	    "trash":["cnt","lat","lon",
 		     "max","maxlat","maxlon",
