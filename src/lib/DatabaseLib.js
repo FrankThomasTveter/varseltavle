@@ -705,10 +705,10 @@ function Database() {
 	);
     };
     this.processData=function(state,response,callbacks) {
-	//console.log("Database processData.");
 	setTimeout(function() {
 	    try {
 		state.Database.json=JSON.parse(response);
+		console.log("Database processData.");
 	    } catch (e) {
 		alert("Data '"+state.Database.files[0]+"' contains Invalid JSON:"+e.name+":"+e.message);
 	    }
@@ -729,8 +729,11 @@ function Database() {
     };
     this.resetSetup=function(state) {
 	if (state.Database.json !== undefined) {
+	    console.log("Reprocessing data...");
 	    state.Database.processJson(state,state.Database.json);
-	}
+	} else {
+	    console.log("No data to reprocess...");
+	};
     };
     this.saveDb=function(state) {
 	var name=this.getDtg() + '_' + this.loaded;
@@ -929,6 +932,17 @@ function Database() {
 	} else {
 	    return val;
 	};
+    };
+    this.dbReset=function(state) {
+	var docs=this.db.tables.alarm.data;
+	var len=docs.length
+	for (var ii=0;ii<len;ii++) {
+	    var doc=docs[ii];
+	    doc._thr=undefined;
+	    state.Threshold.setThresholds(state,doc);
+	    state.Threshold.importVariables(state,doc);
+	};
+	state.Show.showAll(state);
     };
     this.dbInsert=function(state,json) {
 	var ii,key;
