@@ -29,7 +29,7 @@
                                             "NesttunVassdraget":{"key":"max", ">": [0,70,97,129] }}}}}}},
     "default":{"thrs":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
 
-    "summaries":["summary_avkrok"],
+    "summaries":["summary_avkroker"],
     "fragments":[".*"],
     "colors":{
 	"background":["rgb(36,230,36)","rgb(0,109,219)","rgb(73,0,146)","rgb(146,0,0)"],

@@ -509,7 +509,23 @@ function Default() {
 	// get updated information
 	var setup={};
 	var current={};
-	//console.log("Current:",JSON.stringify(state.Colors.colors));
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.statePath);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateData);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateTrash);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateSelect);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateOther);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateHome);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateVisible);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateCustom);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateThr);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateColors);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateTooltip);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateTooltips);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateFocus);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateFilm);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateLooks);
+	state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.setup, current, this.stateSvg);
+	//console.log("Current:",JSON.stringify(state.Default.config.current));
 	// soft copy current to local (state.Default.fillStateDefaults)
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.statePath);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateData);
@@ -525,6 +541,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateLooks);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateSvg);
 	// hard copy state to local (state.Default.forceToStateTrash)
+	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateThr);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateTrash);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateHome);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateFilm);
@@ -552,8 +569,8 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.fill,  current, setup, this.fromStateTrash);
 	state.Utils.copyMap(state, state.Utils.type.fill,  current, setup, this.fromStateVisible);
 	state.Utils.copyMap(state, state.Utils.type.fill,  current, setup, this.fromStateCustom);
-	console.log("Current:",JSON.stringify(state.Default.config.current.Settings.visible));
-	console.log("Setup:  ",JSON.stringify(current.Settings.visible));
+	//if (state.Default.config.current.Settings!==undefined) {console.log("Current:",JSON.stringify(state.Default.config.current.Settings.visible));}
+	//if (current.Settings!==undefined) {console.log("Setup:  ",JSON.stringify(current.Settings.visible));};
 	//JSON.stringify(setup, null, "   ");
 	return setup;
     }.bind(this);
