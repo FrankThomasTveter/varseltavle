@@ -351,7 +351,7 @@ function Path() {
 	    table.title=label;
 	};
     };
-    this.getTitle=function(state) {
+    this.getTableTitle=function(state) {
 	var table=state.Path.table;
 	return table.title;
     };
@@ -431,6 +431,40 @@ function Path() {
 			    if (title !== "") { title=title + del;};
 			    var val=vals[ii];
 			    title=title+state.Database.getTitleDynamic(state,key,val);
+			}
+		    }
+		} else {
+		    console.log("********* Corrupt select...",
+				JSON.stringify(state.Path.select));
+		}
+	    }
+	);
+	if (title === "") { title=state.Layout.title;};
+	//console.log("Pathlib getTitle keys:",JSON.stringify(keys),title,state.Layout.title);
+	return title;
+    };
+    this.getTooltip=function(state) {
+	var title="";
+	var del="\n";
+	var keys=state.Path.keys.path;
+	keys.forEach(
+	    function(key,index) {
+		if (state.Path.select !== undefined
+		    && state.Path.select.val !== undefined
+		    && state.Path.select.range !== undefined) {
+		    var vals=state.Path.select.val[key];
+		    var range=state.Path.select.range[key];
+		    //console.log("   select:",key,JSON.stringify(vals));
+		    if (range !== undefined) {
+			if (title !== "") { title=title + del;};
+			title=title+key+"<"+range[0]+","+range[1]+">";
+		    } else { 
+			if (vals === undefined) {vals=[];};
+			var lenv=vals.length
+			for (var ii=0;ii<lenv;ii++) {
+			    if (title !== "") { title=title + del;};
+			    var val=vals[ii];
+			    title=title+state.Database.getTitleDynamic(state,key,val,key);
 			}
 		    }
 		} else {

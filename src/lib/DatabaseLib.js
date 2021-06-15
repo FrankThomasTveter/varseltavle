@@ -1210,14 +1210,21 @@ function Database() {
 	};
 	//console.log("Indexes:",s);
     };
-    this.getTitleDynamic=function(state,key,val) {
+    this.getLing=function(val,lng) {
+	if (lng === undefined) {
+	    return val;
+	} else {
+	    return lng + "=" + val;
+	}
+    }
+    this.getTitleDynamic=function(state,key,val,lng) {
 	var ret,parse;
 	if (state.Database.values[key] === undefined) {
 	    if (val === "null" || val==="") {
 		ret= "!"+key;
 	    } else {
-		ret=val;
-	    }
+		val=this.getLing(val,lng);
+	    };
 	} else {
 	    var keytrg=this.getKeytrg(state,key,val);
 	    if (val === "null" || val === "") {
@@ -1237,7 +1244,7 @@ function Database() {
 		    ret=parse;
 		};
 	    } else {
-		ret=val;
+		ret=this.getLing(val,lng);
 	    };
 	};
 	return ret;

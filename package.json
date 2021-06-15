@@ -38,6 +38,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.4.3",
     "react-tooltip": "^4.0.0",
+    "src": "^1.1.2",
     "three": "^0.125.0"
   },
   "scripts": {
