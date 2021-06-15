@@ -3,9 +3,9 @@
     "thrs":{
 	"Phenomenon":{
 	    "Vindkast":{"Method":{"mb0":{">": [0,2,10,25],  "key":"max"},
-				  "p50":{">": [0,2,10,25]}, "key":"max",
-				  "p65":{">": [0,10,25] },  "key":"max",
-				  "p100":{">": [0,25] }}}
+				  "p50":{">": [0,2,10,25], "key":"max"},
+				  "p65":{">": [0,10,25] ,  "key":"max"},
+				  "p100":{">": [0,25], "key":"max"}}}
 	}
     },
     "default":{"thrs":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
