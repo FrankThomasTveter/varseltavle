@@ -58,9 +58,9 @@
     },
     "priority":["dtg","date","Unit","Type","Model","Partner","Output","Duration",
 		"Phenomenon","Area","Region","Method","Issued"],
-    "state":{"viewMode":0,"cellMode":0,"layoutMode":0},
+    "state":{"viewMode":0,"cellMode":0,"layoutMode":0,"tooltip":0},
     "home":{"path":[],"val":{"Partner":[]}},
-    "tooltip":{"keys":["Phenomenon","Duration","alarm_key","alarm_val","Unit","Method","dtg","lat","lon","max","aavg","min"],
+    "tooltip":{"keys":["Phenomenon","Duration","alarm_key","alarm_val","Method","dtg","lat","lon","max","aavg","min"],
 	       "select":["Phenomenon","Duration"],
 	       "sort":["Duration","Phenomenon"],
            "click":["Phenomenon","Duration","dtg"]

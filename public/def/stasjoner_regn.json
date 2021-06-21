@@ -2,22 +2,8 @@
     "title":"Stasjoner-regn",
     "thrs":{
 	"Phenomenon":{
-	    "Middelvind":{"Type":{"Fiskebank":{"key":"a1000", ">": [0,17.2,24.5] },
-	                          "Metarea19":{"key":"a1000", ">": [0,17.2,24.5] },
-                              "Kyst":     {"key":"a100", ">": [0,13.9,24.5] },
-                              "Fylke":    {"key":"a100", ">": [0,13.9,24.5] }}},
-	    "Vindkast":[{"Method":{"mb0":{"key":"max", ">": [0,2,10,25] },
-				  "p50":{"key":"max", ">": [0,2,10,25] },
-				  "p65":{"key":"max", ">": [0,10,25] },
-				   "p100":{"key":"max", ">": [0,25] }}}],
-	    "Styrtregn":{"Duration":{ "1t" :{"Method":{"mb0":{"key":"max", ">": [0,15,25,35] },
-						       "p50":{"key":"max", ">": [0,15,25,35] },
-						       "p65":{"key":"max", ">": [0,25,35] },
-						       "p100":{"key":"max", ">": [0,35] }}},
-                                      "3t" :{"Method":{"mb0":{"key":"max", ">": [0,30,40,50] },
-						       "p50":{"key":"max", ">": [0,30,40,50] },
-						       "p65":{"key":"max", ">": [0,40,50] },
-						       "p100":{"key":"max", ">": [0,50] }}}}
+	    "Styrtregn":{"Duration":{ "1t" :{"key":"max", ">": [0,15,20] },
+                                      "3t" :{"key":"max", ">": [0,25,30] }}
 			},
 	    "Regn":{"Method":[{"mb0":{"key":"yrp", ">": [0,5,10,25] },
 			       "p50":{"key":"yrp", ">": [0,5,10,25] },
@@ -28,14 +14,7 @@
 			       "p65":{"key":"max", ">": [0,10,25] },
                                "p100":{"key":"max", ">": [0,25] }}
 			     ]
-		   },
-	    "Skogbrann":{"key":"a100", ">": [0,20,40] },
-	    "Ising på skip":{"Type":{"Fiskebank":{"key":"f70", ">": [0,0.5,1.34] },
-	                             "Metarea19":{"key":"f70", ">": [0,0.5,1.34] },
-                                 "Kyst":     {"key":"f95", ">": [0,0.5,1.34] },
-                                 "Fylke":    {"key":"f95", ">": [0,0.5,1.34] }}},
-	    "Polare lavtrykk":{"key":"max", ">": [0.0,0.05] },
-	    "Turbulens":{"key":"max", ">": [0,2.0,3.5] }
+		   }
 	}
     },
     "default":{"thrs":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
@@ -47,7 +26,7 @@
     },
     "keys":{
 	"other":[
-	    "Region","Phenomenon","date","dtg","Place","Method","Duration","Partner",
+	    "Region","date","dtg","Place","Duration","Method","Phenomenon","Partner",
 	    "Type","Station","Model","Issued","Output","ILS_direction","Unit"
 	],
 	"trash":["cnt","lat","lon",
@@ -62,35 +41,23 @@
     },
     "order":{
 	"Duration":["1t","3t","6t","12t","24t"],
-	"Output":["1t","3t","6t","12t","24t"],
 	"Method":["mb0","p50","p65","p100"],
 	"Phenomenon":["Middelvind","Vindkast","Styrtregn","Regn","Vannstand","Fire Index","Skogbrann","Ising på skip","Polart lavtrykk","Polare lavtrykk","Turbulens"],
-    "Station":["Viker","Oscarsborg","Oslo","Helgeroa","Tregde","Stavanger","Bergen","Måløy","Ålesund","Kristiansund","Heimsjø",
-    "Trondheim","Rørvik","Bodø","Narvik","Kabelvåg","Andenes","Harstad","Tromsø","Hammerfest","Honningsvåg","Vardø","Ny Ålesund","Ny-Ålesund"],
-    "Region":["Innlandet","Viken Øst","Oslo","Viken Vest","Vestfold og Telemark","Agder","Rogaland","Vestland","Møre og Romsdal","Trøndelag",
-    "Nordland","Troms og Finnmark","Indre Skagerrak","Ytre Skagerrak","Fisker","Fladen","Utsira Sør","Utsira Nord",
-    "Viking","Aust-Tampen","Storegga","Frøyabanken","Haltenbanken","Storegga-Haltenbanken-0m","Sklinnabanken","Trænabanken",
-    "Ytre Vestfjorden","Røstbanken","Vesterålsbankene","Bankene u Troms","Tromsøflaket","Hjelmsøybanken","Nordkappbanken","Nordbanken",
-    "Kildinbanken","Amundsenbassenget","Dype Wandelhav","Gakkelryggen","Nansenbassenget","Bankene i Wandelhavet","Nordlige Belgica bank",
-    "Lenadypet","Yermakplataet","Litkedypet","Bankene nord for Svalbard","A1","A2","A3","A4","A5","B1","B2","B3","B4","B5","C2","C3","C4",
-    "C5","D2","D3","Dype D4","E2","E3","Dype E4","F2","F3"],
-    "Airport":["Førde","Sandane","Ørsta-Volda","Værnes","Brønnøysund","Mosjøen","Sandnessjøen","Mo i Rana",
-    "Harstad-Narvik","Svolvær","Leknes","Bardufoss","Tromsø","Hasvik","Hammerfest","Honningsvåg","Mehamn","Svalbard"],
-    "Aerodrome":["ENBL","ENSD","ENOV","ENVA","ENBN","ENMS","ENST","ENRA","ENEV","ENSH","ENLK","ENDU","ENTC","ENHK",
-    "ENHF","ENHV","ENMH","ENSB"]
+    "Region":["Innlandet","Viken Øst","Oslo","Viken Vest","Vestfold og telemark","Agder","Rogaland","Vestland","Møre og romsdal","Trøndelag",
+    "Nordland","Troms og Finnmark","Svalbard"]
     },
     "priority":["dtg","date","Unit","Type","Model","Partner","Output","Duration",
 		"Phenomenon","Airport","Station","Place","Region","Method","Issued"],
-    "state":{"viewMode":0,"cellMode":0,"layoutMode":0},
+    "state":{"viewMode":0,"cellMode":0,"layoutMode":0,"tooltip":0},
     "home":{"path":[],"val":{"Partner":[]}},
-    "tooltip":{"keys":["Phenomenon","Region","Duration","Airport","alarm_key","alarm_val","Unit","Model","Method","Output","dtg","lat","lon","max"],
+    "tooltip":{"keys":["Phenomenon","Region","Place","Duration","Airport","alarm_key","alarm_val","Model","Method","dtg","lat","lon","max","rr"],
 	       "select":["Phenomenon","Duration"],
 	       "sort":["Phenomenon","Duration","Region"],
                "click":["Phenomenon","Region","Duration","Output","Airport","dtg"]
 	      },
     "polygons":{"dir":"simplified/","seperator":"_","keys":["Type","Region","Request"]},
     "custom":{},
-    "visible":["Undo","Redo","Mode","Tooltip","Path"],
+    "visible":["Undo","Redo","Reload","Mode","ViewPath","Tooltip"],
     "svg":{"key":"Phenomenon","svgs":{
 "Ising på skip":"<svg width=\"Size\" height=\"Size\" fill=\"none\" version=\"1.1\" id=\"svg10\"><defs id=\"defs14\" /><path fill=\"#fff\" fill-rule=\"evenodd\" d=\"M31.556 28.24a1.5 1.5 0 0 1-1.302 2.245H1.7A1.5 1.5 0 0 1 .398 28.24L14.675 3.256a1.5 1.5 0 0 1 2.604 0l14.277 24.985z\" clip-rule=\"evenodd\" id=\"path2\" /><path d=\"m 30.277,30.04794 a 1,1 0 0 0 0.868,-1.496 L 16.868,3.5669395 a 1,1 0 0 0 -1.736,0 L 0.855,28.55194 a 1,1 0 0 0 0.868,1.496 z\" id=\"path4\" style=\"clip-rule:evenodd;fill:bg;fill-rule:evenodd\" /><path fill=\"#908715\" fill-rule=\"evenodd\" d=\"M31.277 29a1 1 0 0 0-.132-.496L16.868 3.519a1 1 0 0 0-1.736 0L.855 28.504A1 1 0 0 0 1.723 30h28.554a1 1 0 0 0 1-1zM16.434 3.767l14.277 24.985a.5.5 0 0 1-.434.748H1.723a.5.5 0 0 1-.434-.748L15.566 3.767a.5.5 0 0 1 .868 0z\" clip-rule=\"evenodd\" id=\"path6\" /><path id=\"path820\" d=\"m 8.8001256,24.080321 c 0,0 0.4462574,0.979811 0.7741146,1.399891 0.3042869,0.389879 0.6703528,0.746939 1.1059588,1.026064 0.462056,0.296073 1.015527,0.513929 1.55624,0.679788 0.7129,0.218676 1.518465,0.270571 2.223747,0.289015 0.723754,0.01892 1.54622,0.06837 2.327882,0.01989 0.792337,-0.04913 1.58991,-0.168412 2.338427,-0.400585 0.417335,-0.129448 0.810973,-0.322124 1.173,-0.544898 0.403454,-0.248268 0.778331,-0.539859 1.094619,-0.870736 0.397606,-0.415945 0.987432,-1.37789 0.987432,-1.37789 z\" style=\"fill:fg;fill-opacity:1;stroke:fg;stroke-width:0.77356315px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\" /><path id=\"path822\" d=\"m 14.719626,24.022704 0.166758,-13.238174 0.9474,1.553366 1.459531,4.54191 1.711163,5.659549 -4.253384,-0.04624\" style=\"fill:fg;fill-opacity:1;stroke:fg;stroke-width:0.86000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1\" /></svg>",
 
