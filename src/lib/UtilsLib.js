@@ -916,6 +916,29 @@ function Utils() {
 	//console.log("New URL: (",url.length,"):",this.prettyJson(uri));
 	    return url;
     };
+    this.getQRUrl=function(state) {
+	var path = window.location.pathname;
+	//console.log("Path:",path);
+	var page = path.split("/").pop();
+	page.split('#').shift();
+	//console.log( page );
+	var url=page+"?setup="+state.Default.setup+"&";
+	//console.log("Actual Keys:",JSON.stringify(state.Path.keys));
+	var uri=state.Default.pushQRUrl(state)
+	for (var key of Object.keys(uri)) {
+	    var val=uri[key];
+	    //console.log("KV:",key,val);
+	    if (val !== undefined) {
+		var raw=JSON.stringify(val);
+		//console.log("Raw:",raw, JSON.parse(raw));
+		var str=encodeURIComponent(raw)+"&";
+		url=url + key + "=" + str;
+	    }
+	};
+	//console.log("Setting URL to: (",url.length,"):",decodeURI(url));
+	//console.log("New URL: (",url.length,"):",this.prettyJson(uri));
+	    return url;
+    };
     this.pushChanged=function(state,url,map) {
 	//console.log("PushUrlDetails:",url,JSON.stringify(map));
 	if (url===undefined) {

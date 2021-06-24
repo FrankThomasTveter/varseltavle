@@ -39,7 +39,7 @@ function getTextHeight(fontname, fontsize){
 
 function QrIcon(props) {
     const {state,width}=props; //classes,
-    var url=state.Utils.getUrlPath(state);
+    var url=state.Utils.getQRUrl(state);
     console.log("Got path:",url);
     if (width !== undefined) {
 	return <QRCode value={url} level="Q" style={{ width: width }}/>;
