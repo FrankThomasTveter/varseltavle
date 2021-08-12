@@ -564,7 +564,7 @@ function Utils() {
 	return ret;
     }
     // copy object-structure
-    this.isEmpty=function(state,obj) { // check if obj has any string/number children
+    this.isEmpty=function(obj) { // check if obj has any string/number children
 	var ret=true;
 	var k;
 	if (obj===undefined) {
@@ -573,7 +573,7 @@ function Utils() {
 	    var typ=typeof obj;
 	    if (typ === "Array") { // check array children
 		for (k in obj) {
-		    if (! this.isEmpty(state,obj[k])) {
+		    if (! this.isEmpty(obj[k])) {
 			ret=false;
 			//console.log("    =",typ,ret,k,JSON.stringify(obj[k]));
 			break;
@@ -582,7 +582,7 @@ function Utils() {
 	    } else if (typ === "object") { // check hash children
 		for (k in obj) {
 		    if (obj.hasOwnProperty(k)) {
-			if (! this.isEmpty(state,obj[k])) { 
+			if (! this.isEmpty(obj[k])) { 
 			    ret=false;
 			    //console.log("    =",typ,ret,k,JSON.stringify(obj[k]));
 			    break;
@@ -665,7 +665,7 @@ function Utils() {
     this.cpMap=function(state,t,s,trg,src,type) {
 	var ss=this.getItem(state,s,src);
         if (ss !== undefined || type===this.type.force) {
-	    if (this.bdeb) {console.log("Filling:",s,'->',t,! this.isEmpty(state,ss));}
+	    if (this.bdeb) {console.log("Filling:",s,'->',t,! this.isEmpty(ss));}
 	    this.setMap(state,t,trg,ss,type);
 	};
     }.bind(this);
@@ -684,7 +684,7 @@ function Utils() {
 	    }
 	    if (type===this.type.force ||
 		type===this.type.any ||
-		(type===this.type.fill && this.isEmpty(state,tt[t[ll-1]]))) {
+		(type===this.type.fill && this.isEmpty(tt[t[ll-1]]))) {
 		tt[t[ll-1]]=state.Utils.cp(ss)
 	    }
 	    if (this.bdeb) {
@@ -724,7 +724,7 @@ function Utils() {
 		if (tt[t[ii]]===undefined) { tt[t[ii]]={} };
 		tt=tt[t[ii]];
 	    }
-	    if (this.isEmpty(state,tt[t[ll-1]])) {
+	    if (this.isEmpty(tt[t[ll-1]])) {
 		tt[t[ll-1]]=state.Utils.cp(ss);
 	    }
 	    return tt[t[ll-1]];
@@ -742,8 +742,8 @@ function Utils() {
     }.bind(this);
     this.cpFill=function(state,t,s,trg,src) {
 	var ss=this.getItem(state,s,src);
-	if (this.debug) {console.log("Filling:",s,'->',t,! this.isEmpty(state,ss));}
-	//if (! this.isEmpty(state,ss) ) {
+	if (this.debug) {console.log("Filling:",s,'->',t,! this.isEmpty(ss));}
+	//if (! this.isEmpty(ss) ) {
         if (ss !== undefined) {
 	    this.setFill(state,t,trg,ss);
 	}
@@ -855,8 +855,8 @@ function Utils() {
 	if (s===undefined) {console.log("Invalid map-path...");};
 	if (src===undefined) {console.log("Invalid map-source...");};
 	var ss=this.getItem(state,s,src);
-	//console.log("Filling:",s,'->',t,! this.isEmpty(state,ss),JSON.stringify());
-	//if (! this.isEmpty(state,ss) ) {
+	//console.log("Filling:",s,'->',t,! this.isEmpty(ss),JSON.stringify());
+	//if (! this.isEmpty(ss) ) {
         if (ss !== undefined) {
 	    bok=true;
 	    console.log("Item:",JSON.stringify(s),"->",JSON.stringify(ss));

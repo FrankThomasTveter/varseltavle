@@ -352,7 +352,7 @@ function Matrix() {
 	    console.log("No valid data available for Matrix.");
 	    state.Html.setFootnote(state,"No data with valid threshold was found.");
 	}
-	if (state.Layout.state.tooltip === 2) { // pre-generate all tooltips
+	if (state.Layout.state.tooltip === 1) { // pre-generate all tooltips
 	    state.Matrix.addAllTooltip(state,matrix);
 	};
     };
@@ -557,7 +557,7 @@ function Matrix() {
 	} else if (nn === dd) { // make sure at least 1 undef is added...
 	    arr.docs.push(doc);
 	}
-	//if (state.Layout.state.tooltip === 2) {
+	//if (state.Layout.state.tooltip === 1) {
 	//var drank=state.Threshold.getRank(state,doc);	
 	if (arr.tooltip === undefined) {arr.tooltip={};};
 	var el=this.getTooltipElement(state,arr.tooltip,doc);

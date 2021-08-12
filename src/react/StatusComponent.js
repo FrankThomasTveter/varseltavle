@@ -1,14 +1,28 @@
 import React, { Component} from 'react';
 import {withStyles} from '@material-ui/core/styles';
 import PropTypes from "prop-types";
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+
+import Frag        from './FragComponent';
 
 // npm install notistack
 const styles = theme => ({
+    tableOrder: {
+	display: 'inline-block',
+        marginRight: 'auto',
+    },
+    settings: {
+        marginRight: 'auto',
+	color:'red',
+    },
+    button:{color:'white'},
     content: {
         flex: '1 0 auto',
         paddingTop: '0rem',
         marginLeft: 'auto',
 	alignItems:'right',
+	cursor:'pointer',
     },
     align:{
 	width: '100%',
@@ -28,7 +42,7 @@ class Status extends Component {
     constructor(props) {
 	super(props);
 	props.state.React.Status = this;
-	this.state={msg:""};
+	this.state={msg:"", anchor:null};
     };
     // set dataset age
     setAge(state,age) {
@@ -41,12 +55,29 @@ class Status extends Component {
 	//this.forceUpdate();
     };
     render() {
-        const { classes } = this.props;
+        const { state, classes } = this.props;
+	this.onClose = () => {this.setState({ anchor: null });};
+	this.onClick = (event) => {this.setState({ anchor: event.currentTarget });};
         return (
                 <div className={classes.content}>
-		   <div className={classes.align}>
+		   <div className={classes.align}
+                    aria-owns={this.state.anchor ? 'settings-menu' : undefined}
+                    aria-haspopup="true"
+                    onClick={this.onClick}
+		    title={"Fragment information"}>
 		      <div>{this.state.msg}</div>
 		   </div>
+	           <Menu
+		   className={classes.tableOrder}
+                   id="settings-menu"
+	           anchorEl={this.state.anchor}
+                   open={Boolean(this.state.anchor)}
+                   onClose={this.onClose}
+	          >
+		    <MenuItem key="reload" onClose={this.onClose}>
+		       <Frag state={state}/>
+		    </MenuItem>
+		  </Menu>
                 </div>
         );
     }

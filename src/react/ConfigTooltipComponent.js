@@ -23,7 +23,7 @@ function TooltipIconMode (props) {
     //console.log("ConfigTooltipComponent:",state.Layout.state.tooltip);
     if (state.Layout.state.tooltip===0) {
 	return (<NoTooltipIcon/>);
-    } else if (state.Layout.state.tooltip===1) {
+    } else if (state.Layout.state.tooltip===2) {
 	return (<ClickTooltipIcon/>);
     } else {
 	return (<TooltipIcon/>);

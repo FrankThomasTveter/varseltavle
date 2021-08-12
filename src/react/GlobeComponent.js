@@ -76,7 +76,7 @@ function MapGlobe(props) {
 				exitAnimationDuration:0.0,
 				offsetRadiusScale:0.01,
 				//radiusScaleRange:[1,1],
-				enableGlow:true,
+				enableGlow:false,
 			       }}
 	        cameraOptions={{autoRotateSpeed:0}}
 	/>)

@@ -28,8 +28,9 @@ function Adress(props) {
 
             <Grid item xs={12} sm={12}>
              <Typography color={"inherit"}>
+	    <a href="https://docs.google.com/presentation/d/1SfaiGS2I04l0t0fZODwiPrJCgGo7CnKYAe1ocD_rU0w" rel="noopener noreferrer" target="_blank"> doc@ </a>
             <a href="https://met.no"> met.no </a>
-             </Typography>
+        </Typography>
             </Grid>
     );
 }

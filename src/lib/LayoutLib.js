@@ -36,10 +36,10 @@ function Layout() {
 		       }
 	       };
     this.toggleTooltip=function(state) {
-	state.Layout.state.tooltip=(state.Layout.state.tooltip+1)%3;
+	state.Layout.state.tooltip=(state.Layout.state.tooltip+1)%2;
 	//console.log("Tooltip:",this.state.tooltip);
 	state.Utils.pushUrl(state);
-	var reload=(!state.Matrix.ltooltip && state.Layout.state.tooltip === 2); // pre-generate all tooltips
+	var reload=(!state.Matrix.ltooltip && state.Layout.state.tooltip === 1); // pre-generate all tooltips
 	state.Show.show(state,reload);
     };
     this.changeFont=function(state) {

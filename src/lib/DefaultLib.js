@@ -211,7 +211,7 @@ function Default() {
     // initial state before url is loaded
     this.storeInitState=function(state, response, callbacks) { // executed before URL is loaded...
 	if (this.debug) {console.log("Storing init state.");};
-	if (state.Utils.isEmpty(state,state.Default.config.init)) {
+	if (state.Utils.isEmpty(state.Default.config.init)) {
 	    state.Default.config.init={};
 	    //console.log("Initing:",JSON.stringify(state.Default.config.init));
 	    // soft copy hardcode-state to init (fillStateDefaults2)
@@ -244,7 +244,7 @@ function Default() {
     this.loadUrl=function(state, response, callbacks) {
 	if (this.debug) {console.log("Processing URL.");};
 	var url=state.Utils.getUrlVars();
-	console.log("Url:",JSON.stringify(url));
+	//console.log("Url:",JSON.stringify(url));
 	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.statePath);
 	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateData);
 	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateTrash);
@@ -424,12 +424,13 @@ function Default() {
     }.bind(this);
     this.storeHomeState=function(state,response,callbacks) {
 	if (this.debug) {console.log("Storing home state.");};
-	if (state.Default.config.home === undefined) {
+	if (state.Utils.isEmpty(state.Default.config.home)) {
 	    state.Default.config.home={};
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.home, this.statePath);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.home, this.stateSelect);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.home, this.stateOther);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.home, this.stateTrash);
+	    console.log("Home:",JSON.stringify(state.Default.config.home));
 	};
 	state.File.next(state,"",callbacks);
     }.bind(this);
@@ -445,7 +446,7 @@ function Default() {
     // copy state as soon as first dataset is loaded...
     this.storeStartState=function(state) { // executed before URL is loaded...
 	if (this.debug) {console.log("Storing start state.");};
-	if (state.Utils.isEmpty(state,state.Default.config.start)) {
+	if (state.Utils.isEmpty(state.Default.config.start)) {
 	    state.Default.config.start={};
 	    //console.log("Starting:",JSON.stringify(state.Default.config.start));
 	    // soft copy hardcode-state to start (fillStateDefaults2)

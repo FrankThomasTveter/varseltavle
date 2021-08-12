@@ -120,7 +120,7 @@ class GeoJsonMap extends Component {
     // 	//console.log("Path:",JSON.stringify(marker.state.Path.keys));
     // 	//console.log("Marker colwhere:",marker.colwhere," rowwhere:",marker.rowwhere);
     // 	var state=marker.state;
-    // 	if (state.Layout.state.tooltip===2) {
+    // 	if (state.Layout.state.tooltip===1) {
     // 	    return null;
     // 	} else {
     // 	    return <TooltipFixedComponent state={marker.state} data={marker} update={this.update}/>;

@@ -59,7 +59,7 @@ export const defaultGlobeOptions = {
     process.env.PUBLIC_URL+'/textures/clouds.png',
   enableBackground: true,
   enableClouds: true,
-  enableGlow: true,
+  enableGlow: false,
   glowCoefficient: 0.1,
   glowColor: '#d1d1d1',
   glowPower: 3,

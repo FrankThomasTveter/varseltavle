@@ -235,6 +235,34 @@ function Database() {
 	    delete state.Database.fragjson[frag];
 	};
     };
+    this.getDate=function(epoch) {
+	//2021-06-18_05-00-01.000Z
+	if (epoch===undefined) {return new Date();};
+	var yy=parseInt(epoch.substring(0,4));
+	var mm=parseInt(epoch.substring(5,7));
+	var dd=parseInt(epoch.substring(8,10));
+	var hh=parseInt(epoch.substring(11,13));
+	var mi=parseInt(epoch.substring(14,16));
+	var ss=parseInt(epoch.substring(17,23));
+	return (new Date(Date.UTC(yy,mm-1,dd,hh,mi,ss)));
+    };
+    this.getFragTimes=function(state) {
+	var ret={};
+	var fragments=state.Database.getFragments(state);
+	var lenr=fragments.length;
+	for (var ii=0;ii<lenr;ii++) {
+	    var frag=fragments[ii];
+	    var json=state.Database.fragjson[frag];
+	    var cnt=parseInt(json.cnt,0);
+	    var str=("          " + cnt).slice(-10);
+	    var epoch=json.epoch;
+	    var millis=this.getDate()-this.getDate(epoch);
+	    var hrs=(millis/3600000).toFixed(1); // hours
+	    var hst=("          " + hrs).slice(-10) + "h";
+	    ret[frag]= {age:hst,epoch:epoch,frag:frag,cnt:str};
+	};
+	return ret;
+    };
     this.combineJsons=function(state,nfrags,frags) {
 	var data=[];
 	var epoch;
