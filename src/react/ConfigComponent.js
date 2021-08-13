@@ -24,6 +24,7 @@ import Dims         from './ConfigDimComponent';
 import Levs         from './ConfigLevComponent';
 import Focus        from './ConfigFocusComponent';
 import FullScreen   from './ConfigFullScreenComponent';
+import Notification from './ConfigNotificationComponent';
 import About        from './ConfigAboutComponent';
 import QRCode       from './ConfigQRComponent';
 
@@ -84,6 +85,7 @@ class Config extends Component {
 		<Levs state={state} classes={cls} visible={false}/>
 		<Focus state={state} classes={cls} visible={false}/>
 		<FullScreen state={state} classes={cls} visible={false}/>
+		<Notification state={state} classes={cls} visible={false}/>
 		<About state={state} classes={cls} visible={false}/>
 	        <QRCode state={state} classes={cls} visible={false}/>
                 <Settings state={state} classes={cls} visible={false}/>

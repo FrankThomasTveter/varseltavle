@@ -26,6 +26,7 @@ import Dims         from './ConfigDimComponent';
 import Levs         from './ConfigLevComponent';
 import Focus        from './ConfigFocusComponent';
 import FullScreen   from './ConfigFullScreenComponent';
+import Notification from './ConfigNotificationComponent';
 import About        from './ConfigAboutComponent';
 import QRCode       from './ConfigQRComponent';
 
@@ -141,6 +142,9 @@ class SettingsMenu extends Component {
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="fullscreen" onClose={this.onClose}>
 		       <FullScreen state={state} classes={cls}/>
+		    </MenuItem>
+		    <MenuItem className={classes.order} key="notification" onClose={this.onClose}>
+		       <Notification state={state} classes={cls}/>
 		    </MenuItem>
 		    <MenuItem className={classes.order} key="about" onClose={this.onClose}>
 		       <About state={state} classes={cls}/>

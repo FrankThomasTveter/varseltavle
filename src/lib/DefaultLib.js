@@ -81,6 +81,7 @@ function Default() {
     this.toStateLooks = [
 	[["title"],              ["Layout","title"]],
 	[["priority"],           ["Layout","priority"]],
+	[["notification"],       ["Database","notification","mode"]],
 	[["state","viewMode"],   ["Layout","state","viewMode"]],
 	[["state","cellMode"],   ["Layout","state","cellMode"]],
 	[["state","layoutMode"], ["Layout","state","layoutMode"]],

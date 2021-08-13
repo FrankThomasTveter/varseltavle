@@ -1,4 +1,5 @@
 //console.log("Loading DatabaseLib.js");
+import addNotification from 'react-push-notification';
 
 //import {alasql} from "alasql";
 //const alasql = window.alasql;
@@ -18,6 +19,7 @@ function Database() {
     this.fragjson={};         // json[frag]
     this.fragfile={};         // file[frag]
     this.fragcnt={};          // cnt[frag]
+    this.notification={mode:0,maxLevel:0};
     this.fragdtg=null;
     this.loaded="";
     this.append=false;
@@ -39,6 +41,7 @@ function Database() {
     this.stepCnt=0;      // current step count
     this.loadcnt=0;      // polling count
     this.loadfile=0;      // polling count
+    this.maxLevel=-99;
     this.dbcnt=0;        // records in database
     this.ready=true;     // can we poll server or is another poll running
     this.viewOldData=false;  //  keep old data?
@@ -58,6 +61,15 @@ function Database() {
 	//console.log("Show.view before:",this.state.viewMode,JSON.stringify(this.state),JSON.stringify(this.modes));
 	state.Database.viewOldData=!state.Database.viewOldData;
 	state.Show.showAll(state);
+    };
+    this.toggleNotification=function(state) {
+	//console.log("Show.view before:",this.state.viewMode,JSON.stringify(this.state),JSON.stringify(this.modes));
+	state.Database.notification.mode=(state.Database.notification.mode+1)%3
+	state.Show.showConfig(state);
+    };
+    this.getNotificationMode=function(state) {
+	//console.log("Show.view before:",this.state.viewMode,JSON.stringify(this.state),JSON.stringify(this.modes));
+	return state.Database.notification.mode;
     };
     this.newDb=function(state) {
 	if (state.Database.append && this.db !== null) {
@@ -705,6 +717,37 @@ function Database() {
 		state.Database.makeWhere(state);
 		// put data into database...
 		state.Show.showAll(state);
+		if (frags.length>0) {
+		    var ttl,stl,msg;
+		    if (state.Database.notification.mode === 2 &&
+			(state.Database.notification.maxLevel === undefined ||
+			 state.Database.notification.maxLevel < state.Database.maxLevel)) {
+			state.Database.notification.maxLevel=state.Database.maxLevel;
+			ttl='Warning tablau: Load cnt ' + state.Database.loadcnt;
+			stl= 'Level increased';
+			msg='Maximum level: ' + state.Database.notification.maxLevel;
+			addNotification({
+			    title: ttl,
+			    subtitle: stl,
+			    message:  msg ,
+			    theme: 'red',
+			    duration: 10000,
+			    native: true // when using native, your OS will handle theming.
+			});
+		    } else if (state.Database.notification.mode === 1) {
+			ttl='Warning tablau: Load cnt ' + state.Database.loadcnt;
+			stl= 'Data loaded.';
+			msg="Loaded: " + state.Database.dbcnt + ' records';
+			addNotification({
+			    title: ttl,
+			    subtitle: stl,
+			    message: msg,
+			    theme: 'red',
+			    duration: 10000,
+			    native: true // when using native, your OS will handle theming.
+			});
+		    };
+		};
 		//console.log("Normal end...")
 	    };
 	    // set status...
@@ -721,6 +764,7 @@ function Database() {
 	    console.log("Error msg: " + err.message);
 	};
 	const endAll=function() {
+	    // send notification...
 	    //console.log("Done..");
 	};
 	// wrap up
@@ -962,6 +1006,7 @@ function Database() {
 	};
     };
     this.dbReset=function(state) {
+	state.Database.maxLevel=-1;
 	var docs=this.db.tables.alarm.data;
 	var len=docs.length
 	for (var ii=0;ii<len;ii++) {
@@ -969,10 +1014,15 @@ function Database() {
 	    doc._thr=undefined;
 	    state.Threshold.setThresholds(state,doc);
 	    state.Threshold.importVariables(state,doc);
+	    var lev=doc.level;
+	    if (lev > state.Database.maxLevel) {
+		state.Database.maxLevel=lev;
+	    }
 	};
 	state.Show.showAll(state);
     };
     this.dbInsert=function(state,json) {
+	state.Database.maxLevel=-1;
 	var ii,key;
 	try {
 	    // preprocess
@@ -982,6 +1032,10 @@ function Database() {
 		var doc=docs[ii];
 		doc["cnt"]=ii;
 		state.Threshold.importVariables(state,doc);
+		var lev=doc.level
+		if (lev > state.Database.maxLevel) {
+		    state.Database.maxLevel=lev;
+		}
 	    };
 	    // get modified date
 	    //console.log("Setting time.");

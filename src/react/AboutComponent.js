@@ -25,7 +25,7 @@ const { REACT_APP_DATE } = process.env;
 //text        margin: theme.spacing.getMaxWidth.margin,
 
 function About(props) {
-    const { state } = props;
+//    const { state } = props;
     return (
 
             <Grid item xs={12} sm={12} key={'info'}>

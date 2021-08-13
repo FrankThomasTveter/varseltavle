@@ -4,6 +4,8 @@ import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import createTheme from '../mui/createTheme'
 import {black_palette, teal_palette} from '../mui/metMuiThemes'
 import PropTypes from "prop-types";
+import { Notifications } from 'react-push-notification';
+
 import Header   from    "./HeaderComponent";
 import Footer   from    "./FooterComponent";
 import BackGroundImage from "../images/waves.png";
@@ -240,7 +242,8 @@ const MyApp = withStyles(styles)(withSnackbar( App));
 function IntegrationNotistack() {
   return (
     <SnackbarProvider maxSnack={5} anchorOrigin={{vertical: 'bottom',horizontal: 'right',}}>
-      <MyApp />
+        <Notifications />
+	<MyApp />
     </SnackbarProvider>
   );
 }
