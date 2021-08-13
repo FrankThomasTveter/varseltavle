@@ -2,11 +2,8 @@
     "title":"Fjelloverganger",
     "thrs":[{
 	"Phenomenon":{
-	    "Middelvind":{"Type":{"Fjellovergang":{"key":"max", ">": [0,17.2,24.5] }}},
-	    "Vindkast":[{"Method":{"mb0":{"key":"max", ">": [0,35.0,40.0,45.0] },
-				   "p50":{"key":"max", ">": [0,35.0,40.0,45.0] },
-				   "p65":{"key":"max", ">": [0,40.0,45.0] },
-				   "p100":{"key":"max", ">": [0,45.0] }}}],
+	    "Middelvind":{"Type":{"Fjellovergang":{"key":"max", ">": [0,13.9,24.5,32.7] }}},
+	    "Vindkast":{"Type":{"Fjellovergang":{"key":"max", ">": [0,25.0,35.0,45.0] }}},
 	    "Styrtregn":{"Duration":{"1t" :{"key":"max", ">": [0,15,20] },
                                  "3t" :{"key":"max", ">": [0,25,30] }}},
 	    "Regn":{"Method":[{"mb0":{"key":"max", ">": [0,5,10,25] },
@@ -73,8 +70,8 @@
     "fragments":["track","turbulens","snowfall","ising_skip","middelvind","regn","skogbrann","vannstand","vindkast"],
     "viewOldData":false,
     "colors":{
-	"background":["rgb(182,219,255)","rgb(255,182,119)","rgb(36,255,36)","rgb(0,0,0)"],
-	"foreground":["black","blue","red","white"]
+	"background":["rgb(36,230,36)","rgb(0,109,219)","rgb(73,0,146)","rgb(146,0,0)"],
+	"foreground":["black","white","white","white"]
     },
     "keys":{"other":["Phenomenon","date","dtg","Height","Partner",
 		    "Type","Station","Airport","Station","Place",
