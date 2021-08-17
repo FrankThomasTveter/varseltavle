@@ -157,6 +157,30 @@ function Database() {
 	//console.log("Date:",ret," -> ",yyyy,"/",mm,"/",dd,"T",hh,":",mi);
 	return (ret);
     };
+    this.getPrettyAge=function(millis) {
+	var seconds= Math.floor(millis/1000); millis=(millis%1000);
+        var minutes= Math.floor(seconds/60); seconds=(seconds%60);
+        var hours  = Math.floor(minutes/60); minutes=(minutes%60);
+        var days   = Math.floor(hours/24); hours=(hours%24);
+	var ss = parseInt(seconds);
+	var mi = parseInt(minutes);
+	var hh = parseInt(hours);
+	var dd = parseInt(days);
+	var ret="";
+	if (days>0) {
+	    if(ret!==""){ret=ret+"";};ret=ret+dd+"d";
+	};
+	if (hours>0) {
+	    if(ret!==""){ret=ret+"";};ret=ret+hh+"h";
+	};
+	if (days===0&&minutes>0) {
+	    if(ret!==""){ret=ret+"";};ret=ret+mi+"m";
+	};
+	if (days===0&&hours===0&&seconds>0) {
+	    if(ret!==""){ret=ret+"";};ret=ret+ss+"s";
+	};
+	return (ret);
+    };
     this.getFileDtg=function(state,file) {
 	if (file === undefined) {
 	    console.log("Invalid call to getFileDtg...");
@@ -269,9 +293,10 @@ function Database() {
 	    var str=("          " + cnt).slice(-10);
 	    var epoch=json.epoch;
 	    var millis=this.getDate()-this.getDate(epoch);
-	    var hrs=(millis/3600000).toFixed(1); // hours
-	    var hst=("          " + hrs).slice(-10) + "h";
-	    ret[frag]= {age:hst,epoch:epoch,frag:frag,cnt:str};
+	    var page=this.getPrettyAge(millis);
+	    //var hrs=(millis/3600000).toFixed(2); // hours
+	    //var hst=("          " + hrs).slice(-10) + "h";
+	    ret[frag]= {age:millis,page:page,epoch:epoch,frag:frag,cnt:str};
 	};
 	return ret;
     };
