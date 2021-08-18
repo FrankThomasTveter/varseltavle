@@ -265,17 +265,19 @@ function Database() {
 	for (var ii=0;ii<lenr;ii++) {
 	    var frag=fragments[ii];
 	    var json=state.Database.fragjson[frag];
-	    var cnt,epoch;
+	    var cnt,epoch,age;
 	    if (json !== undefined) {
 		cnt=parseInt(json.cnt,0);
 		epoch=json.epoch;
+		age=-this.getDate(epoch); // used for sorting
 	    } else {
 		cnt=null;
 		epoch=null;
+		age=null;
 	    };
 	    //var hrs=(millis/3600000).toFixed(2); // hours
 	    //var hst=("          " + hrs).slice(-10) + "h";
-	    ret[frag]= {age:epoch,epoch:epoch,frag:frag,cnt:cnt};
+	    ret[frag]= {age:age,epoch:epoch,frag:frag,cnt:cnt};
 	};
 	return ret;
     };
