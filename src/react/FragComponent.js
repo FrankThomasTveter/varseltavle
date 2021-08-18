@@ -24,7 +24,8 @@ class Frag extends Component {
 	this.state={age:   { dir : "up", order : 1, key : "page"},
 		    epoch: { dir : "", order : 2, key : "epoch"},
 		    cnt:   { dir : "", order : 3, key : "cnt"},
-		    frag:  { dir : "", order : 4, key : "frag"}};
+		    frag:  { dir : "", order : 4, key : "frag"},
+		    currentCount:0};
 	this.getStr=this.getStr.bind(this);
 	this.click=this.click.bind(this);
 	this.onClickAge=this.onClickAge.bind(this);
@@ -33,12 +34,27 @@ class Frag extends Component {
 	this.onClickFrag=this.onClickFrag.bind(this);
 	this.getThr=this.getThr.bind(this);
 	this.getKey=this.getKey.bind(this);
+	this.getDate=this.getDate.bind(this);
 	this.sort=this.sort.bind(this);
 	//86400*1000
 	this.thr=[{color:"LightSalmon",range:[23*3600*1000,null]}, 
 		  {color:"Lime",range:[null,3600*1000]}, 
 		  {color:"Yellow",range:[null,null]}];
     }; 
+    timer() {
+	this.setState({
+	    currentCount: this.state.currentCount + 1
+	})
+	if(this.state.currentCount >1000) { 
+	    clearInterval(this.intervalId);
+	}
+    }
+    componentDidMount() {
+	this.intervalId = setInterval(this.timer.bind(this), 1000);
+    }
+    componentWillUnmount(){
+	clearInterval(this.intervalId);
+    }
     getThr (millis) {
 	var ret={color:"LightBlue"};
 	this.thr.forEach((thr) => {
@@ -103,6 +119,42 @@ class Frag extends Component {
 	    return 0;
 	});
     };
+    getDate(epoch) {
+	//2021-06-18_05-00-01.000Z
+	if (epoch===undefined) {return new Date();};
+	var yy=parseInt(epoch.substring(0,4));
+	var mm=parseInt(epoch.substring(5,7));
+	var dd=parseInt(epoch.substring(8,10));
+	var hh=parseInt(epoch.substring(11,13));
+	var mi=parseInt(epoch.substring(14,16));
+	var ss=parseInt(epoch.substring(17,23));
+	return (new Date(Date.UTC(yy,mm-1,dd,hh,mi,ss)));
+    };
+    getPrettyAge(millis) {
+	if (millis===null) {return null;};
+	var seconds= Math.floor(millis/1000); millis=(millis%1000);
+        var minutes= Math.floor(seconds/60); seconds=(seconds%60);
+        var hours  = Math.floor(minutes/60); minutes=(minutes%60);
+        var days   = Math.floor(hours/24); hours=(hours%24);
+	var ss = parseInt(seconds);
+	var mi = parseInt(minutes);
+	var hh = parseInt(hours);
+	var dd = parseInt(days);
+	var ret="";
+	if (days>0) {
+	    if(ret!==""){ret=ret+"";};ret=ret+dd+"d";
+	};
+	if (hours>0) {
+	    if(ret!==""){ret=ret+"";};ret=ret+hh+"h";
+	};
+	if (days===0&&minutes>0) {
+	    if(ret!==""){ret=ret+"";};ret=ret+mi+"m";
+	};
+	if (days===0&&hours===0&&seconds>0) {
+	    if(ret!==""){ret=ret+"";};ret=ret+ss+"s";
+	};
+	return (ret);
+    };
     getStr(val,dir,order) {
 	const up="↑";
 	const down="↓";
@@ -164,6 +216,13 @@ class Frag extends Component {
 	var strs=state.Database.getFragTimes(state);
 	var fragments=this.sort(state.Database.getFragmentActive(state),strs);
 	var fragFunction= (frag) => {
+	    var epoch=strs[frag].epoch;
+	    if (epoch === null) {
+		strs[frag].age=null;
+	    } else {
+		strs[frag].age=this.getDate()-this.getDate(epoch);
+	    }
+	    strs[frag].page=this.getPrettyAge(strs[frag].age);
 	    var thr=this.getThr(strs[frag].age);
 	    var style={border: "1px solid black", textAlign:"right"}; // "center"
 	    if (thr) {style.backgroundColor=thr.color;};
