@@ -289,11 +289,19 @@ function Database() {
 	for (var ii=0;ii<lenr;ii++) {
 	    var frag=fragments[ii];
 	    var json=state.Database.fragjson[frag];
-	    var cnt=parseInt(json.cnt,0);
-	    var str=("          " + cnt).slice(-10);
-	    var epoch=json.epoch;
-	    var millis=this.getDate()-this.getDate(epoch);
-	    var page=this.getPrettyAge(millis);
+	    var cnt,str,epoch,millis,page;
+	    if (json !== undefined) {
+		cnt=parseInt(json.cnt,0);
+		str=("          " + cnt).slice(-10);
+		epoch=json.epoch;
+		millis=this.getDate()-this.getDate(epoch);
+		page=this.getPrettyAge(millis);
+	    } else {
+		str=null;
+		epoch=null;
+		millis=null;
+		page="";
+	    };
 	    //var hrs=(millis/3600000).toFixed(2); // hours
 	    //var hst=("          " + hrs).slice(-10) + "h";
 	    ret[frag]= {age:millis,page:page,epoch:epoch,frag:frag,cnt:str};

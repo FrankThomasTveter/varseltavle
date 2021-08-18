@@ -36,15 +36,16 @@ class Frag extends Component {
 	this.sort=this.sort.bind(this);
 	//86400*1000
 	this.thr=[{color:"LightSalmon",range:[23*3600*1000,null]}, 
-		  {color:"Lime",range:[null,3600*1000]}];
+		  {color:"Lime",range:[null,3600*1000]}, 
+		  {color:"Yellow",range:[null,null]}];
     }; 
     getThr (millis) {
-	var ret;
+	var ret={color:"LightBlue"};
 	this.thr.forEach((thr) => {
 	    var range=thr.range;
 	    var mint=range[0];
 	    var maxt=range[1];
-	    var inrange=true;
+	    var inrange=(millis!==null || (mint===null && maxt==null));
 	    if (mint !==null && millis < mint) {inrange=false;};
 	    if (maxt !==null && millis > maxt) {inrange=false;};
 	    if (inrange) {ret=thr;return (ret);};
@@ -77,13 +78,21 @@ class Frag extends Component {
 		//console.log("Checking:",ii,key);
 		var dir=this.state[key].dir;
 		if (dir === "up") {
-		    if (sa[key] > sb[key]) {
+		    if (sa[key] === null && sb[key] !== null) {
+			return -1;
+		    } else if (sa[key] !== null && sb[key] === null) {
+			return 1;
+		    } else if (sa[key] > sb[key]) {
 			return -1;
 		    } else if (sa[key] < sb[key]) {
 			return 1;
 		    };
 		} else if (dir === "down") {
-		    if (sa[key] > sb[key]) {
+		    if (sa[key] === null && sb[key] !== null) {
+			return -1;
+		    } else if (sa[key] !== null && sb[key] === null) {
+			return 1;
+		    } else if (sa[key] > sb[key]) {
 			return 1;
 		    } else if (sa[key] < sb[key]) {
 			return -1;
@@ -177,7 +186,7 @@ class Frag extends Component {
 		<th style={{border: "1px solid black"}} onClick={this.onClickCnt}>{
 		    this.getStr("Records",this.state.cnt.dir,this.state.cnt.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFrag}>{
-		    this.getStr("Active fragment",this.state.frag.dir,this.state.frag.order)}</th>
+		    this.getStr("Fragment",this.state.frag.dir,this.state.frag.order)}</th>
 		</tr>
 		{fragments.map(fragFunction)}
 		</tbody>
