@@ -25,9 +25,10 @@ class Frag extends Component {
 		    epoch: { dir : "", order : 2, key : "epoch"},
 		    cnt:   { dir : "", order : 3, key : "cnt"},
 		    frag:  { dir : "", order : 4, key : "frag"},
-		    currentCount:0};
+		    currentCount : null};
 	this.getStr=this.getStr.bind(this);
 	this.click=this.click.bind(this);
+	this.onClick=this.onClick.bind(this);
 	this.onClickAge=this.onClickAge.bind(this);
 	this.onClickEpoch=this.onClickEpoch.bind(this);
 	this.onClickCnt=this.onClickCnt.bind(this);
@@ -35,26 +36,63 @@ class Frag extends Component {
 	this.getThr=this.getThr.bind(this);
 	this.getKey=this.getKey.bind(this);
 	this.getDate=this.getDate.bind(this);
+	this.startClock=this.startClock.bind(this);
+	this.clickClock=this.clickClock.bind(this);
+	this.stopClock=this.stopClock.bind(this);
+	this.toggleClock=this.toggleClock.bind(this);
 	this.sort=this.sort.bind(this);
+	this.intervalId=undefined;
+	this.maxcount=3600;
 	//86400*1000
 	this.thr=[{color:"LightSalmon",range:[23*3600*1000,null]}, 
 		  {color:"Lime",range:[null,3600*1000]}, 
 		  {color:"Yellow",range:[null,null]}];
     }; 
-    timer() {
+    startClock() {
+	//console.log("Called start clock...",this.intervalId === undefined);
+	if (this.intervalId === undefined) {
+	    this.setState({
+		currentCount: 0
+	    });
+	    this.intervalId = setInterval(this.timer.bind(this), 1000);
+	}
+    };
+    clickClock() {
 	this.setState({
-	    currentCount: this.state.currentCount + 1
-	})
-	if(this.state.currentCount >1000) { 
+	    currentCount: (this.state.currentCount||0) + 1
+	});
+	//console.log("Count:",this.state.currentCount);
+    };
+    stopClock() {
+	//console.log("Called start clock...",this.intervalId === undefined);
+	if (this.intervalId!==undefined) {
+	    //console.log("Stopped count:",this.state.currentCount);
 	    clearInterval(this.intervalId);
+	    this.intervalId=undefined;
+	    this.setState({
+		currentCount: 0
+	    });
+	}
+    };
+    toggleClock() {
+	if (this.intervalId===undefined) {
+	    this.startClock();
+	} else {
+	    this.stopClock();
 	}
     }
+    timer() {
+	this.clickClock();
+	if(this.state.currentCount >= this.maxcount) {
+	    this.stopClock();
+	}
+    };
     componentDidMount() {
-	this.intervalId = setInterval(this.timer.bind(this), 1000);
-    }
+	this.startClock();
+    };
     componentWillUnmount(){
 	clearInterval(this.intervalId);
-    }
+    };
     getThr (millis) {
 	var ret={color:"LightBlue"};
 	this.thr.forEach((thr) => {
@@ -74,8 +112,7 @@ class Frag extends Component {
 	var match;
 	var keys =Object.keys(this.state);
 	keys.forEach((key) => {
-	    //console.log("Checking:",order, this.state[key].order)
-	    if (order === this.state[key].order) {
+	    if (this.state[key]  && typeof this.state[key] === "object" && order === this.state[key].order) {
 		match=key;
 		//console.log("Match:", match,order)
 		return;
@@ -92,7 +129,6 @@ class Frag extends Component {
 	    var sb=strs[b];
 	    for (var ii=1;ii<5;ii++) {
 		var key=this.getKey(ii);
-		//console.log("Checking:",ii,key);
 		var dir=this.state[key].dir;
 		if (dir === "up") {
 		    if (sa[key] === null && sb[key] !== null) {
@@ -170,6 +206,8 @@ class Frag extends Component {
     };
     // handle header click events
     click(target) {
+	this.toggleClock();
+	if (target===undefined) {return;};
 	//console.log("clicked:",target);
 	// first change the direction
 	var buffer=JSON.parse(JSON.stringify(this.state)); 
@@ -188,24 +226,29 @@ class Frag extends Component {
 	if (dir === "") { //push to the end
 	    // rearrange
 	    keys.forEach((key) => {
-		if (buffer[key].order > order) {
-		    buffer[key].order=buffer[key].order-1;
-		} else if (buffer[key].order === order) {
-		    buffer[key].order=4;
-		}
+		if (this.state[key]  && typeof this.state[key] == "object") {
+		    if (buffer[key].order > order) {
+			buffer[key].order=buffer[key].order-1;
+		    } else if (buffer[key].order === order) {
+			buffer[key].order=4;
+		    };
+		};
 	    });
 	} else { // push to the front
 	    // rearrange
 	    keys.forEach((key) => {
-		if (buffer[key].order < order) {
-		    buffer[key].order=buffer[key].order+1;
-		} else if (buffer[key].order === order) {
-		    buffer[key].order=1;
-		}
+		if (this.state[key]  && typeof this.state[key] == "object") {
+		    if (buffer[key].order < order) {
+			buffer[key].order=buffer[key].order+1;
+		    } else if (buffer[key].order === order) {
+			buffer[key].order=1;
+		    };
+		};
 	    });
 	}
 	this.setState(buffer);
     };
+    onClick()     {this.toggleClock();};
     onClickAge()  {this.click("age");};
     onClickEpoch(){this.click("epoch");};
     onClickCnt()  {this.click("cnt");};
@@ -236,7 +279,7 @@ class Frag extends Component {
 	    );
 	};
 	return (
-		<table style={{border: "1px solid black"}}>
+		<table style={{border: "1px solid black"}} onClick={this.onClick}>
 		<tbody>
 		<tr>
 		<th style={{border: "1px solid black"}} onClick={this.onClickAge}>{
