@@ -45,7 +45,8 @@ class Frag extends Component {
 	    var range=thr.range;
 	    var mint=range[0];
 	    var maxt=range[1];
-	    var inrange=(millis!==null || (mint===null && maxt==null));
+	    var inrange=(millis!==null && (mint!==null || maxt!==null)) || 
+		(millis===null && mint===null && maxt===null);
 	    if (mint !==null && millis < mint) {inrange=false;};
 	    if (maxt !==null && millis > maxt) {inrange=false;};
 	    if (inrange) {ret=thr;return (ret);};
