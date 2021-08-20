@@ -443,7 +443,7 @@ function Path() {
 	//console.log("Pathlib getTitle keys:",JSON.stringify(keys),title,state.Layout.title);
 	return title;
     };
-    this.getTooltip=function(state) {
+    this.getTooltipTitle=function(state) {
 	var title="";
 	var del="\n";
 	var keys=state.Path.keys.path;

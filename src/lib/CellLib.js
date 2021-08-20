@@ -100,7 +100,19 @@ function Cell() {
 	var keys=[];
 	if (data.keys !== undefined) {state.Utils.cpArray(keys,data.keys)};
 	state.Utils.cpArray(keys,state.Path.tooltip.keys);
-	state.Utils.remArray(keys,state.Path.keys.path);
+	// state.Utils.remArray(keys,state.Path.keys.path);
+	// remove "unique" keys from the path
+	var path=state.Path.keys.path
+	var lent=path.length;
+	for (var ii=0;ii<lent;ii++) {
+	    var ind=keys.indexOf(path[ii]);
+	    // check if path has only 1 value...
+	    var vals=state.Path.select.val[path[ii]]
+	    if (vals === undefined || vals.length!==1) {ind=-1;} // include multiple vals...
+	    if (ind!==-1) {
+		keys.splice(ind,1);
+	    }
+	};
 	keys=state.Utils.keepHash(keys,tooltip);
 	return keys;
     }

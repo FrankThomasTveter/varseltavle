@@ -25,7 +25,7 @@ class LocationComponent extends Component {
     render() {
         const { classes, state } = this.props;
 	var title=state.Path.getTitle(state);
-	var tooltip=state.Path.getTooltip(state);
+	var tooltip=state.Path.getTooltipTitle(state);
 	if (state.Layout.title !== undefined && state.Layout.title !== "") {
 	    document.title = state.Layout.title;
 	}
