@@ -180,12 +180,16 @@ function Database() {
 	var file=this.getIndexFile(state,frag,files,index);
 	//console.log("Checking file:",frag,file," loaded:",state.Database.fragfile[frag]);
 	if (file !== undefined && state.Database.fragfile[frag] !== file) {
-	    return file;
+	    return file;      // file should be reloaded
+	} else if (file === undefined) {
+	    return undefined; // file should be ignored
 	} else {
-	    return null;
+	    return null;      // file should not be reloaded
 	}
     };
     this.getIndexFile=function(state,frag,files,index) {
+	// no file returns undefined
+	// ok file returns file name
 	var file;
 	if (index === undefined) {
 	    if (files.length>0) {
@@ -587,6 +591,10 @@ function Database() {
 	}
 	return ret;
     };
+    // remove active fragments from internal database
+    this.clearDataFragments=function(state) {
+	state.Database.fragload=[];
+    };
     // executed after Default-URL has been loaded and before other URL load
     this.loadDataFragments=function(state,index,callbacks,verbose) {
 	// loop over all register files, read content, load data...
@@ -596,8 +604,8 @@ function Database() {
 	var sequence = Promise.resolve();
 	// loop over register files and collect promises
 	var newfrags=[];
-	var oldfrags=state.Database.getFragmentActive(state);
-	var fragments=state.Database.getFragments(state);
+	var oldfrags=state.Database.getFragmentActive(state); // active fragments
+	var fragments=state.Database.getFragments(state); // requested fragments...
 	let lenf=fragments.length;
 	if (lenf===0) {
 	    if (verbose === "verbose") {
@@ -608,10 +616,10 @@ function Database() {
 	    //console.log("Processing fragments: ",lenf);
 	    for (let ii=0;ii<lenf;ii++) {
 		let frag=fragments[ii]||"data";
+		//newfrags.push(frag);
 		let path=frag + "/register"; // register dir
 		//console.log("Fragment ",ii,frag);
 		let file;
-		newfrags.push(frag);
 		let readRegister=function() {
 		    return state.File.get(path);
 		};
@@ -635,8 +643,10 @@ function Database() {
 			state.Database.fragfile[frag]=undefined;
 			return null;
 		    } else if  (file === null) { // file is loaded
+			newfrags.push(frag);
 			return null; //state.Database.fragjson[frag]; //file;
 		    } else { // load new file
+			newfrags.push(frag);
 			var path=frag+"/"+file;
 			state.Database.fragfile[frag]=file;
 			if (ii===0) {
@@ -743,7 +753,7 @@ function Database() {
 		    } else if (state.Database.notification.mode === 1) {
 			ttl='Warning tablau: Load cnt ' + state.Database.loadcnt;
 			stl= 'Data loaded.';
-			msg="Loaded: " + state.Database.dbcnt + ' records';
+			msg="Loaded: " + state.Database.dbcnt;
 			addNotification({
 			    title: ttl,
 			    subtitle: stl,
