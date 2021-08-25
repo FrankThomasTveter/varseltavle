@@ -81,6 +81,11 @@ function File() {
 	    regHttp.overrideMimeType("text/text");
 	    var path=process.env.PUBLIC_URL+"/"+url;
 	    regHttp.open('GET', path, true);
+	    regHttp.setRequestHeader('cache-control', 'no-cache, must-revalidate, post-check=0, pre-check=0');
+	    regHttp.setRequestHeader('cache-control', 'max-age=0');
+	    regHttp.setRequestHeader('expires', '0');
+	    regHttp.setRequestHeader('expires', 'Tue, 01 Jan 1980 1:00:00 GMT');
+	    regHttp.setRequestHeader('pragma', 'no-cache');
 	    
 	    regHttp.onload = function() {
 		// This is called even on 404 etc
