@@ -269,25 +269,34 @@ function Database() {
 	for (var ii=0;ii<lenr;ii++) {
 	    var frag=fragments[ii];
 	    var json=state.Database.fragjson[frag];
-	    var cnt,epoch,age;
-	    if (json !== undefined) {
+	    var cnt,epoch,age,ifirst,ilast,dfirst,dlast;
+	    if (json !== undefined) { // epoch,cnt,ifirst,ilast,dfirst,dlast,data
 		cnt=parseInt(json.cnt,0);
-		epoch=json.epoch;
-		age=-this.getDate(epoch); // used for sorting
+		epoch=(typeof json.epoch === 'undefined') ? null : json.epoch ;
+		ifirst=(typeof json.ifirst === 'undefined') ? null : json.ifirst ;
+		ilast=(typeof json.ilast === 'undefined') ? null : json.ilast ;
+		dfirst=(typeof json.dfirst === 'undefined') ? null : json.dfirst ;
+		dlast=(typeof json.dlast === 'undefined') ? null : json.dlast ;
 	    } else {
 		cnt=null;
 		epoch=null;
-		age=null;
+		ifirst=null;
+		ilast=null;
+		dfirst=null;
+		dlast=null;
 	    };
 	    //var hrs=(millis/3600000).toFixed(2); // hours
 	    //var hst=("          " + hrs).slice(-10) + "h";
-	    ret[frag]= {age:age,epoch:epoch,frag:frag,cnt:cnt};
+	    ret[frag]= {epoch:epoch,
+			ifirst:ifirst,ilast:ilast,
+			dfirst:dfirst,dlast:dlast,
+			frag:frag,cnt:cnt};
 	};
 	return ret;
     };
     this.combineJsons=function(state,nfrags,frags) {
 	var data=[];
-	var epoch;
+	var epoch,ifirst,ilast,dfirst,dlast;
 	var lenp=frags.length;
 	for (var ii=0;ii<lenp;ii++) {
 	    var frag=frags[ii];
@@ -303,12 +312,34 @@ function Database() {
 		    } else if (epoch === undefined) {
 			epoch=json.epoch;
 		    }
+		    if (ifirst !== undefined && ifirst < json.ifirst) {
+			ifirst=json.ifirst;
+		    } else if (ifirst === undefined) {
+			ifirst=json.ifirst;
+		    }
+		    if (ilast !== undefined && ilast > json.ilast) {
+			ilast=json.ilast;
+		    } else if (ilast === undefined) {
+			ilast=json.ilast;
+		    }
+		    if (dfirst !== undefined && dfirst < json.dfirst) {
+			dfirst=json.dfirst;
+		    } else if (dfirst === undefined) {
+			dfirst=json.dfirst;
+		    }
+		    if (dlast !== undefined && dlast > json.dlast) {
+			dlast=json.dlast;
+		    } else if (dlast === undefined) {
+			dlast=json.dlast;
+		    }
 		} else {
 		    console.log("Undefined fragment:",frag);
 		}
 	    }
 	}
-	return {data:data,epoch:epoch};
+	return {data:data,epoch:epoch,
+		ifirst:ifirst,ilast:ilast,
+		dfirst:dfirst,dlast:dlast};
     };
     this.load=function(state) { // autoload function
 	if (state.Database.indexDtg === undefined) {

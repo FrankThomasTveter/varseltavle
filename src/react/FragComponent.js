@@ -21,20 +21,26 @@ const styles = theme => ({
 class Frag extends Component {
     constructor() {
         super();
-	this.state={age:   { dir : "up", order : 1, key : "page"},
-		    epoch: { dir : "", order : 2, key : "epoch"},
-		    cnt:   { dir : "", order : 3, key : "cnt"},
-		    frag:  { dir : "", order : 4, key : "frag"},
+	this.maxorder=6;
+	this.state={age:   { dir:"up", order:1, key:"epoch", sort:"age", show:"pAge"},
+		    epoch: { dir:"",   order:2, key:"epoch"},
+		    issued:{ dir:"",   order:3, key:"ifirst",sort:"issAge",show:"pIssAge"},
+		    data:  { dir:"",   order:4, key:"dfirst",sort:"datAge",show:"pDatAge"},
+		    cnt:   { dir:"",   order:5, key:"cnt"},
+		    frag:  { dir:"",   order:6, key:"frag"},
 		    currentCount : null};
 	this.getStr=this.getStr.bind(this);
 	this.click=this.click.bind(this);
 	this.onClick=this.onClick.bind(this);
 	this.onClickAge=this.onClickAge.bind(this);
 	this.onClickEpoch=this.onClickEpoch.bind(this);
+	this.onClickIssued=this.onClickIssued.bind(this);
+	this.onClickData=this.onClickData.bind(this);
 	this.onClickCnt=this.onClickCnt.bind(this);
 	this.onClickFrag=this.onClickFrag.bind(this);
+	this.setAge=this.setAge.bind(this);
 	this.getThr=this.getThr.bind(this);
-	this.getKey=this.getKey.bind(this);
+	this.getCol=this.getCol.bind(this);
 	this.getDate=this.getDate.bind(this);
 	this.startClock=this.startClock.bind(this);
 	this.clickClock=this.clickClock.bind(this);
@@ -93,6 +99,24 @@ class Frag extends Component {
     componentWillUnmount(){
 	clearInterval(this.intervalId);
     };
+    setAge(strs,col) {
+	var now=this.getDate();
+	for (var key in strs) {
+	    if (strs.hasOwnProperty(key)) {
+		var str=strs[key];
+		var key=this.state[col].key;
+		var sort=this.state[col].sort;
+		var show=this.state[col].show;
+		var epoch=str[key];
+		if (epoch === null || epoch === undefined) {
+		    str[sort]=null;
+		} else {
+		    str[sort]=now-this.getDate(epoch);
+		}
+		str[show]=this.getPrettyAge(str[sort]);
+	    }
+	}
+    };	
     getThr (millis) {
 	var ret={color:"LightBlue"};
 	this.thr.forEach((thr) => {
@@ -108,12 +132,12 @@ class Frag extends Component {
 	//console.log("Threshold:",millis,JSON.stringify(ret));
 	return ret;		 
     };
-    getKey (order) {
+    getCol (order) {
 	var match;
-	var keys =Object.keys(this.state);
-	keys.forEach((key) => {
-	    if (this.state[key]  && typeof this.state[key] === "object" && order === this.state[key].order) {
-		match=key;
+	var cols =Object.keys(this.state);
+	cols.forEach((col) => {
+	    if (this.state[col]  && typeof this.state[col] === "object" && order === this.state[col].order) {
+		match=col;
 		//console.log("Match:", match,order)
 		return;
 	    }
@@ -127,9 +151,11 @@ class Frag extends Component {
 	return fragments.sort((a,b) => {
 	    var sa=strs[a];
 	    var sb=strs[b];
-	    for (var ii=1;ii<5;ii++) {
-		var key=this.getKey(ii);
-		var dir=this.state[key].dir;
+	    for (var ii=1;ii<=this.maxorder;ii++) {
+		var col=this.getCol(ii);
+		var dir=this.state[col].dir;
+		var key=(typeof this.state[col].sort === 'undefined') ?
+		    this.state[col].key : this.state[col].sort ;
 		if (dir === "up") {
 		    if (sa[key] === null && sb[key] !== null) {
 			return -1;
@@ -161,13 +187,19 @@ class Frag extends Component {
 	var yy=parseInt(epoch.substring(0,4));
 	var mm=parseInt(epoch.substring(5,7));
 	var dd=parseInt(epoch.substring(8,10));
-	var hh=parseInt(epoch.substring(11,13));
-	var mi=parseInt(epoch.substring(14,16));
-	var ss=parseInt(epoch.substring(17,23));
-	return (new Date(Date.UTC(yy,mm-1,dd,hh,mi,ss)));
+	var hh=parseInt(epoch.substring(11,13))||0;
+	var mi=parseInt(epoch.substring(14,16))||0;
+	var ss=parseInt(epoch.substring(17,23))||0;
+	var dat=new Date(Date.UTC(yy,mm-1,dd,hh,mi,ss))
+	return (dat);
     };
     getPrettyAge(millis) {
 	if (millis===null) {return null;};
+	var sign="";
+	if (millis < 0) {
+	    millis=-millis;
+	    sign="-";
+	}
 	var seconds= Math.floor(millis/1000); millis=(millis%1000);
         var minutes= Math.floor(seconds/60); seconds=(seconds%60);
         var hours  = Math.floor(minutes/60); minutes=(minutes%60);
@@ -189,7 +221,7 @@ class Frag extends Component {
 	if (days===0&&hours===0&&seconds>0) {
 	    if(ret!==""){ret=ret+"";};ret=ret+ss+"s";
 	};
-	return (ret);
+	return (sign+ret);
     };
     getStr(val,dir,order) {
 	const up="↑";
@@ -205,14 +237,14 @@ class Frag extends Component {
 	};
     };
     // handle header click events
-    click(target) {
+    click(trg,nokey,upkey,downkey) {
 	this.toggleClock();
-	if (target===undefined) {return;};
-	//console.log("clicked:",target);
+	if (trg===undefined) {return;};
+	//console.log("clicked:",trg);
 	// first change the direction
 	var buffer=JSON.parse(JSON.stringify(this.state)); 
-	var order=buffer[target].order;
-	var dir=buffer[target].dir;
+	var order=buffer[trg].order;
+	var dir=buffer[trg].dir;
 	if (dir === "") {
 	    dir="up";
 	} else if (dir === "up") {
@@ -220,61 +252,66 @@ class Frag extends Component {
 	} else if (dir === "down") {
 	    dir="";
 	};
-	buffer[target].dir=dir;
+	buffer[trg].dir=dir;
 	// change the order
-	var keys =Object.keys(this.state);
+	var cols =Object.keys(this.state);
 	if (dir === "") { //push to the end
 	    // rearrange
-	    keys.forEach((key) => {
-		if (this.state[key]  && typeof this.state[key] == "object") {
-		    if (buffer[key].order > order) {
-			buffer[key].order=buffer[key].order-1;
-		    } else if (buffer[key].order === order) {
-			buffer[key].order=4;
+	    cols.forEach((col) => {
+		if (this.state[col]  && typeof this.state[col] == "object") {
+		    if (buffer[col].order > order) {
+			buffer[col].order=buffer[col].order-1;
+		    } else if (buffer[col].order === order) {
+			buffer[col].order=this.maxorder;
 		    };
 		};
 	    });
+	    if (nokey !== undefined) { buffer[trg].key=nokey; }
 	} else { // push to the front
 	    // rearrange
-	    keys.forEach((key) => {
-		if (this.state[key]  && typeof this.state[key] == "object") {
-		    if (buffer[key].order < order) {
-			buffer[key].order=buffer[key].order+1;
-		    } else if (buffer[key].order === order) {
-			buffer[key].order=1;
+	    cols.forEach((col) => {
+		if (this.state[col]  && typeof this.state[col] == "object") {
+		    if (buffer[col].order < order) {
+			buffer[col].order=buffer[col].order+1;
+		    } else if (buffer[col].order === order) {
+			buffer[col].order=1;
 		    };
 		};
 	    });
+	    if (dir === "up" && upkey !== undefined) { buffer[trg].key=upkey; }
+	    if (dir === "down" && downkey !== undefined) { buffer[trg].key=downkey; }
 	}
 	this.setState(buffer);
     };
-    onClick()     {this.toggleClock();};
-    onClickAge()  {this.click("age");};
-    onClickEpoch(){this.click("epoch");};
-    onClickCnt()  {this.click("cnt");};
-    onClickFrag() {this.click("frag");};
+    onClick()      {this.toggleClock();};
+    onClickAge()   {this.click("age");};
+    onClickEpoch() {this.click("epoch");};
+    onClickIssued(){this.click("issued","ifirst","ifirst","ilast");}
+    onClickData()  {this.click("data","dfirst","dfirst","dlast");}
+    onClickCnt()   {this.click("cnt");};
+    onClickFrag()  {this.click("frag");};
     // draw table...
     render () {
 	const { state } = this.props;
 	var strs=state.Database.getFragTimes(state);
+	this.setAge(strs,"age");
+	this.setAge(strs,"issued");
+	this.setAge(strs,"data");
+	var frags=state.Database.getFragmentActive(state);
 	var fragments=this.sort(state.Database.getFragmentActive(state),strs);
 	var fragFunction= (frag) => {
-	    var epoch=strs[frag].epoch;
-	    if (epoch === null) {
-		strs[frag].age=null;
-	    } else {
-		strs[frag].age=this.getDate()-this.getDate(epoch);
-	    }
-	    strs[frag].page=this.getPrettyAge(strs[frag].age);
-	    var thr=this.getThr(strs[frag].age);
-	    var style={border: "1px solid black", textAlign:"right"}; // "center"
-	    if (thr) {style.backgroundColor=thr.color;};
+	    var thr=this.getThr(strs[frag][this.state['age'].sort]);
+	    var styleR={border: "1px solid black", textAlign:"right"}; // "center"
+	    var styleL={border: "1px solid black", textAlign:"left"}; // "center"
+	    if (thr) {styleL.backgroundColor=thr.color;styleR.backgroundColor=thr.color;};
 	    return (
 		<tr key={frag}>
-		  <td style={style}>  {strs[frag][this.state['age'].key]}</td>
-		  <td style={style}>  {strs[frag][this.state['epoch'].key]}</td>
-		  <td style={style}>  {strs[frag][this.state['cnt'].key]}</td>
-		  <td style={style}> {strs[frag][this.state['frag'].key]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['age'].show]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['epoch'].key]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['issued'].show]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['data'].show]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['cnt'].key]}</td>
+		    <td style={styleL}> {strs[frag][this.state['frag'].key]}</td>
 		</tr>
 	    );
 	};
@@ -285,7 +322,11 @@ class Frag extends Component {
 		<th style={{border: "1px solid black"}} onClick={this.onClickAge}>{
 		    this.getStr("Age",this.state.age.dir,this.state.age.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickEpoch}>{
-		    this.getStr("Load time",this.state.epoch.dir,this.state.epoch.order)}</th>
+		    this.getStr("Loaded",this.state.epoch.dir,this.state.epoch.order)}</th>
+		<th style={{border: "1px solid black"}} onClick={this.onClickIssued}>{
+		    this.getStr("Issued",this.state.issued.dir,this.state.issued.order)}</th>
+		<th style={{border: "1px solid black"}} onClick={this.onClickData}>{
+		    this.getStr("Data",this.state.data.dir,this.state.data.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickCnt}>{
 		    this.getStr("Records",this.state.cnt.dir,this.state.cnt.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFrag}>{
