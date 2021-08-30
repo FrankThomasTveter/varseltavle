@@ -21,21 +21,25 @@ const styles = theme => ({
 class Frag extends Component {
     constructor() {
         super();
-	this.maxorder=6;
-	this.state={age:   { dir:"up", order:1, key:"epoch", sort:"age", show:"pAge"},
-		    epoch: { dir:"",   order:2, key:"epoch"},
-		    issued:{ dir:"",   order:3, key:"ifirst",sort:"issAge",show:"pIssAge"},
-		    data:  { dir:"",   order:4, key:"dfirst",sort:"datAge",show:"pDatAge"},
-		    cnt:   { dir:"",   order:5, key:"cnt"},
-		    frag:  { dir:"",   order:6, key:"frag"},
+	this.state={age:   { order:1, dir:"down", key:"epoch", sort:"age",    show:"pAge"},
+		    epoch: { order:2, dir:"",     key:"epoch"},
+		    first: { order:3, dir:"",     key:"ifirst",sort:"firstAge", show:"pFirstAge"},
+		    last:  { order:4, dir:"",     key:"ilast", sort:"lastAge", show:"pLastAge"},
+		    from:  { order:5, dir:"",     key:"dfirst",sort:"fromAge",show:"pFromAge"},
+		    to:    { order:6, dir:"",     key:"dlast", sort:"toAge",  show:"pToAge",  post:"invert"},
+		    cnt:   { order:7, dir:"",     key:"cnt"},
+		    frag:  { order:8, dir:"",     key:"frag"},
 		    currentCount : null};
+	this.maxorder=8;
 	this.getStr=this.getStr.bind(this);
 	this.click=this.click.bind(this);
 	this.onClick=this.onClick.bind(this);
 	this.onClickAge=this.onClickAge.bind(this);
 	this.onClickEpoch=this.onClickEpoch.bind(this);
-	this.onClickIssued=this.onClickIssued.bind(this);
-	this.onClickData=this.onClickData.bind(this);
+	this.onClickFirst=this.onClickFirst.bind(this);
+	this.onClickLast=this.onClickLast.bind(this);
+	this.onClickFrom=this.onClickFrom.bind(this);
+	this.onClickTo=this.onClickTo.bind(this);
 	this.onClickCnt=this.onClickCnt.bind(this);
 	this.onClickFrag=this.onClickFrag.bind(this);
 	this.setAge=this.setAge.bind(this);
@@ -107,11 +111,15 @@ class Frag extends Component {
 		var key=this.state[col].key;
 		var sort=this.state[col].sort;
 		var show=this.state[col].show;
+		var post=this.state[col].post;
 		var epoch=str[key];
 		if (epoch === null || epoch === undefined) {
 		    str[sort]=null;
 		} else {
 		    str[sort]=now-this.getDate(epoch);
+		    if (post === "invert") {
+			str[sort] = -str[sort];
+		    };
 		}
 		str[show]=this.getPrettyAge(str[sort]);
 	    }
@@ -286,8 +294,10 @@ class Frag extends Component {
     onClick()      {this.toggleClock();};
     onClickAge()   {this.click("age");};
     onClickEpoch() {this.click("epoch");};
-    onClickIssued(){this.click("issued","ifirst","ifirst","ilast");}
-    onClickData()  {this.click("data","dfirst","dfirst","dlast");}
+    onClickFirst() {this.click("first");}
+    onClickLast()  {this.click("last");}
+    onClickFrom()  {this.click("from","dfirst","dfirst","dfirst");}
+    onClickTo()    {this.click("to","dlast","dlast","dlast");}
     onClickCnt()   {this.click("cnt");};
     onClickFrag()  {this.click("frag");};
     // draw table...
@@ -295,8 +305,10 @@ class Frag extends Component {
 	const { state } = this.props;
 	var strs=state.Database.getFragTimes(state);
 	this.setAge(strs,"age");
-	this.setAge(strs,"issued");
-	this.setAge(strs,"data");
+	this.setAge(strs,"first");
+	this.setAge(strs,"last");
+	this.setAge(strs,"from");
+	this.setAge(strs,"to");
 	var frags=state.Database.getFragmentActive(state);
 	var fragments=this.sort(state.Database.getFragmentActive(state),strs);
 	var fragFunction= (frag) => {
@@ -308,8 +320,10 @@ class Frag extends Component {
 		<tr key={frag}>
 		  <td style={styleR}>  {strs[frag][this.state['age'].show]}</td>
 		  <td style={styleR}>  {strs[frag][this.state['epoch'].key]}</td>
-		  <td style={styleR}>  {strs[frag][this.state['issued'].show]}</td>
-		  <td style={styleR}>  {strs[frag][this.state['data'].show]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['first'].show]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['last'].show]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['from'].show]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['to'].show]}</td>
 		  <td style={styleR}>  {strs[frag][this.state['cnt'].key]}</td>
 		    <td style={styleL}> {strs[frag][this.state['frag'].key]}</td>
 		</tr>
@@ -323,10 +337,14 @@ class Frag extends Component {
 		    this.getStr("Age",this.state.age.dir,this.state.age.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickEpoch}>{
 		    this.getStr("Loaded",this.state.epoch.dir,this.state.epoch.order)}</th>
-		<th style={{border: "1px solid black"}} onClick={this.onClickIssued}>{
-		    this.getStr("Issued",this.state.issued.dir,this.state.issued.order)}</th>
-		<th style={{border: "1px solid black"}} onClick={this.onClickData}>{
-		    this.getStr("Data",this.state.data.dir,this.state.data.order)}</th>
+		<th style={{border: "1px solid black"}} onClick={this.onClickFirst}>{
+		    this.getStr("First",this.state.first.dir,this.state.first.order)}</th>
+		<th style={{border: "1px solid black"}} onClick={this.onClickLast}>{
+		    this.getStr("Last",this.state.last.dir,this.state.last.order)}</th>
+		<th style={{border: "1px solid black"}} onClick={this.onClickFrom}>{
+		    this.getStr("From",this.state.from.dir,this.state.from.order)}</th>
+		<th style={{border: "1px solid black"}} onClick={this.onClickTo}>{
+		    this.getStr("To",this.state.to.dir,this.state.to.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickCnt}>{
 		    this.getStr("Records",this.state.cnt.dir,this.state.cnt.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFrag}>{
