@@ -228,8 +228,8 @@
 	"play": false
     },
     "order":{
-	"Duration":["1t","3t","6t","12t","24t"],
-	"Output":["1t","3t","6t","12t","24t"],
+	"Duration":["1t","3t","6t","12t","24t","48t","72t","120t"],
+	"Output":["1t","3t","6t","12t","24t","48t","72t","120t"],
 	"Method":["mb0","p50","p65","p100"],
 	"Phenomenon":["Middelvind","Vindkast","Styrtregn","Regn","Snø","Vannstand","Skogbrann","Ising på skip","Polare lavtrykk","Turbulens"],
     "Station":["Viker","Oscarsborg","Oslo","Helgeroa","Tregde","Stavanger","Bergen","Måløy","Ålesund","Kristiansund","Heimsjø",
