@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = theme => ({
     loadDb: {
@@ -11,10 +14,11 @@ const styles = theme => ({
 class LoadDb extends Component {
     constructor(props) {
 	super(props);
+	this.state={anchor:null};
 	this.loaded="";
     };
     render() {
-	const { classes, state, append } = this.props;
+	const { classes, state, append, icon, title } = this.props;
 	let fileReader;
 	const handleFileRead = (e) => {
 	    const content = fileReader.result;
@@ -32,12 +36,30 @@ class LoadDb extends Component {
 	    fileReader.onloadend = handleFileRead;
 	    fileReader.readAsText(file);
 	};
+ 	this.onClick = event => {this.setState({ anchor: event.currentTarget });};
+	this.onClose = () => {this.setState({ anchor: null });};
 	return (
-		<div className={classes.loadDb}>
+		<div className={classes.load}>
+                   <Button
+                      className={classes.button}
+                      aria-owns={this.state.anchor ? 'keys-menu' : undefined}
+                      aria-haspopup="true"
+                      onClick={this.onClick}
+                      title={title}
+                    >
+                       {icon}
+                     </Button>
+                     <Menu
+                        id="keys-menu"
+                        anchorEl={this.state.anchor}
+                        open={Boolean(this.state.anchor)}
+                        onClose={this.onClose}
+                     >	    
    	  	   <input type='file' id='file'
 	              onChange={e=>handleFileChosen(e.target)}
 	              onClick={e=> {e.target.value = null}}/>
-		</div>
+                     </Menu>
+                </div>		
 	);
     }
 }

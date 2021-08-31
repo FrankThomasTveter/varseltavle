@@ -10,6 +10,7 @@ import Fragment   from './FragmentListComponent';
 import Archive    from './ArchiveListComponent';
 import Upload     from './UploadDbComponent';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
+import UploadIcon from '@material-ui/icons/CloudUpload';
 import SelectedIcon from '@material-ui/icons/CloudDone';
 import AppendIcon from '@material-ui/icons/PlaylistAdd';
 import ReplaceIcon from '@material-ui/icons/PlaylistAddCheck';
@@ -100,7 +101,7 @@ class ArchiveMenu extends Component {
 		           <Append state={state} classes={classes} append={this.state.append} onclick={this.onAppend}/>
 		       </MenuItem>
 		       <MenuItem className={classes.order} key="upload" onClose={this.onClose}>
-		           <Upload state={state} append={this.state.append}/>
+		    <Upload classes={{button:classes.button}} state={state} append={this.state.append} icon={<UploadIcon/>} title={"Upload data"}/>
 		       </MenuItem>
 		       <MenuItem className={classes.order} key="download" onClose={this.onClose}>
 		           <Download state={state} classes={cls}/>

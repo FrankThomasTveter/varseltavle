@@ -4,7 +4,7 @@ function Default() {
     this.setupdir="def/"; // defaults directory
     this.setup="defaults.json"; // defaults file, contains default setup...
     this.path="test.json";
-    this.config={setup:{}, url:{}, init:{}, start:{}, current:{}, home:{}};
+    this.config={setup:{}, url:{}, init:{}, start:{}, current:{}, home:{}, stage:{}};
     this.cnt=0;
     this.init=function(state){ // executed before anything else...
 	state.Utils.init("setup",this);
@@ -475,12 +475,23 @@ function Default() {
 	//console.log(">>>>>>>>>>>State:",JSON.stringify(state.Layout.state));
 	//console.log(">>>>>>>>>>>Start:",JSON.stringify(state.Default.config.start.Layout.state));
     }.bind(this);
+    this.stageSetup=function(state,setup) {
+	//console.log("Staging changes");
+	state.Default.config.stage=setup;
+    }.bind(this);
+    this.commitSetup=function(state) {
+	//console.log("Commiting changes");
+	this.setSetup(state,state.Default.config.stage);
+    }.bind(this);
     this.resetSetup=function(state,response,callbacks) {
 	try {
 	    var setup = JSON.parse(response);
 	} catch (e) {
 	    alert("Default '"+state.Default.setup+"' contains Invalid SETUP:"+e.name+":"+e.message);
-	}
+	};
+	this.setSetup(state,setup);
+    }.bind(this);
+    this.setSetup=function(state,setup) {
 	if (setup !== undefined && state.Default.config.start !== undefined) {
 	    //console.log("Reset state:",JSON.stringify(state.Path));
 	    state.Default.config.current={};

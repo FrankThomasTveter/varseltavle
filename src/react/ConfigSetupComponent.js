@@ -5,8 +5,14 @@ import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Upload from './UploadComponent';
+import Json from './JsonComponent';
 import FileIcon from '@material-ui/icons/Save';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
+import UploadIcon from '@material-ui/icons/CloudUpload';
+import EditIcon from '@material-ui/icons/CloudQueue';
+
+import Popup from 'react-popup';
+import './react-popup.css';
 
 const styles = theme => ({
     file: {
@@ -26,6 +32,44 @@ const styles = theme => ({
     },
 });
 // 
+function Edit(props) {
+    const {state,classes,onClose}=props;
+    var onClick=()=>{
+	// launch popup
+	var json=state.Default.getSetup(state);//{"dummy":"is a test"};
+	//var json={"x":"test..."};
+	var handleChange=function (json) {
+	    //console.log("Json changed.",json);
+	    state.Default.stageSetup(state,json);
+	};
+	//console.log("Launching popup.");
+	Popup.create({
+	    title: 'Edit SETUP file.',
+	    content: <Json handleChange={handleChange} value={json} />,
+	    buttons: {
+		left: ['cancel'],
+		right: [{
+		    text: 'Save',
+		    key: '⌘+s',
+		    className: 'success',
+		    action: function () {
+			state.Default.commitSetup(state);
+			//console.log("Done...");
+			//promptChange(promptValue);
+			Popup.close();
+		    }
+		}]
+	    }
+	});
+	onClose();
+    };
+    var title="Edit setup";
+    return (<Button
+            className={classes.button}
+            onClick={onClick}
+	    title={title}
+	    ><EditIcon/></Button>);
+};
 function Download(props) {
     const {state,classes}=props;
     var onclick=() => {state.Default.saveSetup(state);};
@@ -33,9 +77,12 @@ function Download(props) {
     return <Button className={classes.button} onClick={onclick} title={title}><DownloadIcon/></Button>;
 };
 class FileMenu extends Component {
+    constructor(props) {
+	super(props);
+    };
     state={anchor:null};
     render() {
-        const { classes, state, visible } = this.props;
+        const { classes, state, visible, onClose } = this.props;
 	if ( visible !== undefined && ! visible && state.Settings.isInvisible(state,"File")) {
 	    return null;
 	} else if (visible !== undefined) {
@@ -59,11 +106,14 @@ class FileMenu extends Component {
                     open={Boolean(this.state.anchor)}
                     onClose={this.onClose}
 		    >
-		    <MenuItem key="upload"  className={classes.file} onClose={this.onClose}>
-		    <Upload state={state}/>
+		    <MenuItem key="edit"  className={classes.file} onClose={this.onClose}>
+		       <Edit classes={classes} state={state} onClose={this.onClose}/>
 		    </MenuItem>
 		    <MenuItem key="download"  className={classes.file} onClose={this.onClose}>
-		    <Download state={state} classes={cls}/>
+		       <Download state={state} classes={cls}/>
+		    </MenuItem>
+		    <MenuItem key="upload"  className={classes.file} onClose={this.onClose}>
+		       <Upload classes={{button:classes.button}} state={state} icon={<UploadIcon/>} title={"Upload setup"}/>
 		    </MenuItem>
 	            </Menu>
 		    </div>
