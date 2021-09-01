@@ -77,12 +77,9 @@ function Download(props) {
     return <Button className={classes.button} onClick={onclick} title={title}><DownloadIcon/></Button>;
 };
 class FileMenu extends Component {
-    constructor(props) {
-	super(props);
-    };
     state={anchor:null};
     render() {
-        const { classes, state, visible, onClose } = this.props;
+        const { classes, state, visible } = this.props;
 	if ( visible !== undefined && ! visible && state.Settings.isInvisible(state,"File")) {
 	    return null;
 	} else if (visible !== undefined) {

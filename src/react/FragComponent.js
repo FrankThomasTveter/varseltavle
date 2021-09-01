@@ -105,9 +105,9 @@ class Frag extends Component {
     };
     setAge(strs,col) {
 	var now=this.getDate();
-	for (var key in strs) {
-	    if (strs.hasOwnProperty(key)) {
-		var str=strs[key];
+	for (var ss in strs) {
+	    if (strs.hasOwnProperty(ss)) {
+		var str=strs[ss];
 		var key=this.state[col].key;
 		var sort=this.state[col].sort;
 		var show=this.state[col].show;
@@ -309,7 +309,7 @@ class Frag extends Component {
 	this.setAge(strs,"last");
 	this.setAge(strs,"from");
 	this.setAge(strs,"to");
-	var frags=state.Database.getFragmentActive(state);
+	//var frags=state.Database.getFragmentActive(state);
 	var fragments=this.sort(state.Database.getFragmentActive(state),strs);
 	var fragFunction= (frag) => {
 	    var thr=this.getThr(strs[frag][this.state['age'].sort]);

@@ -281,7 +281,7 @@ function Default() {
 	} else {
 	    return false;
 	};
-    }.bind(this);
+    };
     this.pushUrl=function(state) {
 	var url={};
 	if (this.useUrl(state,"Path")) {
@@ -501,7 +501,7 @@ function Default() {
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.home, this.statePath);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.home, this.stateOther);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.home, this.stateTrash);
-	    console.log("Home:",JSON.stringify(state.Default.config.home));
+	    //console.log("Home:",JSON.stringify(state.Default.config.home));
 	};
 	state.File.next(state,"",callbacks);
     }.bind(this);
@@ -547,7 +547,7 @@ function Default() {
     this.stageSetup=function(state,setup) {
 	//console.log("Staging changes");
 	state.Default.config.stage=setup;
-    }.bind(this);
+    };
     this.commitSetup=function(state) {
 	//console.log("Commiting changes");
 	this.setSetup(state,state.Default.config.stage);

@@ -269,7 +269,7 @@ function Database() {
 	for (var ii=0;ii<lenr;ii++) {
 	    var frag=fragments[ii];
 	    var json=state.Database.fragjson[frag];
-	    var cnt,epoch,age,ifirst,ilast,dfirst,dlast;
+	    var cnt,epoch,ifirst,ilast,dfirst,dlast;
 	    if (json !== undefined) { // epoch,cnt,ifirst,ilast,dfirst,dlast,data
 		cnt=parseInt(json.cnt,0);
 		epoch=(typeof json.epoch === 'undefined') ? null : json.epoch ;
@@ -458,124 +458,93 @@ function Database() {
 	}
     };
     //return	([{
-    //	    value: 'mars',
-    //	    label: 'Mars',
+    //	    value: 'data/cape',
+    //	    label: 'cape',
     //	    children: [
     //		{ value: 'phobos', label: 'Phobos' },
     //		{ value: 'deimos', label: 'Deimos' },
     //	    ]}]);
     // get a list of all the fragments...
-    this.getFragmentList=function(state,frags,mg,gg,pp,cc) {
+    this.getFragmentList=function(state) {
 	var bdeb=false; // false
-	if (mg === undefined) { mg=0;}; // max granny level
-	if (frags === undefined) {
-	    frags=[];
-	    var summary=state.Database.summary.sort();
-	    var lens=summary.length;
-	    for (var jj=0; jj<lens;jj++) {
-		var ss=summary[jj].replace(/\/+$/, ""); // path must not end with "/"
-		var parts=ss.split("/");
-		if (bdeb) {console.log("Fragment:",jj,JSON.stringify(parts));};
-		mg=Math.max(mg,parts.length);
-		frags.push(parts);
-	    }
-	    if (bdeb) {console.log("Initial summary:",JSON.stringify(frags));};
+	var makeMap= function(map,summary) {
+	    var ss=summary.replace(/\/+$/, ""); // path must not end with "/"
+	    var parts=ss.split("/");
+	    var pos=map;
+	    parts.forEach((part) => {
+		if (pos.sub===undefined) {pos.sub={};};
+		if (pos.sub[part]===undefined) {pos.sub[part]={};};
+		pos=pos.sub[part];
+	    });
+	    pos["value"]=summary;
 	};
-	var lenf=frags.length;
-	if (gg === undefined) { gg=0;}; // granny level
-	if (pp === undefined) { pp=0;};  // parent position
-	if (cc === undefined) { cc=lenf-1;}; // child position
-	var path;
-	var name;
-	var item;
-	var ret=[];
-	var lg=gg; // local granny level
-	var lp=pp; // local parent position
-	var lc=pp; // local child position
-	var ii=Math.min(pp+1,lenf-1); // current position
-	if (bdeb) {console.log(">>>>> Fragments processing: ",gg,pp,cc,lenf-1);};
-	var bdone=(ii > frags.length);
-	while (! bdone) {
-	    //if (bdeb) {console.log("Loop par=",lp,"(",pp,") ch=",lc,"(",cc,") ii=",
-	    //		   ii,"(",lenf,") lev=",lg,"(",mg,")");}
-	    if (this.fragmentMatch(frags[lp],frags[ii],lg)) {
-		if (bdeb) {console.log(" Fragments ",lg,
-				       JSON.stringify(frags[lp]),JSON.stringify(frags[ii]),
-				       " match at lev=",lg,"(",mg,") pos=",lp,ii,"(",lenf,")");};
-		lc=ii;    // current child position
-		ii=ii+1;  // current position
-		bdone= (lc >= Math.min(cc,lenf-1)); // no more positions (fragments)?
-		if (bdone) { // all matched, increase gg (global granny level)
-		    if (lc===cc && lp===pp) {
-			lg=lg+1; // increase level
-			if (lg > mg) { // end of the line, no more levels 
-			    // only one match...
-			    path=this.getName(frags[lp],0,mg);
-			    name=this.getName(frags[lp],gg,mg);//this.getParentName(state,granny,parent);
-			    item={value:path,label:name}
-			    if(bdeb)console.log("+++ done:",JSON.stringify(item));
-			    ret.push(item);
-			} else {
-			    ii=Math.min(lp+1,lenf-1);
-			    bdone= (ii > Math.min(cc,lenf-1));
-			}
-		    } else {
-			path=this.getName(frags[lp],0,lg);
-			name=this.getName(frags[lp],gg,lg);//this.getParentName(state,granny,parent);
-			if (lc === lp) {
-			    item={value:path,label:name};
-			    if (bdeb) {console.log("+++ CHILD:",JSON.stringify(item),JSON.stringify(frags[lp]),lg,mg);};
-			    ret.push(item);
-			} else {
-			    item={value:path,label:name};
-			    if (bdeb) {console.log("+++ PARENT:",JSON.stringify(item),lg,lp,lc);};
-			    item["children"]=this.getFragmentList(state,frags,mg,lg,lp,lc);
-			    ret.push(item);
-			}
-		    }
-		}
-	    } else if (lg-1 > gg) { // make common parent
-		if (bdeb) {console.log(" Fragments ",lg,JSON.stringify(frags[lp]),
-				       JSON.stringify(frags[ii])," DO NOT match at lev=",lg,
-				       "(",gg,") pos=",lp,ii,"(",lenf,")");};
-		path=this.getName(frags[lp],0,lg-1);
-		name=this.getName(frags[lp],gg,lg-1);//this.getParentName(state,granny,parent);
-		item={value:path,label:name};
-		if (bdeb) {console.log("+++ parent:",JSON.stringify(item));};
-		item.children=this.getFragmentList(state,frags,mg,lg-1,pp,cc);
-		ret.push(item);
-		return ret;
-	    } else {
-		if (bdeb) {console.log(" Fragments ",lp,ii,lenf,JSON.stringify(frags[lp]),
-				       JSON.stringify(frags[ii])," do not match",gg,lg,mg);};
-		name=this.getName(frags[lp],gg,lg);//this.getParentName(state,granny,parent);
-		if (lc === lp) {
-		    path=this.getName(frags[lp],0,mg);
-		    item={value:path,label:name};
-		    if (bdeb) {console.log("+++ child:",JSON.stringify(item));}
-		    ret.push(item);
-		} else {
-		    path=this.getName(frags[lp],0,lg);
-		    item={value:path,label:name};
-		    if (bdeb) {console.log("+++ parent:",JSON.stringify(item),lg,lp,lc);};
-		    item["children"]=this.getFragmentList(state,frags,mg,lg,lp,lc);
-		    ret.push(item);
-		}
-		lp=ii;
-		lc=ii;
-		ii=ii+1;
-		bdone= (ii > Math.min(cc,lenf-1));
-		if (bdone){
-		    path=this.getName(frags[lc],0,lg);
-		    name=this.getName(frags[lc],gg,lg);//this.getParentName(state,granny,parent);
-		    item={value:path,label:name};
-		    //console.log("+++ last child:",JSON.stringify(item));
-		    ret.push(item);
-		}
+	var makeLabels= function(map,summary) {
+	    var ss=summary.replace(/\/+$/, ""); // path must not end with "/"
+	    var parts=ss.split("/");
+	    var pos=map;
+	    var val="";
+	    var lab="";
+	    parts.forEach((part) => {
+		if (pos.sub===undefined || pos.sub[part]===undefined) {
+		    console.log("System error:",part,JSON.stringify(pos),
+				JSON.stringify(parts));
+		} else if (Object.keys(pos.sub).length > 1) {
+		    pos["value"]=val;
+		    pos["label"]=lab;
+		    lab=part;
+		    pos=pos.sub[part];
+		} else if (Object.keys(pos.sub).length > 0)  {
+		    if (lab==="") { lab=part;};
+		    pos=pos.sub[part];
+		};
+		if (val!=="") { val=val+"/";};
+		val=val+part;
+	    });
+	    pos["label"]=lab;
+	};
+	var makeTree=function(map) {
+	    var tree={};
+	    var value=map["value"];
+	    var label=map["label"];
+	    var sub=map["sub"];
+	    var keys;
+	    if (label!==undefined) {
+		tree["value"]=value||"";
+		tree["label"]=label;
+		if (sub!==undefined) {
+		    var children=[];
+		    keys=Object.keys(sub);
+		    keys.forEach((key, index) => {
+			children.push(makeTree(sub[key]))
+		    });
+		    tree["children"]=children;
+		};
+	    } else { // there is zero or one key....
+		keys=Object.keys(sub);
+		keys.forEach((key, index) => {
+		    tree=makeTree(sub[key]);
+		});
 	    };
+	    return tree;
 	};
-	if (bdeb) {console.log("Fragmentlist:",JSON.stringify(ret));};
-	return ret;
+	// make map
+	var map={};
+	var summary=state.Database.summary.sort();
+	var lens=summary.length;
+	var jj;
+	for (jj=0; jj<lens;jj++) {
+	    if (bdeb) {console.log("Fragment:",jj,JSON.stringify(summary[jj]));};
+	    makeMap(map,summary[jj]);
+	};
+	for (jj=0; jj<lens;jj++) {
+	    if (bdeb) {console.log("Fragment:",jj,JSON.stringify(summary[jj]));};
+	    makeLabels(map,summary[jj]);
+	};
+	if (bdeb) {console.log("Map:",JSON.stringify(map));};
+	// create structure...
+	var tree=makeTree(map);
+	if (bdeb) {console.log("Fragmentlist:",JSON.stringify(tree));};
+	return [tree];
     };
     this.getFragmentActive=function(state) {
 	var bdeb=false;

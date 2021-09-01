@@ -6,6 +6,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = theme => ({
+    button:{},
     loadDb: {
 	width: '100%',
     }
@@ -55,9 +56,11 @@ class LoadDb extends Component {
                         open={Boolean(this.state.anchor)}
                         onClose={this.onClose}
                      >	    
-   	  	   <input type='file' id='file'
-	              onChange={e=>handleFileChosen(e.target)}
-	              onClick={e=> {e.target.value = null}}/>
+		        <MenuItem key="input">
+   	  	           <input type='file' id='file'
+	                    onChange={e=>handleFileChosen(e.target)}
+	                    onClick={e=> {e.target.value = null}}/>
+		        </MenuItem>
                      </Menu>
                 </div>		
 	);
