@@ -1,6 +1,6 @@
 {
     "title":"Broer",
-    "thrs":[{
+    "thresholds":[{
 	"Phenomenon":{
 	    "Middelvind":{"Type":{"Bro":{"key":"max", ">": [0,13.9,24.5,32.7] }}},
 	    "Vindkast":{"Type":{"Bro":{"key":"max", ">": [0,25.0,35.0,45.0] }}},
@@ -65,7 +65,7 @@
                                                     "p65":{"key":"max", ">": [0,25,40] },
                                                     "p100":{"key":"max", ">": [0,40] }}}}}}}
 	   ],
-    "default":{"thrs":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
+    "default":{"thresholds":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
     "summaries":["summary_broer"],
     "fragments":["track","turbulens","snowfall","ising_skip","middelvind","regn","skogbrann","vannstand","vindkast"],
     "viewOldData":false,
@@ -128,7 +128,7 @@
     "polygons":{"dir":"simplified/","seperator":"_","keys":["Type","Region","Request"]},
     "custom":{},
     "visible":["Undo","Redo","Reload","Mode","ViewPath","Tooltip"],
-    "svg":{"key":"Phenomenon","svgs":{
+    "icons":{"key":"Phenomenon","svgs":{
 "Ising på skip":"<svg width=\"Size\" height=\"Size\" fill=\"none\" version=\"1.1\" id=\"svg10\"><defs id=\"defs14\" /><path fill=\"#fff\" fill-rule=\"evenodd\" d=\"M31.556 28.24a1.5 1.5 0 0 1-1.302 2.245H1.7A1.5 1.5 0 0 1 .398 28.24L14.675 3.256a1.5 1.5 0 0 1 2.604 0l14.277 24.985z\" clip-rule=\"evenodd\" id=\"path2\" /><path d=\"m 30.277,30.04794 a 1,1 0 0 0 0.868,-1.496 L 16.868,3.5669395 a 1,1 0 0 0 -1.736,0 L 0.855,28.55194 a 1,1 0 0 0 0.868,1.496 z\" id=\"path4\" style=\"clip-rule:evenodd;fill:bg;fill-rule:evenodd\" /><path fill=\"#908715\" fill-rule=\"evenodd\" d=\"M31.277 29a1 1 0 0 0-.132-.496L16.868 3.519a1 1 0 0 0-1.736 0L.855 28.504A1 1 0 0 0 1.723 30h28.554a1 1 0 0 0 1-1zM16.434 3.767l14.277 24.985a.5.5 0 0 1-.434.748H1.723a.5.5 0 0 1-.434-.748L15.566 3.767a.5.5 0 0 1 .868 0z\" clip-rule=\"evenodd\" id=\"path6\" /><path id=\"path820\" d=\"m 8.8001256,24.080321 c 0,0 0.4462574,0.979811 0.7741146,1.399891 0.3042869,0.389879 0.6703528,0.746939 1.1059588,1.026064 0.462056,0.296073 1.015527,0.513929 1.55624,0.679788 0.7129,0.218676 1.518465,0.270571 2.223747,0.289015 0.723754,0.01892 1.54622,0.06837 2.327882,0.01989 0.792337,-0.04913 1.58991,-0.168412 2.338427,-0.400585 0.417335,-0.129448 0.810973,-0.322124 1.173,-0.544898 0.403454,-0.248268 0.778331,-0.539859 1.094619,-0.870736 0.397606,-0.415945 0.987432,-1.37789 0.987432,-1.37789 z\" style=\"fill:fg;fill-opacity:1;stroke:fg;stroke-width:0.77356315px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\" /><path id=\"path822\" d=\"m 14.719626,24.022704 0.166758,-13.238174 0.9474,1.553366 1.459531,4.54191 1.711163,5.659549 -4.253384,-0.04624\" style=\"fill:fg;fill-opacity:1;stroke:fg;stroke-width:0.86000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1\" /></svg>",
 
 "Middelvind":"<svg width=\"Size\" height=\"Size\" fill=\"none\"><path fill=\"#fff\" fill-rule=\"evenodd\" d=\"M31.556 28.24a1.5 1.5 0 0 1-1.302 2.245H1.7A1.5 1.5 0 0 1 .398 28.24L14.675 3.256a1.5 1.5 0 0 1 2.604 0l14.277 24.985z\" clip-rule=\"evenodd\"/><path fill=\"bg\" fill-rule=\"evenodd\" d=\"M30.277 30a1 1 0 0 0 .868-1.496L16.868 3.519a1 1 0 0 0-1.736 0L.855 28.504A1 1 0 0 0 1.723 30h28.554z\" clip-rule=\"evenodd\"/><path fill=\"#908715\" fill-rule=\"evenodd\" d=\"M31.277 29a1 1 0 0 0-.132-.496L16.868 3.519a1 1 0 0 0-1.736 0L.855 28.504A1 1 0 0 0 1.723 30h28.554a1 1 0 0 0 1-1zM16.434 3.767l14.277 24.985a.501.501 0 0 1-.434.748H1.723a.5.5 0 0 1-.434-.748L15.566 3.767a.5.5 0 0 1 .868 0z\" clip-rule=\"evenodd\"/><path fill=\"fg\" fill-rule=\"evenodd\" d=\"M16 16a1 1 0 0 0-1 1h-1a2 2 0 1 1 2 2v-1a1 1 0 1 0 0-2zm2 10a1 1 0 0 1-1-1h-1a2 2 0 1 0 2-2v1a1 1 0 1 1 0 2zm2.5-7.5a1 1 0 0 0-1 1h-1a2 2 0 1 1 2 2v-1a1 1 0 1 0 0-2z\" clip-rule=\"evenodd\"/><path fill=\"fg\" d=\"M9 18h7v1H9zm0 2.5h11.5v1H9zM9 23h9v1H9z\"/></svg>",

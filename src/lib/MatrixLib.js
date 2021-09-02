@@ -188,16 +188,16 @@ function Matrix() {
 	    return self.indexOf(value) === index;
 	};
 	var lats, lons;
-	var layoutMode=state.Layout.getLayoutMode(state);
-	var map=state.Custom.getMap(state,layoutMode);
-	if (map !== undefined && map.cells !== undefined) {
-	    //console.log("Found custom map...",JSON.stringify(map));
-	    lats=state.Custom.getLats(state,map);
-	    lons=state.Custom.getLons(state,map);
-	} else {
+	//var layoutMode=state.Layout.getLayoutMode(state);
+	// var map=state.Custom.getMap(state,layoutMode);
+	// if (map !== undefined && map.cells !== undefined) {
+	//     //console.log("Found custom map...",JSON.stringify(map));
+	//     lats=state.Custom.getLats(state,map);
+	//     lons=state.Custom.getLons(state,map);
+	// } else {
 	    lats=state.Grid.getLats(state);
 	    lons=state.Grid.getLons(state);
-	};
+	// };
 	lats=lats.filter(distinct); lats=lats.sort();
 	this.values["_lat"]=lats;
 	lons=lons.filter(distinct); lons=lons.sort();
@@ -265,24 +265,24 @@ function Matrix() {
 	}
     };
     this.addMapAreaKeys=function(state,docs) {
-	var layoutMode=state.Layout.getLayoutMode(state);
-	var map=state.Custom.getMap(state,layoutMode);
+	// var layoutMode=state.Layout.getLayoutMode(state);
+	// var map=state.Custom.getMap(state,layoutMode);
 	var dlen,ii,doc,ilat,ilon;
-	if (map !== undefined && map.cells !== undefined) {
-	    dlen = docs.length;
-	    for (ii = 0; ii < dlen; ii++) {
-    		doc=docs[ii];
-		var cell=state.Custom.findCell(state,map,doc);
-		if (cell !== undefined) {
-		    ilat=state.Custom.getCellRow(state,cell);
-		    ilon=state.Custom.getCellCol(state,cell);
-		    doc._lat=ilat
-		    doc._lon=ilon
-		    this.updateKeyCnt(state,"_lat");
-		    this.updateKeyCnt(state,"_lon");
-		}
-	    }
-	} else {
+	// if (map !== undefined && map.cells !== undefined) {
+	//     dlen = docs.length;
+	//     for (ii = 0; ii < dlen; ii++) {
+    	// 	doc=docs[ii];
+	// 	var cell=state.Custom.findCell(state,map,doc);
+	// 	if (cell !== undefined) {
+	// 	    ilat=state.Custom.getCellRow(state,cell);
+	// 	    ilon=state.Custom.getCellCol(state,cell);
+	// 	    doc._lat=ilat
+	// 	    doc._lon=ilon
+	// 	    this.updateKeyCnt(state,"_lat");
+	// 	    this.updateKeyCnt(state,"_lon");
+	// 	}
+	//     }
+	// } else {
 	    dlen = docs.length;
 	    for (ii = 0; ii < dlen; ii++) {
     		doc=docs[ii];
@@ -300,7 +300,7 @@ function Matrix() {
 		this.updateKeyCnt(state,"_lon");
 		//console.log("AddMapAreaKeys=",doc.lon,lonpos,ilon,doc._lon);
 	    }
-	}
+         // }
     };
     this.makeMatrixCntMap=function(state,cntDocs,matrix) {
 	//console.log("MatrixCnt:",JSON.stringify(cntDocs));
@@ -877,7 +877,7 @@ function Matrix() {
 	}
 	return tooltip;
     };
-    this.getElementWhere=function(state,el,mode) {
+    this.getElementWhere=function(state,el) { //,mode
 	var del="'";
 	var where = state.Database.getWhere(state);
 	//console.log("Element:",JSON.stringify(el));
@@ -890,9 +890,10 @@ function Matrix() {
 		var key=keys[ii];
 		var val=values[key];
 		var range=ranges[key];
-		if (mode === undefined ||  ! state.Custom.mapHasCells(state,mode)) {
+		//if (mode === undefined ||  ! state.Custom.mapHasCells(state,mode)) {
+		    // this happens if there is no custom map, or custom map is map...
 		    if (key.substring(0,1)==="_" ) {del="";}; // numerical value
-		}
+		//}
 		if (key !== undefined && key !== "") {
 		    if (range === undefined) {
 			where=state.Database.addWhere(where,key+"="+del +val+del);
@@ -904,24 +905,24 @@ function Matrix() {
 	    };
 	};
 	//console.log("Where:",where,JSON.stringify(where));
-	//console.log("Data:",mode,JSON.stringify(state.Database.db.tables.alarm));
+	//console.log("Data:",JSON.stringify(state.Database.db.tables.alarm)); //mode,
 	return where;
     };
     this.addAllTooltip=function(state,matrix) {
-	var mode=state.Custom.getLayoutMode(state);
+	//var mode=state.Custom.getLayoutMode(state);
 	//console.log(">>> Adding all tooltips...",mode); // 
 	// loop over all elements and add tooltips
 	var elements=this.getMatrixElements(state,matrix); // all elements
 	var lenc=elements.length;
 	for (var cc=0;cc<lenc;cc++) {
 	    var el=elements[cc];
-	    this.addElementTooltip(state,el,mode);
+	    this.addElementTooltip(state,el); //,mode
 	}
 	state.Matrix.ltooltip=true;
     };
-    this.addElementTooltip=function(state,el,mode) {
+    this.addElementTooltip=function(state,el) { //,mode
 	// called when info-button is pressed - to add tooltip to element...
-	var where = this.getElementWhere(state,el,mode);
+	var where = this.getElementWhere(state,el); //,mode
 	//console.log(">>> Adding ElementTooltip:",JSON.stringify(el),mode," where:",where); // 
 	var docs=[];
 	if (el.cnt>0) {docs=state.Database.getDocs(state,where);};

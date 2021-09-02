@@ -36,7 +36,8 @@ function Default() {
     this.toStateData  = [
 	[["summaries"],    ["Database","summaries"]],
 	[["fragments"],    ["Database","fragments"]],
-	[["viewOldData"],  ["Database","viewOldData"]]
+	[["viewOldData"],  ["Database","viewOldData"]],
+	[["notification"], ["Database","notification"]]
     ];
     this.toStateTrash  = [
 	[["keys","trash"],   ["Path","keys","trash"]]
@@ -52,12 +53,12 @@ function Default() {
     this.toStateVisible  = [
 	[["visible"], ["Settings","visible"]]
     ];
-    this.toStateCustom= [
-	[["custom"],  ["Custom","maps"]]
-    ];
+    // this.toStateCustom= [
+    // 	[["custom"],  ["Custom","maps"]]
+    // ];
     this.toStateThr  = [
-	[["thrs"],    ["Threshold","thrs"]],
-	[["default","thrs"], ["Threshold","def"]]
+	[["thresholds"],    ["Threshold","thrs"]],
+	[["default","thresholds"], ["Threshold","def"]]
     ];
     this.toStateColors= [
 	[["colors"],  ["Colors","colors"]]
@@ -95,7 +96,6 @@ function Default() {
     this.toStateLooks = [
 	[["title"],              ["Layout","title"]],
 	[["priority"],           ["Layout","priority"]],
-	[["notification"],       ["Database","notification","mode"]],
 	[["state","viewMode"],   ["Layout","state","viewMode"]],
 	[["state","cellMode"],   ["Layout","state","cellMode"]],
 	[["state","layoutMode"], ["Layout","state","layoutMode"]],
@@ -103,7 +103,7 @@ function Default() {
 	[["state","tooltip"],    ["Layout","state","tooltip"]],
     ];
     this.toStateSvg = [
-	[["svg"],     ["Svg","config"]]
+	[["icons"],     ["Svg","config"]]
     ];
     this.invert=function(map) {
 	var ret=[];
@@ -140,7 +140,7 @@ function Default() {
     this.stateOther=this.getTarget(this.toStateOther);
     this.stateHome=this.getTarget(this.toStateHome);
     this.stateVisible=this.getTarget(this.toStateVisible);
-    this.stateCustom=this.getTarget(this.toStateCustom);
+//    this.stateCustom=this.getTarget(this.toStateCustom);
     this.stateThr=this.getTarget(this.toStateThr);
     this.stateColors=this.getTarget(this.toStateColors);
     this.stateTooltip=this.getTarget(this.toStateTooltip);
@@ -159,7 +159,7 @@ function Default() {
     this.fromStateOther=this.invert(this.toStateOther);
     this.fromStateHome=this.invert(this.toStateHome);
     this.fromStateVisible=this.invert(this.toStateVisible);
-    this.fromStateCustom=this.invert(this.toStateCustom);
+//    this.fromStateCustom=this.invert(this.toStateCustom);
     this.fromStateThr=this.invert(this.toStateThr);
     this.fromStateColors=this.invert(this.toStateColors);
     this.fromStateTooltip=this.invert(this.toStateTooltip);
@@ -207,7 +207,7 @@ function Default() {
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.setup, this.toStateOther);
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.setup, this.toStateHome);
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.setup, this.toStateVisible);
-		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.setup, this.toStateCustom);
+//		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.setup, this.toStateCustom);
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.setup, this.toStateThr);
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.setup, this.toStateColors);
 		state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.setup, this.toStateTooltip);
@@ -236,7 +236,7 @@ function Default() {
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateOther);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateHome);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateVisible);
-	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateCustom);
+//	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateCustom);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateThr);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateColors);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.init, this.stateTooltip);
@@ -381,7 +381,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateOther);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateHome);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateVisible);
-	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateCustom);
+//	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateCustom);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateThr);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.init, merge, this.stateTooltip);
@@ -399,7 +399,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.stateOther);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.stateHome);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.stateVisible);
-	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.stateCustom);
+//	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.stateCustom);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.stateThr);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.setup, merge, this.stateTooltip);
@@ -433,7 +433,7 @@ function Default() {
 	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.start, merge, this.stateOther);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.start, merge, this.stateHome);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.start, merge, this.stateVisible);
-	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.start, merge, this.stateCustom);
+//	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.start, merge, this.stateCustom);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.start, merge, this.stateThr);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.start, merge, this.stateColors);
 	    state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.start, merge, this.stateTooltip);
@@ -451,7 +451,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.config.current, merge, this.stateOther);
 	state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.config.current, merge, this.stateHome);
 	state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.config.current, merge, this.stateVisible);
-	state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.config.current, merge, this.stateCustom);
+//	state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.config.current, merge, this.stateCustom);
 	state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.config.current, merge, this.stateThr);
 	state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.config.current, merge, this.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.fill,  state.Default.config.current, merge, this.stateTooltips);
@@ -469,7 +469,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateOther);
 	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateHome);
 	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateVisible);
-	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateCustom);
+//	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateCustom);
 	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateThr);
 	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.force, merge, state, this.stateTooltips);
@@ -526,7 +526,7 @@ function Default() {
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateOther);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateHome);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateVisible);
-	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateCustom);
+//	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateCustom);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateThr);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateColors);
 	    state.Utils.copyMap(state, state.Utils.type.force, state, state.Default.config.start, this.stateTooltip);
@@ -571,7 +571,7 @@ function Default() {
 	    state.Utils.copyMap( state, state.Utils.type.fill, setup, state.Default.config.current, this.toStateOther);
 	    // hard copy setup to current (state.Default.forceToStateDefaults)
 	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.current, this.toStateVisible);
-	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.current, this.toStateCustom);
+//	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.current, this.toStateCustom);
 	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.current, this.toStateThr);
 	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.current, this.toStateColors);
 	    state.Utils.copyMap(state, state.Utils.type.force, setup, state.Default.config.current, this.toStateTooltip);
@@ -588,7 +588,7 @@ function Default() {
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.config.start,state.Default.config.current,this.stateTrash);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.config.start,state.Default.config.current,this.stateOther);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.config.start,state.Default.config.current,this.stateVisible);
-	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.config.start,state.Default.config.current,this.stateCustom);
+//	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.config.start,state.Default.config.current,this.stateCustom);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.config.start,state.Default.config.current,this.stateThr);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.config.start,state.Default.config.current,this.stateColors);
 	    state.Utils.copyMap( state, state.Utils.type.fill, state.Default.config.start,state.Default.config.current,this.stateTooltips);
@@ -614,7 +614,7 @@ function Default() {
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateTooltips);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateFocus);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateLooks);
-	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateCustom);
+//	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateCustom);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateFilm);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateURL);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateThr);
@@ -636,7 +636,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateOther);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateTrash);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateVisible);
-	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateCustom);
+//	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateCustom);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateThr);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.current, current, this.stateTooltips);
@@ -651,7 +651,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.setup, current, this.stateOther);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.setup, current, this.stateHome);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.setup, current, this.stateVisible);
-	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.setup, current, this.stateCustom);
+//	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.setup, current, this.stateCustom);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.setup, current, this.stateThr);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.setup, current, this.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.fill, state.Default.config.setup, current, this.stateTooltip);
@@ -672,7 +672,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateURL);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateData);
-	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateCustom);
+//	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateCustom);
 	//console.log("Current:",JSON.stringify(current));
 	//console.log("keys:",JSON.stringify(state.Path.keys));
 	//console.log("trash:",JSON.stringify(state.Path.trash));
@@ -681,7 +681,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.fromStateColors);
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.fromStateTooltip);
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.fromStateVisible);
-	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.fromStateCustom);
+//	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.fromStateCustom);
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.fromStateHome);
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.fromStateFocus);
 	state.Utils.copyMap(state, state.Utils.type.force, current, setup, this.fromStateFilm);
@@ -694,7 +694,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.fill,  current, setup, this.fromStateOther);
 	state.Utils.copyMap(state, state.Utils.type.fill,  current, setup, this.fromStateTrash);
 	state.Utils.copyMap(state, state.Utils.type.fill,  current, setup, this.fromStateVisible);
-	state.Utils.copyMap(state, state.Utils.type.fill,  current, setup, this.fromStateCustom);
+//	state.Utils.copyMap(state, state.Utils.type.fill,  current, setup, this.fromStateCustom);
 	//if (state.Default.config.current.Settings!==undefined) {console.log("Current:",JSON.stringify(state.Default.config.current.Settings.visible));}
 	//if (current.Settings!==undefined) {console.log("Setup:  ",JSON.stringify(current.Settings.visible));};
 	//JSON.stringify(setup, null, "   ");
