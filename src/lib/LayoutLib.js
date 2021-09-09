@@ -21,6 +21,7 @@ function Layout() {
 		cellMode:0,       // sum, series, item
 		layoutMode:0,     // table, list, map
 		cfont:0,
+		iconSize:35,
 		tooltip:1,
 	       };
     this.modes={view:{nopath:0,
@@ -84,6 +85,9 @@ function Layout() {
 	state.Layout.state.cellMode=cellMode;
 	//state.Show.showConfig(state);
 	state.Show.showAll(state,reload);
+    };
+    this.getIconSize=function(state) {
+	return this.state.iconSize;
     };
     this.getDim=function(state) {
 	//console.log("Dimension:",state.Path.other.table.length,JSON.stringify(state.Path.other.table.length));

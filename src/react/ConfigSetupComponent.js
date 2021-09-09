@@ -33,7 +33,7 @@ const styles = theme => ({
 });
 // 
 function Edit(props) {
-    const {state,classes,onClose}=props;
+    const {classes,state,onClose}=props;
     var onClick=()=>{
 	// launch popup
 	var json=state.Default.getSetup(state);//{"dummy":"is a test"};
@@ -45,7 +45,7 @@ function Edit(props) {
 	//console.log("Launching popup.");
 	Popup.create({
 	    title: 'Edit SETUP file.',
-	    content: <Json handleChange={handleChange} value={json} />,
+	    content: <Json handleChange={handleChange} value={json}/>,
 	    buttons: {
 		left: ['cancel'],
 		right: [{
@@ -104,7 +104,7 @@ class FileMenu extends Component {
                     onClose={this.onClose}
 		    >
 		    <MenuItem key="edit"  className={classes.file} onClose={this.onClose}>
-		       <Edit classes={classes} state={state} onClose={this.onClose}/>
+		    <Edit classes={classes} state={state} onClose={this.onClose}/>
 		    </MenuItem>
 		    <MenuItem key="download"  className={classes.file} onClose={this.onClose}>
 		       <Download state={state} classes={cls}/>

@@ -54,9 +54,6 @@ class Frag extends Component {
 	this.intervalId=undefined;
 	this.maxcount=3600;
 	//86400*1000
-	this.thr=[{color:"LightSalmon",range:[23*3600*1000,null]}, 
-		  {color:"Lime",range:[null,3600*1000]}, 
-		  {color:"Yellow",range:[null,null]}];
     }; 
     startClock() {
 	//console.log("Called start clock...",this.intervalId === undefined);
@@ -125,9 +122,9 @@ class Frag extends Component {
 	    }
 	}
     };	
-    getThr (millis) {
+    getThr (thr,millis) {
 	var ret={color:"LightBlue"};
-	this.thr.forEach((thr) => {
+	thr.forEach((thr) => {
 	    var range=thr.range;
 	    var mint=range[0];
 	    var maxt=range[1];
@@ -312,10 +309,16 @@ class Frag extends Component {
 	//var frags=state.Database.getFragmentActive(state);
 	var fragments=this.sort(state.Database.getFragmentActive(state),strs);
 	var fragFunction= (frag) => {
-	    var thr=this.getThr(strs[frag][this.state['age'].sort]);
+	    var fragthr=state.Database.getFragThr(state);
+	    var thr=this.getThr(fragthr, strs[frag][this.state['age'].sort]);
 	    var styleR={border: "1px solid black", textAlign:"right"}; // "center"
 	    var styleL={border: "1px solid black", textAlign:"left"}; // "center"
-	    if (thr) {styleL.backgroundColor=thr.color;styleR.backgroundColor=thr.color;};
+	    if (thr) {
+		styleL.backgroundColor=thr.background;
+		styleL.color=thr.foreground;
+		styleR.backgroundColor=thr.background;
+		styleR.color=thr.foreground;
+	    };
 	    return (
 		<tr key={frag}>
 		  <td style={styleR}>  {strs[frag][this.state['age'].show]}</td>

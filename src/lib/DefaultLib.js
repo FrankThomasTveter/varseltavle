@@ -9,6 +9,7 @@ function Default() {
 	      Trash:true,
 	      Other:true,
 	      Data:true,
+	      Thresholds:false,
 	      Home:true,
 	      Visible:true,
 	      Colors:true,
@@ -61,6 +62,7 @@ function Default() {
 	[["default","thresholds"], ["Threshold","def"]]
     ];
     this.toStateColors= [
+	[["monitoring"],    ["Database","fragthr"]],
 	[["colors"],  ["Colors","colors"]]
     ];
     this.toStateTooltip = [
@@ -100,6 +102,7 @@ function Default() {
 	[["state","cellMode"],   ["Layout","state","cellMode"]],
 	[["state","layoutMode"], ["Layout","state","layoutMode"]],
 	[["state","cfont"],      ["Layout","state","cfont"]],
+	[["state","icon"],       ["Layout","state","iconSize"]],
 	[["state","tooltip"],    ["Layout","state","tooltip"]],
     ];
     this.toStateSvg = [
@@ -289,7 +292,13 @@ function Default() {
 	};
 	if (this.useUrl(state,"Data")) {
 	    //console.log("Url:",JSON.stringify(url));
+	    // ,state.Utils.type.splice
 	    state.Utils.pushChanged(state,url,this.stateData);
+	};
+	if (this.useUrl(state,"Thresholds")) {
+	    //console.log("Url:",JSON.stringify(url));
+	    // ,state.Utils.type.splice
+	    state.Utils.pushChanged(state,url,this.stateThr);
 	};
 	if (this.useUrl(state,"Trash")) {
 	    state.Utils.pushChanged(state,url,this.stateTrash);
@@ -334,6 +343,10 @@ function Default() {
 	};
 	if (this.useUrl(state,"Data")) {
 	    state.Utils.pushChanged(state,url,this.stateData);
+	};
+	if (this.useUrl(state,"Thresholds")) {
+	    //console.log("Url:",JSON.stringify(url));
+	    state.Utils.pushChanged(state,url,this.stateThr);
 	};
 	if (this.useUrl(state,"Trash")) {
 	    state.Utils.pushChanged(state,url,this.stateTrash);
@@ -714,6 +727,7 @@ function Default() {
 	var start=state.Default.config.start;
 	//console.log("Url:",url);
 	//console.log("Start:",JSON.stringify(state.Default.config.start));
+	//console.log("Path:",JSON.stringify(pth));
 	var trg=state;
 	var lenp=pth.length;
 	//console.log("hasChanged ",lenp,JSON.stringify(pth));
@@ -753,12 +767,23 @@ function Default() {
 	//var u=JSON.stringify(url);
 	//var s=JSON.stringify(start);
 	//var t=JSON.stringify(trg);
+
 	if (url !== undefined) {
-	    return true; // changes to url...
-	} else if (JSON.stringify(start) !== JSON.stringify(trg)) {
+	    return null; // changes to url...
+	} else if (!state.Utils.deepEqual(start,trg)) {
+	    //var diff=state.Utils.deepDiff(start,trg);
+	    //var splice=state.Utils.spliceDiff(start,diff);
+	    //console.log("Src:",JSON.stringify(start));
+	    //console.log("Trg:",JSON.stringify(trg));
+	    //console.log("Diff:",JSON.stringify(diff));
+	    //console.log("Splice:",JSON.stringify(splice));
 	    return true; // changes relative to start state
 	} else {
-	    //console.log("No change:",JSON.stringify(pth),u,s,t);
+	    //console.log("Init:",JSON.stringify(state.Default.config.start));
+	    //console.log("Equal:",JSON.stringify(state.Utils.deepEqual(start,trg)));
+	    //console.log("Diff:",JSON.stringify(state.Utils.deepDiff(start,trg)));
+	    //console.log("Start:",JSON.stringify(start));
+	    //console.log("Trg:",JSON.stringify(trg));
 	    return false; // no url and same as start state
 	}
     };

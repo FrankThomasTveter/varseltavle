@@ -299,7 +299,7 @@ class GeoJsonMap extends Component {
       var height='calc(100% - 70px - 70px - 5px)';
       //var layoutMode  = state.Layout.getLayoutMode(state);
       var markFunction= (mark) => {
-	  var size=50;
+	  var size=state.Layout.getIconSize(state);//50
 	  var svgstr=state.Svg.getSvg(state,mark.svgid,mark.fgcolor,mark.bgcolor,size);
 	  //console.log("Using SVG:",mark.svgid,svgstr,mark.fgcolor,mark.bgcolor);
 	  var flagIcon = new  L.divIcon({iconSize: [size, size],html: svgstr,className:'dummy'});

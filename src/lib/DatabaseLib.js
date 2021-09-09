@@ -19,6 +19,9 @@ function Database() {
     this.fragjson={};         // json[frag]
     this.fragfile={};         // file[frag]
     this.fragcnt={};          // cnt[frag]
+    this.fragthr=[{background:"LightSalmon",foreground:"Black",range:[23*3600*1000,null]}, 
+		  {background:"Lime",foreground:"Black",range:[null,3600*1000]}, 
+		  {background:"Yellow",foreground:"Black",range:[null,null]}];
     this.notification={mode:0,maxLevel:0};
     this.fragdtg=null;
     this.loaded="";
@@ -261,6 +264,9 @@ function Database() {
 	var mi=parseInt(epoch.substring(14,16));
 	var ss=parseInt(epoch.substring(17,23));
 	return (new Date(Date.UTC(yy,mm-1,dd,hh,mi,ss)));
+    };
+    this.getFragThr=function(state) {
+	return this.fragthr;
     };
     this.getFragTimes=function(state) {
 	var ret={};

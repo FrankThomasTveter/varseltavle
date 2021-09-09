@@ -4,7 +4,8 @@ function Utils() {
     this.version="1";
     this.type={"any"  :0,
 	       "force":1,
-	       "fill" :2};
+	       "fill" :2,
+	       "splice":3};
     this.bdeb=false;
     this.debug=function(state,val) {
 	if (val!==undefined && val !== null && val) { 
@@ -256,6 +257,7 @@ function Utils() {
 	//console.log("Restoring:",JSON.stringify(obj));
 	//this.debug(state,true);
 	this.copyMap(state,this.type.any,obj,arr);
+	state.Path.cleanSelect(state);
 	//this.debug(state,false);
 	// for (var key in obj) {
         //     if (Object.prototype.hasOwnProperty.call(obj, key)) {
@@ -609,7 +611,6 @@ function Utils() {
 	};
 	return {"src":s,"trg":t};
     }
-
     // map src onto target always
     this.copyMap=function(state,type,src,trg,map) {
 	if (this.bdeb) {console.log("Map:",JSON.stringify(map),type,this.getType(state,type));}
@@ -939,7 +940,8 @@ function Utils() {
 	//console.log("New URL: (",url.length,"):",this.prettyJson(uri));
 	    return url;
     };
-    this.pushChanged=function(state,url,map) {
+    this.pushChanged=function(state,url,map,type) {
+	if (type===undefined) {type=this.type.fill;};
 	//console.log("PushUrlDetails:",url,JSON.stringify(map));
 	if (url===undefined) {
 	    throw new Error("ERROR: pushUrl with no src.");
@@ -951,10 +953,21 @@ function Utils() {
 	    for (var ii=0;ii<len;ii++){
 		//console.log("PushUrlDetails...",ii,map.length);
 		let mm=this.getMapItem(state,map,ii);
-		if (state.Default.hasChanged(state,mm.trg)) {
+		let cc=state.Default.hasChanged(state,mm.trg);
+		if (cc === null || cc) {  // already in URL or changed
 		    var ss=this.getItem(state,mm.trg,state);
-		    if (ss !== undefined) {
-			this.setMap(state,mm.trg,url,ss,this.type.fill);
+		    if (ss === undefined) { // item does not exist any more, how strange...
+			// do nothing
+		    // } else if (type === this.type.splice) {
+		    //  	var tt=this.getItem(state,mm.trg,state.Default.config.setup);
+		    //  	var dd=state.Utils.deepDiff(ss,tt);
+		    //  	console.log("SS:",JSON.stringify(ss),this.type.fill);
+		    //  	console.log("TT:",JSON.stringify(tt));
+		    //  	console.log("DD:",JSON.stringify(dd));
+		    //  	this.setMap(state,mm.trg,url,ss,this.type.fill);
+		    } else {
+		    //	console.log("SS:",JSON.stringify(ss),type);
+		 	this.setMap(state,mm.trg,url,ss,type);
 		    }
 		}
 	    }
@@ -985,6 +998,129 @@ function Utils() {
 	}
 
     };
+    this.isObject=function(object) {
+	return object != null && typeof object === 'object';
+    };
+    this.getDefinedKeys=function(object) {
+	var ret=[];
+	for (var key in object) {
+            if (hasOwnProperty.call(object, key) && object[key]!==undefined) {
+		ret.push(key);
+	    }
+        }
+	return ret.sort();
+    };
+    this.deepEqual=function(object1, object2) {
+	if ((object1 === null && object2 === null) ||
+	    (object1 === undefined && object2 === undefined)) {
+	    return true;
+	} else if (object1===null || object1===undefined ||
+		   object2===null || object2===undefined) {
+	    return false;
+	};
+	if (typeof(object2) === 'object') {
+	    var keys1 = this.getDefinedKeys(object1);
+	    var keys2 = this.getDefinedKeys(object2);
+	    if (keys1.length !== keys2.length) {
+		return false;
+	    };
+	    for (var key of keys1) {
+		var val1 = object1[key];
+		var val2 = object2[key];
+		var areObjects = this.isObject(val1) && this.isObject(val2);
+		if (areObjects) {
+		    if (!this.deepEqual(val1, val2)) {
+			return false;
+		    };
+		} else {
+		    if (val1 !== val2) {
+			return false;
+		    };
+		}
+	    }
+	} else if (object1 !== object2) {
+	    return false;
+	}
+	return true;
+    }.bind(this);
+    // splice 
+    this.spliceDiff=function(object,diff) {
+	var ret;
+	if (diff === null || diff === undefined) {
+	    return this.cp(object);
+	} else if (object===null || object===undefined) {
+	    return; // need object structure
+	};
+	if (typeof(object) === 'object') {
+	    if (Array.isArray(object)) {
+		ret=[];
+	    } else {
+		ret={};
+	    };
+	    //var keys1 = this.getDefinedKeys(object);
+	    var okeys = this.getDefinedKeys(object);
+	    for (var okey of okeys) {
+		var val1 = object[okey];
+		var val2 = diff[okey];
+		var areObjects = this.isObject(val1) && this.isObject(val2);
+		if (areObjects) {
+		    ret[okey]=this.spliceDiff(val1, val2);
+		} else {
+		    if (val2 !== undefined && val1 !== val2) { // use new value
+			ret[okey]=this.cp(val2);
+		    } else { // use old value
+			ret[okey]=this.cp(val1);
+		    };
+		}
+	    }
+	    // add missing diff-keys...
+	    var dkeys = this.getDefinedKeys(diff);
+	    for (var dkey of dkeys) {
+		var dal1 = object[dkey];
+		var dal2 = diff[dkey];
+		var dareObjects = this.isObject(dal1) && this.isObject(dal2);
+		if (!dareObjects) {
+		    if (dal2 !== undefined && dal1 !== dal2) { // use new value
+			ret[dkey]=this.cp(dal2);
+		    };
+		}
+	    }
+	} else if (object !== diff) {
+	    ret=this.cp(diff);
+	};
+	return ret;
+    }.bind(this);
+    this.deepDiff=function(object1,object2) {
+	var ret;
+	if ((object1 === null && object2 === null) ||
+	    (object1 === undefined && object2 === undefined)) {
+	    return;
+	} else if (object1===null || object1===undefined ||
+		   object2===null || object2===undefined) {
+	    return this.cp(object2);
+	};
+	if (typeof(object2) === 'object') {
+	    ret={};
+	    var keys2 = this.getDefinedKeys(object2);
+	    for (var key of keys2) {
+		var val1 = object1[key];
+		var val2 = object2[key];
+		var areObjects = this.isObject(val1) && this.isObject(val2);
+		if (areObjects) {
+		    if (!this.deepEqual(val1, val2)) {
+			ret[key]=this.deepDiff(val1, val2);
+		    };
+		} else {
+		    if (val1 !== val2) {
+			ret[key]=val2;
+		    };
+		}
+	    }
+	} else if (object1 !== object2) {
+	    ret=object2;
+	};
+	return ret;
+    }.bind(this);
 };
 export default Utils;
     
