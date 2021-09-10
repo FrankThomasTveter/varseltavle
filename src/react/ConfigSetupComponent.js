@@ -33,7 +33,7 @@ const styles = theme => ({
 });
 // 
 function Edit(props) {
-    const {classes,state,onClose}=props;
+    const {classes,state,onClose,onCloseParent}=props;
     var onClick=()=>{
 	// launch popup
 	var json=state.Default.getSetup(state);//{"dummy":"is a test"};
@@ -61,7 +61,8 @@ function Edit(props) {
 		}]
 	    }
 	});
-	onClose();
+	if (onClose !== undefined) {onClose();}
+	if (onCloseParent !== undefined) {onCloseParent();};
     };
     var title="Edit setup";
     return (<Button
@@ -79,7 +80,7 @@ function Download(props) {
 class FileMenu extends Component {
     state={anchor:null};
     render() {
-        const { classes, state, visible } = this.props;
+        const { classes, state, visible, onClose } = this.props;
 	if ( visible !== undefined && ! visible && state.Settings.isInvisible(state,"File")) {
 	    return null;
 	} else if (visible !== undefined) {
@@ -104,7 +105,7 @@ class FileMenu extends Component {
                     onClose={this.onClose}
 		    >
 		    <MenuItem key="edit"  className={classes.file} onClose={this.onClose}>
-		    <Edit classes={classes} state={state} onClose={this.onClose}/>
+		    <Edit classes={classes} state={state} onClose={this.onClose} onCloseParent={onClose}/>
 		    </MenuItem>
 		    <MenuItem key="download"  className={classes.file} onClose={this.onClose}>
 		       <Download state={state} classes={cls}/>

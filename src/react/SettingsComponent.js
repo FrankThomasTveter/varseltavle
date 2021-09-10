@@ -114,7 +114,7 @@ class Settings extends Component {
 		       <Star state={state} classes={cls} visible={true}/>
 		    </MenuItem>
 		    <MenuItem key="file" onClose={this.onClose}>
-		       <Setup state={state} classes={cls} visible={true}/>
+		       <Setup state={state} classes={cls} visible={true} onClose={this.onClose}/>
 		    </MenuItem>
 		    <MenuItem key="viewPolygon" onClose={this.onClose}>
 		       <ViewPolygon state={state} classes={cls} visible={true}/>
