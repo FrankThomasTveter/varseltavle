@@ -190,6 +190,9 @@
 	{"Method":{"efi":{"key":"a100", ">": [-1,0.7] },"sot":{"key":"a100", ">": [-5,0,1,2] }}}
     ],
     "default":{"thresholds":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
+    "monitoring": [{"background":"LightSalmon","foreground":"Black","range":[82800000,null]},
+		   {"background":"Lime",       "foreground":"Black","range":[null,10800000]},
+		   {"background":"Yellow",     "foreground":"Black","range":[null,null]}],
     "summaries":["summary"],
     "fragments":["track","turbulens","snowfall","ising_skip","middelvind","regn","skogbrann","vannstand","vindkast","cape","thunder"],
     "title":"Landområder og Fiskebanker",
