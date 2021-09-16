@@ -24,9 +24,9 @@ class Frag extends Component {
 	this.state={age:   { order:1, dir:"down", key:"epoch", sort:"age",    show:"pAge"},
 		    epoch: { order:2, dir:"",     key:"epoch"},
 		    first: { order:3, dir:"",     key:"ifirst",sort:"firstAge", show:"pFirstAge"},
-		    last:  { order:4, dir:"",     key:"ilast", sort:"lastAge", show:"pLastAge"},
+		    last:  { order:4, dir:"",     key:"ilast", ref:"ifirst", sort:"lastAge", show:"pLastAge"},
 		    from:  { order:5, dir:"",     key:"dfirst",sort:"fromAge",show:"pFromAge"},
-		    to:    { order:6, dir:"",     key:"dlast", sort:"toAge",  show:"pToAge",  post:"invert"},
+		    to:    { order:6, dir:"",     key:"dlast", ref:"dfirst", sort:"toAge",  show:"pToAge"},
 		    cnt:   { order:7, dir:"",     key:"cnt"},
 		    frag:  { order:8, dir:"",     key:"frag"},
 		    currentCount : null};
@@ -42,6 +42,7 @@ class Frag extends Component {
 	this.onClickTo=this.onClickTo.bind(this);
 	this.onClickCnt=this.onClickCnt.bind(this);
 	this.onClickFrag=this.onClickFrag.bind(this);
+	this.setDuration=this.setDuration.bind(this);
 	this.setAge=this.setAge.bind(this);
 	this.getThr=this.getThr.bind(this);
 	this.getCol=this.getCol.bind(this);
@@ -100,6 +101,29 @@ class Frag extends Component {
     componentWillUnmount(){
 	clearInterval(this.intervalId);
     };
+    setDuration(strs,col) {
+	for (var ss in strs) {
+	    if (strs.hasOwnProperty(ss)) {
+		var str=strs[ss];
+		var key=this.state[col].key;
+		var ref=this.state[col].ref;
+		var sort=this.state[col].sort;
+		var show=this.state[col].show;
+		var post=this.state[col].post;
+		var epoch=str[key];
+		var reference=str[ref];
+		if (epoch === null || epoch === undefined) {
+		    str[sort]=null;
+		} else {
+		    str[sort]=this.getDate(epoch)-this.getDate(reference);
+		    if (post === "invert") {
+			str[sort] = -str[sort];
+		    };
+		}
+		str[show]=this.getPrettyAge(str[sort]);
+	    }
+	}
+    };	
     setAge(strs,col) {
 	var now=this.getDate();
 	for (var ss in strs) {
@@ -201,10 +225,13 @@ class Frag extends Component {
     getPrettyAge(millis) {
 	if (millis===null) {return null;};
 	var sign="";
-	if (millis < 0) {
+	var ret="";
+	if (millis===0) {
+	    return ("0");
+	} else if (millis < 0) {
 	    millis=-millis;
 	    sign="-";
-	}
+	};
 	var seconds= Math.floor(millis/1000); millis=(millis%1000);
         var minutes= Math.floor(seconds/60); seconds=(seconds%60);
         var hours  = Math.floor(minutes/60); minutes=(minutes%60);
@@ -213,7 +240,6 @@ class Frag extends Component {
 	var mi = parseInt(minutes);
 	var hh = parseInt(hours);
 	var dd = parseInt(days);
-	var ret="";
 	if (days>0) {
 	    if(ret!==""){ret=ret+"";};ret=ret+dd+"d";
 	};
@@ -303,9 +329,9 @@ class Frag extends Component {
 	var strs=state.Database.getFragTimes(state);
 	this.setAge(strs,"age");
 	this.setAge(strs,"first");
-	this.setAge(strs,"last");
+	this.setDuration(strs,"last");
 	this.setAge(strs,"from");
-	this.setAge(strs,"to");
+	this.setDuration(strs,"to");
 	//var frags=state.Database.getFragmentActive(state);
 	var fragments=this.sort(state.Database.getFragmentActive(state),strs);
 	var fragFunction= (frag) => {
@@ -341,13 +367,13 @@ class Frag extends Component {
 		<th style={{border: "1px solid black"}} onClick={this.onClickEpoch}>{
 		    this.getStr("Loaded",this.state.epoch.dir,this.state.epoch.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFirst}>{
-		    this.getStr("First",this.state.first.dir,this.state.first.order)}</th>
+		    this.getStr("Cycle",this.state.first.dir,this.state.first.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickLast}>{
-		    this.getStr("Last",this.state.last.dir,this.state.last.order)}</th>
+		    this.getStr("Stretch",this.state.last.dir,this.state.last.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFrom}>{
-		    this.getStr("From",this.state.from.dir,this.state.from.order)}</th>
+		    this.getStr("Data",this.state.from.dir,this.state.from.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickTo}>{
-		    this.getStr("To",this.state.to.dir,this.state.to.order)}</th>
+		    this.getStr("Range",this.state.to.dir,this.state.to.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickCnt}>{
 		    this.getStr("Records",this.state.cnt.dir,this.state.cnt.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFrag}>{
