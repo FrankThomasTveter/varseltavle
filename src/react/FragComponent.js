@@ -25,7 +25,7 @@ class Frag extends Component {
 		    epoch: { order:2, dir:"",     key:"epoch"},
 		    first: { order:3, dir:"",     key:"ifirst"}, //,sort:"firstAge", show:"pFirstAge"
 		    last:  { order:4, dir:"",     key:"ilast", ref:"ifirst", sort:"lastAge", show:"pLastAge"},
-		    from:  { order:5, dir:"",     key:"dfirst",sort:"fromAge",show:"pFromAge"},
+		    from:  { order:5, dir:"",     key:"dfirst"}, //,sort:"fromAge",show:"pFromAge"
 		    to:    { order:6, dir:"",     key:"dlast", ref:"dfirst", sort:"toAge",  show:"pToAge"},
 		    cnt:   { order:7, dir:"",     key:"cnt"},
 		    frag:  { order:8, dir:"",     key:"frag"},
@@ -350,7 +350,7 @@ class Frag extends Component {
 		  <td style={styleR}>  {strs[frag][this.state['age'].show]}</td>
 		  <td style={styleR}>  {strs[frag][this.state['first'].key]}</td>
 		  <td style={styleR}>  {strs[frag][this.state['last'].show]}</td>
-		  <td style={styleR}>  {strs[frag][this.state['from'].show]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['from'].key]}</td>
 		  <td style={styleR}>  {strs[frag][this.state['to'].show]}</td>
 		  <td style={styleR}>  {strs[frag][this.state['cnt'].key]}</td>
 		    <td style={styleL}> {strs[frag][this.state['frag'].key]}</td>
@@ -365,11 +365,11 @@ class Frag extends Component {
 		<th style={{border: "1px solid black"}} onClick={this.onClickAge}>{
 		    this.getStr("Age",this.state.age.dir,this.state.age.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFirst}>{
-		    this.getStr("Cycle",this.state.first.dir,this.state.first.order)}</th>
+		    this.getStr("Issued",this.state.first.dir,this.state.first.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickLast}>{
 		    this.getStr("Stretch",this.state.last.dir,this.state.last.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFrom}>{
-		    this.getStr("Data",this.state.from.dir,this.state.from.order)}</th>
+		    this.getStr("Dtg",this.state.from.dir,this.state.from.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickTo}>{
 		    this.getStr("Range",this.state.to.dir,this.state.to.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickCnt}>{
