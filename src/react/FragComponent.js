@@ -23,7 +23,7 @@ class Frag extends Component {
         super();
 	this.state={age:   { order:1, dir:"down", key:"epoch", sort:"age",    show:"pAge"},
 		    epoch: { order:2, dir:"",     key:"epoch"},
-		    first: { order:3, dir:"",     key:"ifirst",sort:"firstAge", show:"pFirstAge"},
+		    first: { order:3, dir:"",     key:"ifirst"}, //,sort:"firstAge", show:"pFirstAge"
 		    last:  { order:4, dir:"",     key:"ilast", ref:"ifirst", sort:"lastAge", show:"pLastAge"},
 		    from:  { order:5, dir:"",     key:"dfirst",sort:"fromAge",show:"pFromAge"},
 		    to:    { order:6, dir:"",     key:"dlast", ref:"dfirst", sort:"toAge",  show:"pToAge"},
@@ -348,8 +348,7 @@ class Frag extends Component {
 	    return (
 		<tr key={frag}>
 		  <td style={styleR}>  {strs[frag][this.state['age'].show]}</td>
-		  <td style={styleR}>  {strs[frag][this.state['epoch'].key]}</td>
-		  <td style={styleR}>  {strs[frag][this.state['first'].show]}</td>
+		  <td style={styleR}>  {strs[frag][this.state['first'].key]}</td>
 		  <td style={styleR}>  {strs[frag][this.state['last'].show]}</td>
 		  <td style={styleR}>  {strs[frag][this.state['from'].show]}</td>
 		  <td style={styleR}>  {strs[frag][this.state['to'].show]}</td>
@@ -358,14 +357,13 @@ class Frag extends Component {
 		</tr>
 	    );
 	};
+	//		  <td style={styleR}>  {strs[frag][this.state['epoch'].key]}</td>
 	return (
 		<table style={{border: "1px solid black"}} onClick={this.onClick}>
 		<tbody>
 		<tr>
 		<th style={{border: "1px solid black"}} onClick={this.onClickAge}>{
 		    this.getStr("Age",this.state.age.dir,this.state.age.order)}</th>
-		<th style={{border: "1px solid black"}} onClick={this.onClickEpoch}>{
-		    this.getStr("Loaded",this.state.epoch.dir,this.state.epoch.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFirst}>{
 		    this.getStr("Cycle",this.state.first.dir,this.state.first.order)}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickLast}>{
@@ -383,6 +381,8 @@ class Frag extends Component {
 		</tbody>
 	    </table>
 	);
+	//	<th style={{border: "1px solid black"}} onClick={this.onClickEpoch}>{
+	//	    this.getStr("Loaded",this.state.epoch.dir,this.state.epoch.order)}</th>
     };
 }
 
