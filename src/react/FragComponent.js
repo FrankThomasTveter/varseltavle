@@ -180,6 +180,7 @@ class Frag extends Component {
 	return fragments.sort((a,b) => {
 	    var sa=strs[a];
 	    var sb=strs[b];
+	    if (sa === undefined || sb === undefined) { return 0;}
 	    for (var ii=1;ii<=this.maxorder;ii++) {
 		var col=this.getCol(ii);
 		var dir=this.state[col].dir;

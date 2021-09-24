@@ -147,15 +147,18 @@ function Auto() {
 	}
 	if (analysis.tblkey !== "") {
 	    state.Path.table.ntarget=1+analysis.othkeys.length
-	    state.Path.keys.other=state.Utils.clean(analysis.othkeys.concat([analysis.tblkey]).concat(rest).concat(ignore));
+	    state.Path.keys.other=state.Utils.clean(analysis.othkeys.concat([analysis.tblkey]).concat(rest));
+	    state.Path.keys.trash=state.Utils.clean(analysis.trash.concat(ignore).concat(state.Path.keys.trash));
             if(this.debug){console.log("Table key present:",JSON.stringify(state.Path.keys.other),state.Path.table.nkeys);};
 	} else if (analysis.othkeys !== undefined) {
 	    state.Path.table.ntarget=analysis.othkeys.length;
-	    state.Path.keys.other=state.Utils.clean(analysis.othkeys.concat(rest).concat(ignore));
+	    state.Path.keys.other=state.Utils.clean(analysis.othkeys.concat(rest));
+	    state.Path.keys.trash=state.Utils.clean(analysis.trash.concat(ignore).concat(state.Path.keys.trash));
             if(this.debug){console.log("Other key present:",JSON.stringify(state.Path.keys.other),state.Path.table.nkeys);};
 	} else {
 	    state.Path.table.ntarget=1;
-	    state.Path.keys.other=state.Utils.clean([].concat(rest).concat(ignore));
+	    state.Path.keys.other=state.Utils.clean([].concat(rest));
+	    state.Path.keys.trash=state.Utils.clean(analysis.trash.concat(ignore).concat(state.Path.keys.trash));
             if(this.debug){console.log("No key present:",JSON.stringify(state.Path.keys.other),state.Path.table.nkeys);};
 	};
 	if (state.Path.table.nmanual !== undefined) {state.Path.table.ntarget=Math.min(state.Path.table.ntarget,state.Path.table.nmanual);}
@@ -179,6 +182,7 @@ function Auto() {
 	var sel=[]; // selected
 	var val=[]; // values
 	var rest=[]; //rest
+	var trash=[]; //trash
 	var tblkey=""; // target key
 	var lenk=restkeys.length;
 	var keywhere=state.Database.addWhere(where,trgwhere);
@@ -195,7 +199,11 @@ function Auto() {
 	    var testdep=this.getDependancy(state,keywhere,testtable);
 	    if(this.debug){console.log("        Dependency:   ",JSON.stringify(othkeys),testkey,":",JSON.stringify(testdep));};
 	    // in case there are no targets
-	    if (this.hasAnyDependancy(state,testdep,testtable,"insignificant") ||
+	    if (testdep.intprt[testkey]==="unknown") { // select redundant testkey
+		if(this.debug){console.log("****  Trash:",testkey,":",
+					   JSON.stringify(sel),JSON.stringify(trash),tblkey);};
+		trash.push(testkey);
+	    } else if (this.hasAnyDependancy(state,testdep,testtable,"insignificant") ||
 		testdep.intprt[testkey]==="insignificant" || tblkey !== "") {
 		rest.push(testkey);
 		if(this.debug){console.log("****  Postpone:",testkey,":",
@@ -224,7 +232,7 @@ function Auto() {
 	    }
 	}
 	//if(this.debug){console.log("Sel/Val:",JSON.stringify(sel),JSON.stringify(val));};
-	var ret={sel:sel,val:val,rest:rest,tblkey:tblkey,othkeys:othkeys};
+	var ret={sel:sel,val:val,rest:rest,trash:trash,tblkey:tblkey,othkeys:othkeys};
 	if(this.debug){console.log("analyse Done:",JSON.stringify(ret));};
 	return ret;
     };
@@ -320,6 +328,8 @@ function Auto() {
 			if (rr !== jj) {
 			    if (dep[rkey] === "common") {
 				interpretation[rkey]="redundant"; // 
+			    } else if (dep[rkey] === "unknown") {
+				interpretation[rkey]="unknown"; // 
 			    } else {
 				interpretation[rkey]="insignificant"; //
 			    };
