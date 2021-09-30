@@ -108,7 +108,7 @@ function Auto() {
 		//ret = state.Auto.tableKeyToPath(state,key,keyval,keywhere,keycnt); // remove duplicate
 	    }
 	};
-	if (ret) {state.Path.exportAllKeys(state);};
+	if (ret) {state.Path.exportAllKeys(state);state.Path.pushList(state);};
 	if(this.debug){console.log("selectTableKey Done:",JSON.stringify(state.Path.keys),JSON.stringify(ret));};
 	return ret;
     };

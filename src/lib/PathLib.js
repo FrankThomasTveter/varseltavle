@@ -727,6 +727,21 @@ function Path() {
 	//console.log("After Valid:",JSON.stringify(state.Path.valid),JSON.stringify(state.Path.keys));
 	//console.log("Completed makepath.");
     };
+    this.pushList=function(state) {
+	this.list=[]
+	state.Utils.cpArray(this.list,state.Path.other.table);
+	state.Utils.cpArray(this.list,state.Path.other.rest);
+	state.Utils.cpArray(this.list,state.Path.trash.found);
+	state.Utils.cpArray(this.list,["lat","lon"]);
+	//console.log("**Other table:",JSON.stringify(state.Path.other.table));
+	//console.log("**Other rest:",JSON.stringify(state.Path.other.rest));
+	//console.log("--Other ignore:",JSON.stringify(state.Path.other.ignore));
+	//console.log("**Trash found:",JSON.stringify(state.Path.trash.found));
+	//console.log("--Trash rest:",JSON.stringify(state.Path.trash.rest));
+	//console.log("--Trash ignore:",JSON.stringify(state.Path.trash.ignore));
+	//console.log("New list:",JSON.stringify(this.list));
+	
+    };
     this.getRange=function(state,key) {
 	return state.Path.select.range[key];
     }

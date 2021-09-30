@@ -21,16 +21,16 @@ const styles = theme => ({
 class Frag extends Component {
     constructor() {
         super();
-	this.state={age:   { order:1, dir:"down", key:"epoch", sort:"age",    show:"pAge"},
-		    epoch: { order:2, dir:"",     key:"epoch"},
-		    first: { order:3, dir:"",     key:"ifirst"}, //,sort:"firstAge", show:"pFirstAge"
-		    last:  { order:4, dir:"",     key:"ilast", ref:"ifirst", sort:"lastAge", show:"pLastAge"},
-		    from:  { order:5, dir:"",     key:"dfirst"}, //,sort:"fromAge",show:"pFromAge"
-		    to:    { order:6, dir:"",     key:"dlast", ref:"dfirst", sort:"toAge",  show:"pToAge"},
-		    cnt:   { order:7, dir:"",     key:"cnt"},
-		    frag:  { order:8, dir:"",     key:"frag"},
+	this.state={age:   { dir:"down", key:"epoch", sort:"age",    show:"pAge"},
+		    epoch: { dir:"",     key:"epoch"},
+		    first: { dir:"",     key:"ifirst"}, //,sort:"firstAge", show:"pFirstAge"
+		    last:  { dir:"",     key:"ilast", ref:"ifirst", sort:"lastAge", show:"pLastAge"},
+		    from:  { dir:"",     key:"dfirst"}, //,sort:"fromAge",show:"pFromAge"
+		    to:    { dir:"",     key:"dlast", ref:"dfirst", sort:"toAge",  show:"pToAge"},
+		    cnt:   { dir:"",     key:"cnt"},
+		    frag:  { dir:"",     key:"frag"},
 		    currentCount : null};
-	this.maxorder=8;
+	this.order=["age"];
 	this.getStr=this.getStr.bind(this);
 	this.click=this.click.bind(this);
 	this.onClick=this.onClick.bind(this);
@@ -45,7 +45,6 @@ class Frag extends Component {
 	this.setDuration=this.setDuration.bind(this);
 	this.setAge=this.setAge.bind(this);
 	this.getThr=this.getThr.bind(this);
-	this.getCol=this.getCol.bind(this);
 	this.getDate=this.getDate.bind(this);
 	this.startClock=this.startClock.bind(this);
 	this.clickClock=this.clickClock.bind(this);
@@ -161,19 +160,6 @@ class Frag extends Component {
 	//console.log("Threshold:",millis,JSON.stringify(ret));
 	return ret;		 
     };
-    getCol (order) {
-	var match;
-	var cols =Object.keys(this.state);
-	cols.forEach((col) => {
-	    if (this.state[col]  && typeof this.state[col] === "object" && order === this.state[col].order) {
-		match=col;
-		//console.log("Match:", match,order)
-		return;
-	    }
-	});
-	//console.log("Final Match:", order,match)
-	return (match);
-    };
     // push item to the front
     sort (fragments,strs) {
 	//console.log("Sorting:",JSON.stringify(this.state));
@@ -181,8 +167,9 @@ class Frag extends Component {
 	    var sa=strs[a];
 	    var sb=strs[b];
 	    if (sa === undefined || sb === undefined) { return 0;}
-	    for (var ii=1;ii<=this.maxorder;ii++) {
-		var col=this.getCol(ii);
+	    var leno=this.order.length;
+	    for (var ii=0;ii<leno;ii++) {
+		var col=this.order[ii];
 		var dir=this.state[col].dir;
 		var key=(typeof this.state[col].sort === 'undefined') ?
 		    this.state[col].key : this.state[col].sort ;
@@ -255,17 +242,18 @@ class Frag extends Component {
 	};
 	return (sign+ret);
     };
-    getStr(val,dir,order) {
+    getStr(name,key) {
 	const up="↑";
 	const down="↓";
-	if (order !== 1) {
-	    return (val);
+	var dir=this.state[key].dir;
+	if (this.order.length > 0 && this.order[0] !== key) {
+	    return (name);
 	} else if (dir === "up") {
-	    return (val + up);
+	    return (name + up);
 	} else if (dir === "down") {
-	    return (val + down);
+	    return (name + down);
 	} else {
-	    return (val);
+	    return (name);
 	};
     };
     // handle header click events
@@ -275,7 +263,6 @@ class Frag extends Component {
 	//console.log("clicked:",trg);
 	// first change the direction
 	var buffer=JSON.parse(JSON.stringify(this.state)); 
-	var order=buffer[trg].order;
 	var dir=buffer[trg].dir;
 	if (dir === "") {
 	    dir="up";
@@ -285,31 +272,14 @@ class Frag extends Component {
 	    dir="";
 	};
 	buffer[trg].dir=dir;
-	// change the order
-	var cols =Object.keys(this.state);
-	if (dir === "") { //push to the end
-	    // rearrange
-	    cols.forEach((col) => {
-		if (this.state[col]  && typeof this.state[col] == "object") {
-		    if (buffer[col].order > order) {
-			buffer[col].order=buffer[col].order-1;
-		    } else if (buffer[col].order === order) {
-			buffer[col].order=this.maxorder;
-		    };
-		};
-	    });
+	// remove target key
+	this.order= this.order.filter(function(key){ 
+	    return key != trg; 
+        });
+	if (dir === "") { // remove
 	    if (nokey !== undefined) { buffer[trg].key=nokey; }
 	} else { // push to the front
-	    // rearrange
-	    cols.forEach((col) => {
-		if (this.state[col]  && typeof this.state[col] == "object") {
-		    if (buffer[col].order < order) {
-			buffer[col].order=buffer[col].order+1;
-		    } else if (buffer[col].order === order) {
-			buffer[col].order=1;
-		    };
-		};
-	    });
+	    this.order.unshift(trg);
 	    if (dir === "up" && upkey !== undefined) { buffer[trg].key=upkey; }
 	    if (dir === "down" && downkey !== undefined) { buffer[trg].key=downkey; }
 	}
@@ -364,19 +334,19 @@ class Frag extends Component {
 		<tbody>
 		<tr>
 		<th style={{border: "1px solid black"}} onClick={this.onClickAge}>{
-		    this.getStr("Age",this.state.age.dir,this.state.age.order)}</th>
+		    this.getStr("Age","age")}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFirst}>{
-		    this.getStr("Issued",this.state.first.dir,this.state.first.order)}</th>
+		    this.getStr("Issued","first")}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickLast}>{
-		    this.getStr("Stretch",this.state.last.dir,this.state.last.order)}</th>
+		    this.getStr("Stretch","last")}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFrom}>{
-		    this.getStr("Dtg",this.state.from.dir,this.state.from.order)}</th>
+		    this.getStr("Dtg","from")}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickTo}>{
-		    this.getStr("Range",this.state.to.dir,this.state.to.order)}</th>
+		    this.getStr("Range","to")}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickCnt}>{
-		    this.getStr("Records",this.state.cnt.dir,this.state.cnt.order)}</th>
+		    this.getStr("Records","cnt")}</th>
 		<th style={{border: "1px solid black"}} onClick={this.onClickFrag}>{
-		    this.getStr("Fragment",this.state.frag.dir,this.state.frag.order)}</th>
+		    this.getStr("Fragment","frag")}</th>
 		</tr>
 		{fragments.map(fragFunction)}
 		</tbody>

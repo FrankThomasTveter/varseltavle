@@ -64,140 +64,14 @@ const styles = theme => ({
     }
 });
 // ---------------- DATA
-function renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index){
-    if (doc===undefined) {
-	return <div className={classes.divTableCell} style={{backgroundColor:'#EEE'}}/>
-    } else {
-	var val=doc[skey];
-	var where=state.Database.getWhereValue(skey,val);
-	var range;
-	var title=state.Matrix.getTooltipTitle(state,doc,skey); // get threshold... ala 
-	var onClick=()=>{state.Navigate.selectKeys(state,skey,val,range,where,1);};
-	if (val === undefined) {val="";};
-	//console.log("Key:",skey," Val:",JSON.stringify(val),JSON.stringify(doc[skey]));
-	return (
-		<div className={classes.divTableCell} style={{color:fgcolor,backgroundColor:bgcolor,cursor: "pointer"}} key={skey} onClick={onClick} title={title}>
-		{val}
-	    </div>
-	);
-    }
-};
-function renderDoc(classes,state,skeys,plan,doc,index) {
-    //console.log("We have a matrix(",rowval,") with range:",JSON.stringify(range));
-    //var lev=doc.level;
-    var lev=doc.__lev;
-    var bgcolor=state.Colors.getLevelBgColor(lev);
-    var fgcolor=state.Colors.getLevelFgColor(lev);
-    var mapFunction= (skey,index)=>renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index);
-    return (<div className={classes.divTableRow} key={index.toString()}>
-	    {skeys.map(mapFunction)}
-	    </div>);
-};
-function getDataRowList(classes,state,skeys,plans) {
-    const items=[];
-    const docs=[];
-    var matrix=state.React.matrix;
-    //var ret=null;
-    if (matrix!==undefined) {
-	var elements=state.Matrix.getMatrixElements(state,matrix);
-	elements.forEach( element => {
-	    if (element !== undefined && element.docs !== undefined) {
-		let lev=element.maxlev;
-		element.docs.forEach((doc)=>{doc.__lev=lev;});
-		docs.push.apply(docs,element.docs);
-	    };
-	});
-    };
-    // sort
-    if (state.Path.shouldSort()) {
-	var key=state.Path.getSortKey();
-	var dir=state.Path.getSortDir();
-	if (state.Path.isNumeric(key)) {
-	    //console.log("Numeric sort:",key);
-	    if (dir) { // ascending
-		docs.sort((a,b) => b[key]-a[key]);
-	    } else {
-		docs.sort((a,b) => a[key]-b[key]);
-	    }
-	} else {
-	    if (dir) { // ascending
-		docs.sort((a,b) => {return (a[key] > b[key])?-1:((a[key]===b[key])?0:+1);});
-	    } else {
-		docs.sort((a,b) => {return (a[key] > b[key])?+1:((a[key]===b[key])?0:-1);});
-	    }
-	};
-    }
-    // make react-components...
-    var mapFunction=(doc,index) =>renderDoc(classes,state,skeys,plans.cell,doc,index);
-    items.push(docs.map(mapFunction));
-    //console.log("Docs:",JSON.stringify(docs));
-    return items;
-};
-// ---------------- HDR
-function renderHdrList(classes,state,plan,val,index) {
-    //console.log("HdrCell:",val);
-    var up="↑";
-    var down="↓";
-    var label=val;
-    var dir;
-    if (state.Path.sortKey(val)) {
-	dir=state.Path.sortDirUp(val)
-	if (dir) {
-	    label=label + up;
-	} else {
-	    label=label + down;
-	}
-    }
-    var cursor=classes.divTableCell;
-    var onClick=() => {state.Path.setSortKey(val);state.Show.showMatrix(state,state.React.matrix,true);};
-    return (<div className={cursor} style={{backgroundColor:'#DDD',cursor: "pointer",}} key={`col-${index}`} onClick={onClick}>
-	    {label}
- 	    </div> );
-}
-function HdrRow(props) {
-    const { classes, state, plans, skeys } = props; //, rowvalues, label, cellMode
-    var mapFunction= (val,index)=>renderHdrList(classes,state,plans.col,val,index);
-    //console.log("Making header List row.",JSON.stringify(skeys));
-    return (<div className={classes.divTableRow} key={'hdr'}>
-	    {skeys.map(mapFunction)}
-	    </div>);
-}
-// ---------------- Details
-function Details(props) {
-    const { classes, state } = props; // classes, 
-    var cellMode  = state.Layout.getCellMode(state);
-    if (state.React.matrix === undefined) {
-	return (<div className={classes.divTable}>
-		   <div className={classes.divTableBody}>
-		      <div className={classes.devTableCell}>
-		         {"No Matrix defined"}
-		      </div>
-		   </div>
-		</div>
-	       );
-    } else {
-        var skeys = state.Path.getVisibleKeys(state);
-	//console.log("Skeys:",skeys);
- 	//DOM.style.font
-	var border=2;
-	var label="";
-	var width=0.9*window.innerWidth;
-	var height=0.94*window.innerHeight - 180;
-	//var height=0.8*(window.innerHeight-200);
-	var plans=state.Layout.makePlans(label,[""],[""],width,height,border,cellMode);
-	var items=getDataRowList(classes,state,skeys,plans);
-	//console.log("Details => Width/Height:",window.innerWidth,window.innerHeight,plan.cell.width,plan.hdr.height)
-	return (<div className={classes.divTable}>
-		   <div className={classes.divTableBody}>
-		      <HdrRow classes={classes} state={state} key={"hdr"} plans={plans} label={label} cellMode={cellMode} skeys={skeys}/>
-		      {items}
-		   </div>
-		</div>
-	       );
-    }
-};
-
 class List extends Component {
+    constructor() {
+        super();
+	this.dirs={};
+	this.order=[];
+	this.Details=this.Details.bind(this);
+	this.HdrRow=this.HdrRow.bind(this);
+    };
     componentDidMount() {
         window.addEventListener("resize", this.updateWindowDimensions);
     } 
@@ -214,19 +88,185 @@ class List extends Component {
 	    //console.log("BBX width/height:",this.bbx.width,this.bbx.height);
 	};
     };
+    renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index){
+	if (doc===undefined) {
+	    return <div className={classes.divTableCell} style={{backgroundColor:'#EEE'}}/>
+	} else {
+	    var val=doc[skey];
+	    var where=state.Database.getWhereValue(skey,val);
+	    var range;
+	    var title=state.Matrix.getTooltipTitle(state,doc,skey); // get threshold... ala 
+	    var onClick=()=>{state.Navigate.selectKeys(state,skey,val,range,where,1);};
+	    if (val === undefined) {val="";};
+	    //console.log("Key:",skey," Val:",JSON.stringify(val),JSON.stringify(doc[skey]));
+	    return (
+		    <div className={classes.divTableCell} style={{color:fgcolor,backgroundColor:bgcolor,cursor: "pointer"}} key={skey} onClick={onClick} title={title}>
+		    {val}
+		</div>
+	    );
+	}
+    };
+    renderDoc(classes,state,skeys,plan,doc,index) {
+	//console.log("We have a matrix(",rowval,") with range:",JSON.stringify(range));
+	//var lev=doc.level;
+	var lev=doc.__lev;
+	var bgcolor=state.Colors.getLevelBgColor(lev);
+	var fgcolor=state.Colors.getLevelFgColor(lev);
+	var mapFunction= (skey,index)=>this.renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index);
+	return (<div className={classes.divTableRow} key={index.toString()}>
+		{skeys.map(mapFunction)}
+		</div>);
+    };
+    getDataRowList(classes,state,skeys,plans,dirs,order) {
+	const items=[];
+	const docs=[];
+	var matrix=state.React.matrix;
+	//var ret=null;
+	if (matrix!==undefined) {
+	    var elements=state.Matrix.getMatrixElements(state,matrix);
+	    elements.forEach( element => {
+		if (element !== undefined && element.docs !== undefined) {
+		    let lev=element.maxlev;
+		    element.docs.forEach((doc)=>{doc.__lev=lev;});
+		    docs.push.apply(docs,element.docs);
+		};
+	    });
+	};
+	// sort
+	var sort=docs.sort((a,b) => {
+	    var sa=docs[a];
+	    var sb=docs[b];
+	    if (sa === undefined || sb === undefined) { return 0;}
+	    var leno=order.length;
+	    for (var ii=0;ii<leno;ii++) {
+		var col=order[ii];
+		var key=col;
+		var dir=dirs[col];
+		if (dir === "up") {
+		    if (sa[key] === null && sb[key] !== null) {
+			return -1;
+		    } else if (sa[key] !== null && sb[key] === null) {
+			return 1;
+		    } else if (sa[key] > sb[key]) {
+			return -1;
+		    } else if (sa[key] < sb[key]) {
+			return 1;
+		    };
+		} else if (dir === "down") {
+		    if (sa[key] === null && sb[key] !== null) {
+			return -1;
+		    } else if (sa[key] !== null && sb[key] === null) {
+			return 1;
+		    } else if (sa[key] > sb[key]) {
+			return 1;
+		    } else if (sa[key] < sb[key]) {
+			return -1;
+		    };
+		}
+	    }
+	    return 0;
+	});
+	// make react-components...
+	var mapFunction=(doc,index) =>this.renderDoc(classes,state,skeys,plans.cell,doc,index);
+	items.push(sort.map(mapFunction));
+	//console.log("Docs:",JSON.stringify(docs));
+	return items;
+    };
+    // ---------------- HDR
+    renderHdrList(classes,state,plan,val,index,dirs,order) {
+	//console.log("HdrCell:",val);
+	var up="↑";
+	var down="↓";
+	var label=val;
+	var dir;
+	if (state.Path.sortKey(val)) {
+	    dir=state.Path.sortDirUp(val)
+	    if (dir) {
+		label=label + up;
+	    } else {
+		label=label + down;
+	    }
+	}
+	var cursor=classes.divTableCell;
+	var onClick=() => {
+	    var dir=dirs[val];
+	    if (dir === "") {
+		dir="up";
+	    } else if (dir === "up") {
+		dir="down";
+	    } else if (dir === "down") {
+		dir="";
+	    };
+	    dirs[val]=dir;
+	    // remove target key
+	    order= order.filter(function(key){ 
+		return (key !== val); 
+            });
+	    if (dir !== "") { // remove
+		order.unshift(val);
+	    };
+	    console.log("Clicked:",val,dir,JSON.stringify(dirs),JSON.stringify(order));
+	    state.Show.showMatrix(state,state.React.matrix,true);
+	};
+	return (<div className={cursor} style={{backgroundColor:'#DDD',cursor: "pointer",}} key={`col-${index}`} onClick={onClick}>
+		{label}
+ 		</div> );
+    }
+    HdrRow(props) {
+	const { classes, state, plans, skeys, dirs, order } = props; //, rowvalues, label, cellMode
+	var mapFunction= (val,index)=>this.renderHdrList(classes,state,plans.col,val,index,dirs,order);
+	//console.log("Making header List row.",JSON.stringify(skeys));
+	return (<div className={classes.divTableRow} key={'hdr'}>
+		{skeys.map(mapFunction)}
+		</div>);
+    };
+    // ---------------- Details
+    Details(props) {
+	const { classes, state, dirs, order } = props; // classes, 
+	var cellMode  = state.Layout.getCellMode(state);
+	if (state.React.matrix === undefined) {
+	    return (<div className={classes.divTable}>
+		    <div className={classes.divTableBody}>
+		    <div className={classes.devTableCell}>
+		    {"No Matrix defined"}
+		    </div>
+		    </div>
+		    </div>
+		   );
+	} else {
+            var skeys = state.Path.getVisibleKeys(state);
+	    //console.log("Skeys:",skeys);
+ 	    //DOM.style.font
+	    var border=2;
+	    var label="";
+	    var width=0.9*window.innerWidth;
+	    var height=0.94*window.innerHeight - 180;
+	    //var height=0.8*(window.innerHeight-200);
+	    var plans=state.Layout.makePlans(label,[""],[""],width,height,border,cellMode);
+	    var items=this.getDataRowList(classes,state,skeys,plans,dirs,order);
+	    //console.log("Details => Width/Height:",window.innerWidth,window.innerHeight,plan.cell.width,plan.hdr.height)
+	    return (<div className={classes.divTable}>
+		    <div className={classes.divTableBody}>
+		    <this.HdrRow classes={classes} state={state} key={"hdr"} plans={plans} label={label} cellMode={cellMode} skeys={skeys} dirs={dirs} order={order}/>
+		    {items}
+		    </div>
+		    </div>
+		   );
+	}
+    };
     render() {
 	const { classes, state } = this.props;
 	//console.log("##### Rendering List.");
 	return (<div ref={el=>{this.element(el)}} className={classes.root}  style={{width: '100%', height: '100%'}}>
-		 <Grid container>
-		  <Grid item xs={12} > 
-                   { <Paper className={classes.paper}>
-		       <Details state={state} classes={classes} element={this}/>
-                     </Paper>}
-                  </Grid>
-                 </Grid>
+		<Grid container>
+		<Grid item xs={12} > 
+                { <Paper className={classes.paper}>
+		  <this.Details state={state} classes={classes} element={this} dirs={this.dirs} order={this.order}/>
+                  </Paper>}
+                </Grid>
+                </Grid>
 	        </div>);
-	}
+    }
 }
 
 List.propTypes = {
