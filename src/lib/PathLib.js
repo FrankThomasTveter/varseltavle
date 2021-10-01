@@ -130,34 +130,6 @@ function Path() {
     this.getFocusLon=function(state) {
 	return state.Path.focus.lon;
     };
-    this.getSortKey=function() {
-	return this.sort.key;
-    };
-    this.getSortDir=function() {
-	return this.sort.dir;
-    };
-    this.shouldSort=function() {
-	return (this.sort.key!==null && this.sort.key!== undefined && this.sort.key!=="");
-    };
-    this.sortKey=function(key) {
-	return (this.sort.key===key);
-    }
-    this.sortDirUp=function(key) {
-	return (this.sort.dir);
-    }
-    this.setSortKey=function(key) {
-	//console.log("Clicked:",key);
-	if (this.sort.key===key) {
-	    if (this.sort.dir) {
-		this.sort.dir=false;
-	    } else {
-		this.sort.key=null;
-	    }
-	} else {
-	    this.sort.key=key;
-	    this.sort.dir=true;
-	};
-    }
     this.cleanKeys=function(pkeys,val) {
 	var keys=Object.keys(val);
 	var lenk=keys.length;

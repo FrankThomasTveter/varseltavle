@@ -133,39 +133,40 @@ class List extends Component {
 	    });
 	};
 	// sort
+	//console.log("Sorting:",JSON.stringify(dirs),JSON.stringify(order),docs.length);
 	var sort=docs.sort((a,b) => {
-	    var sa=docs[a];
-	    var sb=docs[b];
-	    if (sa === undefined || sb === undefined) { return 0;}
 	    var leno=order.length;
 	    for (var ii=0;ii<leno;ii++) {
 		var col=order[ii];
 		var key=col;
 		var dir=dirs[col];
+		var ka=a[key];
+		var kb=b[key];
 		if (dir === "up") {
-		    if (sa[key] === null && sb[key] !== null) {
+		    if (ka === null && kb !== null) {
 			return -1;
-		    } else if (sa[key] !== null && sb[key] === null) {
+		    } else if (ka !== null && kb === null) {
 			return 1;
-		    } else if (sa[key] > sb[key]) {
+		    } else if (ka > kb) {
 			return -1;
-		    } else if (sa[key] < sb[key]) {
+		    } else if (ka < kb) {
 			return 1;
 		    };
 		} else if (dir === "down") {
-		    if (sa[key] === null && sb[key] !== null) {
+		    if (ka === null && kb !== null) {
 			return -1;
-		    } else if (sa[key] !== null && sb[key] === null) {
+		    } else if (ka !== null && kb === null) {
 			return 1;
-		    } else if (sa[key] > sb[key]) {
+		    } else if (ka > kb) {
 			return 1;
-		    } else if (sa[key] < sb[key]) {
+		    } else if (ka < kb) {
 			return -1;
 		    };
 		}
 	    }
 	    return 0;
 	});
+	//console.log("Sorted:",JSON.stringify(sort));
 	// make react-components...
 	var mapFunction=(doc,index) =>this.renderDoc(classes,state,skeys,plans.cell,doc,index);
 	items.push(sort.map(mapFunction));
@@ -178,34 +179,39 @@ class List extends Component {
 	var up="↑";
 	var down="↓";
 	var label=val;
-	var dir;
-	if (state.Path.sortKey(val)) {
-	    dir=state.Path.sortDirUp(val)
-	    if (dir) {
+//	if (state.Path.sortKey(val)) {
+	if (order.length > 0 && order[0] === val) {
+	    var dir =dirs[val];
+	    if (dir === "up") {
 		label=label + up;
-	    } else {
+	    } else if (dir === "down") {
 		label=label + down;
-	    }
+	    };
 	}
 	var cursor=classes.divTableCell;
 	var onClick=() => {
 	    var dir=dirs[val];
-	    if (dir === "") {
+	    if (dir === undefined) {
 		dir="up";
 	    } else if (dir === "up") {
 		dir="down";
 	    } else if (dir === "down") {
-		dir="";
+		dir=undefined;
 	    };
-	    dirs[val]=dir;
+	    if (dir === undefined) {
+		if (val in dirs) {delete dirs[val];};
+	    } else {
+		dirs[val]=dir;
+	    };
 	    // remove target key
-	    order= order.filter(function(key){ 
-		return (key !== val); 
-            });
-	    if (dir !== "") { // remove
+	    var index=order.indexOf(val);
+	    if (index !== -1) {
+		order.splice(index,1);
+	    };
+	    if (dir !== undefined ) { // put in front of array
 		order.unshift(val);
 	    };
-	    console.log("Clicked:",val,dir,JSON.stringify(dirs),JSON.stringify(order));
+	    //console.log("Clicked:",val,dir,JSON.stringify(dirs),JSON.stringify(order));
 	    state.Show.showMatrix(state,state.React.matrix,true);
 	};
 	return (<div className={cursor} style={{backgroundColor:'#DDD',cursor: "pointer",}} key={`col-${index}`} onClick={onClick}>

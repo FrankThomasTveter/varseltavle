@@ -274,7 +274,7 @@ class Frag extends Component {
 	buffer[trg].dir=dir;
 	// remove target key
 	this.order= this.order.filter(function(key){ 
-	    return key != trg; 
+	    return (key !== trg); 
         });
 	if (dir === "") { // remove
 	    if (nokey !== undefined) { buffer[trg].key=nokey; }
