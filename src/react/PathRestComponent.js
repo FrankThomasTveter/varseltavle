@@ -25,7 +25,7 @@ function renderPathRest(classes,state,item,type,index,focusPoints) {
 	//onclick=() => state.Navigate.onClickPath(state,'path',item);
 	onclick=() => state.Navigate.pushPathToTable(state,item);
 	title="'"+state.Path.where[index]+"'";
-	return (<span key={`path-${item}`}>
+	return (<span key={`rest-path-${item}`}>
 		<SelectValueMenu state={state} classes={cls} label={item} keyitem={item} keytype={type} keyindex={index} remove={remove} target={target} onclick={onclick} title={item} focusPoints={focusPoints}/>
 		</span>);
     } else if (state.Path.other.rest.indexOf(item) !== -1) {
@@ -33,7 +33,7 @@ function renderPathRest(classes,state,item,type,index,focusPoints) {
 	//onclick=() => state.Navigate.onClickPath(state,'rest',item);
 	onclick=() => state.Navigate.pushRestToTable(state,item);
 	title="'"+item+"'";
-	return (<span  key={`${item}`} title={title}>
+	return (<span  key={`rest-table-${item}`} title={title}>
 		<RestValueMenu state={state} classes={cls} keyitem={item} keyindex={index} keytype={type} label={lab} remove={remove} target={target} onclick={onclick} title={title} focusPoints={focusPoints}/>
 		</span>);
     } else if (state.Path.other.ignore.indexOf(item) !== -1) {
@@ -41,7 +41,7 @@ function renderPathRest(classes,state,item,type,index,focusPoints) {
 	//onclick=() => state.Navigate.onClickPath(state,'rest',item);
 	onclick=() => state.Navigate.pushRestToTable(state,item);
 	title="'"+item+"'";
-	return (<span  key={`${item}`} title={title}>
+	return (<span  key={`rest$-ignore-{item}`} title={title}>
 		<RestValueMenu state={state} classes={cls} keyitem={item} keyindex={index} label={lab} remove={remove} target={target} onclick={onclick} title={title} focusPoints={focusPoints}/>
 		</span>);
     }

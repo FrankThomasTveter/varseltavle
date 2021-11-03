@@ -520,8 +520,9 @@ function Navigate() {
 		if (state.Auto.selectTableKey(state,key,val,where,cnt)) {
 		    if (state.Auto.debug) {
 			console.log("Selected:",key,val,
-				    JSON.stringify(state.Path.keys.path),
+				    JSON.stringify(state.Path.keys),
 				    JSON.stringify(state.Path.other.table),
+				    JSON.stringify(state.Path.other.rest),
 				    JSON.stringify(state.Path.select));};
 		    this.rank[key]=state.Utils.cp(rank);
 		    changed=true;
@@ -543,14 +544,14 @@ function Navigate() {
 		    if (vals.length===1) { // select
 			var oval=vals[0];
 			var owhere=state.Database.getWhereDynamic(state,okey,oval)
-			if (state.Auto.debug) {
-			    console.log("=> Key is redundant:",okey," val:",oval,JSON.stringify(vals)," ",owhere);};
+			//console.log("Key is redundant:",okey," val:",oval," ",owhere);
 			if (this.bdeb) {console.log("Checking ",okey," -> ",oval," ",owhere);};
 			if (state.Auto.selectTableKey(state,okey,oval,owhere,1)) {
 			    if (state.Auto.debug) {
-				console.log("Selected:",okey,oval,
-					    JSON.stringify(state.Path.keys.path),
+				console.log("Selected:",key,val,
+					    JSON.stringify(state.Path.keys),
 					    JSON.stringify(state.Path.other.table),
+					    JSON.stringify(state.Path.other.rest),
 					    JSON.stringify(state.Path.select));};
 			    this.rank[okey]=state.Utils.cp(rank);
 			    changed=true;
@@ -608,9 +609,10 @@ function Navigate() {
 		var vals=criteria[key];
 		if (state.Auto.selectTableKey(state,key,vals,colwhere,colcnt)) {
 		    if (state.Auto.debug) {
-			console.log("Selected:",colkey,colval,
-				    JSON.stringify(state.Path.keys.path),
+			console.log("Selected:",key,val,
+				    JSON.stringify(state.Path.keys),
 				    JSON.stringify(state.Path.other.table),
+				    JSON.stringify(state.Path.other.rest),
 				    JSON.stringify(state.Path.select));};
 		    this.rank[key]=state.Utils.cp(rank);
 		    changed=true;
@@ -638,11 +640,12 @@ function Navigate() {
 	//console.log("SelectItem:",colkey,"=",colval,"  ",rowkey,"=",rowval);
 	var changed=false;
 	if (state.Auto.selectTableKey(state,colkey,colval,colwhere,colcnt)) {
-	    if (state.Auto.debug) {
-		console.log("Selected:",colkey,colval,
-			    JSON.stringify(state.Path.keys.path),
-			    JSON.stringify(state.Path.other.table),
-			    JSON.stringify(state.Path.select));};
+			    if (state.Auto.debug) {
+				console.log("Selected:",key,val,
+					    JSON.stringify(state.Path.keys),
+					    JSON.stringify(state.Path.other.table),
+					    JSON.stringify(state.Path.other.rest),
+					    JSON.stringify(state.Path.select));};
 	    this.rank[colkey]=state.Utils.cp(rank);
 	    changed=true;
 	} else if (state.Path.table.nkeys < 2) {
@@ -651,11 +654,7 @@ function Navigate() {
 	    console.log("Unable to select:",colkey,state.Path.table.nkeys);
 	};
 	if (state.Auto.selectTableKey(state,rowkey,rowval,rowwhere,rowcnt)) {
-	    if (state.Auto.debug) {
-		console.log("Selected:",rowkey,rowval,
-			    JSON.stringify(state.Path.keys.path),
-			    JSON.stringify(state.Path.other.table),
-			    JSON.stringify(state.Path.select));};
+	    if (state.Auto.debug) {console.log("Selected:",rowkey,rowval,JSON.stringify(state.Path.keys),JSON.stringify(state.Path.other));};
 	    this.rank[rowkey]=state.Utils.cp(rank);
 	    changed=true;
 	} else if (state.Path.table.nkeys < 2) {

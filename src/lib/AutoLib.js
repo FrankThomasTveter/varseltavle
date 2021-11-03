@@ -74,7 +74,10 @@ function Auto() {
     };
     // select given table key...
     this.selectTableKey=function(state,key,keyval,keywhere,keycnt,keep) { // keep abscissa
-	if(this.debug){console.log("selectTableKey Entering:",key,keyval,keywhere,keycnt,JSON.stringify(state.Path.other));};
+	if(this.debug){console.log("selectTableKey Entering:",key,keyval,keywhere,keycnt,
+				   JSON.stringify(state.Path.keys.path),
+				   JSON.stringify(state.Path.other.table),
+				   JSON.stringify(state.Path.select));};
 	var ret=false;
 	var sid = state.Path.keys.other.indexOf(key);
 	//console.log("SelectTableKey:",key,sid,JSON.stringify(state.Path.keys.other));
@@ -89,16 +92,17 @@ function Auto() {
 	    var leno=othkeys.length;
 	    var lenr=restkeys.length;
 	    if (keep !== undefined & keep) { // only move key, no auto select
-		if(this.debug){console.log("Move-key");};
+		if(this.debug){console.log("Move-key",key,keyval);};
 		ret = state.Path.addTableKeyToPath(state,key,keyval,keywhere);
 	    } else if (lenr===0 || leno===0 || ! state.Auto.complete ) { // nothing to consider
-		if(this.debug){console.log("Single-select");};
+		if(this.debug){console.log("Single-select",key,keyval);};
 		ret = state.Path.tableKeyToPath(state,key,keyval,keywhere,keycnt);
 	    } else if (!state.Path.isTableKey(state,key)) { // plain select...
-		if(this.debug){console.log("Plain-select");};
+		if(this.debug){console.log("Plain-select",key,keyval);};
 		ret = state.Path.tableKeyToPath(state,key,keyval,keywhere,keycnt);
 	    } else { // auto-select
-		if(this.debug){console.log("Auto-select:",JSON.stringify(state.Path.other));}
+		if(this.debug){console.log("Auto-select:",key,keyval,
+					   JSON.stringify(state.Path.other));}
 		//if(this.debug){console.log("Before:",JSON.stringify(state.Path.keys));};
                 state.Path.moveOther2Table(state,key);   // move target key to front of array
                 state.Path.exportAllKeys(state);
@@ -109,20 +113,31 @@ function Auto() {
 	    }
 	};
 	if (ret) {state.Path.exportAllKeys(state);state.Path.pushList(state);};
-	if(this.debug){console.log("selectTableKey Done:",JSON.stringify(state.Path.keys),JSON.stringify(ret));};
+	if(this.debug){console.log("selectTableKey Done:",
+				   JSON.stringify(state.Path.keys.path),
+				   JSON.stringify(state.Path.other.table),
+				   JSON.stringify(state.Path.select),
+				   JSON.stringify(ret));};
 	return ret;
     };
     this.tableKeyToPath=function (state,key,keyval,keywhere,keycnt) {
-	if(this.debug){console.log("tableKeyToPath Entering key=",key," val=",keyval," where='",keywhere,"' other=",JSON.stringify(state.Path.other));};
+	if(this.debug){console.log("tableKeyToPath Entering key=",key," val=",keyval," where='",keywhere,
+				   JSON.stringify(state.Path.keys.path),
+				   JSON.stringify(state.Path.other.table),
+				   JSON.stringify(state.Path.select));};
 	// look for table-key candidates in the rest-stack
 	var analysis=this.analyse(state,key,keywhere);
 	// move the key
 	var ret=state.Path.tableKeyToPath(state,key,keyval,keywhere,keycnt);
 	//state.Path.exportAllKeys(state);
 	this.applyAnalysis(state,analysis);
-	if(this.debug){console.log("Analysis:",JSON.stringify(analysis));};
-	if(this.debug){console.log("tableKeyToPath Path:",JSON.stringify(state.Path.keys));};
-	if(this.debug){console.log("tableKeyToPath Done:",JSON.stringify(ret));};
+	//if(this.debug){console.log("Analysis:",JSON.stringify(analysis));};
+	//if(this.debug){console.log("tableKeyToPath Path:",JSON.stringify(state.Path.keys));};
+	if(this.debug){console.log("tableKeyToPath:",key,keyval,
+				   JSON.stringify(state.Path.keys.path),
+				   JSON.stringify(state.Path.other.table),
+				   JSON.stringify(state.Path.select),
+				   JSON.stringify(ret));};
 	return ret;
     };
     this.applyAnalysis=function(state,analysis) {
@@ -135,37 +150,40 @@ function Auto() {
 		jkey=analysis.sel[jj];
 		jkeyval=analysis.val[jj];
 		jkeywhere=jkey + "='" + jkeyval+"'";
-		if (jkeyval !== null) {
+		if (jkeyval !== "") {
                     state.Path.tableKeyToPath(state,jkey,jkeyval,jkeywhere,1);
 		} else {
 		    console.log("Panick-mode:",jkey);
 		    analysis.rest.push(jkey);
 		}
 	    }
-	    if(this.debug){console.log("tableKeyToPath Init:",JSON.stringify(state.Path.keys));};
+	    if(this.debug){console.log("applyAnalysis:",
+				       JSON.stringify(state.Path.keys.path),
+				       JSON.stringify(state.Path.other.table),
+				       JSON.stringify(state.Path.select));};
 	    rest=state.Utils.clean(analysis.rest);
 	}
 	if (analysis.tblkey !== "") {
 	    state.Path.table.ntarget=1+analysis.othkeys.length
 	    state.Path.keys.other=state.Utils.clean(analysis.othkeys.concat([analysis.tblkey]).concat(rest));
 	    state.Path.keys.trash=state.Utils.clean(analysis.trash.concat(ignore).concat(state.Path.keys.trash));
-            if(this.debug){console.log("Table key present:",JSON.stringify(state.Path.keys.other),state.Path.table.nkeys);};
+            if(this.debug){console.log("Table key present:",state.Path.table.nkeys);};
 	} else if (analysis.othkeys !== undefined) {
 	    state.Path.table.ntarget=analysis.othkeys.length;
 	    state.Path.keys.other=state.Utils.clean(analysis.othkeys.concat(rest));
 	    state.Path.keys.trash=state.Utils.clean(analysis.trash.concat(ignore).concat(state.Path.keys.trash));
-            if(this.debug){console.log("Other key present:",JSON.stringify(state.Path.keys.other),state.Path.table.nkeys);};
+            if(this.debug){console.log("Other key present:",state.Path.table.nkeys);};
 	} else {
 	    state.Path.table.ntarget=1;
 	    state.Path.keys.other=state.Utils.clean([].concat(rest));
 	    state.Path.keys.trash=state.Utils.clean(analysis.trash.concat(ignore).concat(state.Path.keys.trash));
-            if(this.debug){console.log("No key present:",JSON.stringify(state.Path.keys.other),state.Path.table.nkeys);};
+            if(this.debug){console.log("No key present:",state.Path.table.nkeys);};
 	};
 	if (state.Path.table.nmanual !== undefined) {state.Path.table.ntarget=Math.min(state.Path.table.ntarget,state.Path.table.nmanual);}
 	//console.log("Cleaning:",JSON.stringify(state.Path.keys.other));
     };
     this.analyse=function(state,trgkey,trgwhere) {
-        if(this.debug){console.log("analyseOther Entering:",JSON.stringify(state.Path.other));};
+        if(this.debug){console.log("Entering ANALYSE:",trgkey,JSON.stringify(state.Path.other));};
 	//console.log("path-other:",JSON.stringify(state.Path.other));
 	//other key
 	var where=state.Database.getWhere(state);
@@ -193,47 +211,48 @@ function Auto() {
 	    // first key dependencies
 	    var testkey=restkeys[ii];
 	    var testtable=othkeys.concat([testkey]);
-	    if(this.debug){console.log(">>> Checking:",testkey,":",JSON.stringify(testtable),
-				       " vs Table:(",JSON.stringify(restkeys),
-				       ") where=",where,trgwhere);};
+	    //if(this.debug){console.log("  Checking:",testkey,":",JSON.stringify(testtable),
+ 	    //			       " vs Table:(",JSON.stringify(restkeys),
+	    //			       ") where=",where,trgwhere);};
 	    var testdep=this.getDependancy(state,keywhere,testtable);
-	    if(this.debug){console.log("        Dependency:   ",JSON.stringify(othkeys),testkey,":",JSON.stringify(testdep));};
+	    if(this.debug){    console.log("   Checking:",JSON.stringify(othkeys),testkey,":",JSON.stringify(testdep));};
 	    // in case there are no targets
 	    if (testdep.intprt[testkey]==="unknown") { // select redundant testkey
-		if(this.debug){console.log("****  Trash:",testkey,":",
+		if(this.debug){console.log("   => Trash:",testkey,":",
 					   JSON.stringify(sel),JSON.stringify(trash),tblkey);};
 		trash.push(testkey);
 	    } else if (this.hasAnyDependancy(state,testdep,testtable,"insignificant") ||
 		testdep.intprt[testkey]==="insignificant" || tblkey !== "") {
 		rest.push(testkey);
-		if(this.debug){console.log("****  Postpone:",testkey,":",
+		if(this.debug){console.log("   => Postpone:",testkey,":",
 					   JSON.stringify(sel),JSON.stringify(rest),tblkey);};
 	    } else if (testdep.intprt[testkey]==="redundant") { // select redundant testkey
 		var testval=testdep.val[testkey];
 		var sid=-1;
 		if (soft) {// force move
 		    sid = state.Path.keys.path.indexOf(testkey);
-		    //console.log("Soft move:",testkey,sid,JSON.stringify(state.Path.keys.path));
+		    if(this.debug){console.log("   => Move:",testkey,sid,
+					       JSON.stringify(state.Path.keys.path));};
 		};
-		if (testval !== null & sid===-1) { // single value & "not" in path
+		if (testval !== "" & sid===-1) { // single value & "not" in path
 		    sel.push(testkey);
 		    val.push(testval);
-		    if(this.debug){console.log("****  Select:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey,JSON.stringify(testdep),where);};
+		    if(this.debug){console.log("   => Select:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey,JSON.stringify(testdep),where);};
 		} else {
 		    rest.push(testkey);
-		    if(this.debug){console.log("****  Rest:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey,JSON.stringify(testdep),where);};
+		    if(this.debug){console.log("   => Rest:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey,JSON.stringify(testdep),where);};
 		}
 	    } else { // control key, only if testdep.intprt[othkey]!=="redundant", otherwise postpone...
 		tblkey=testkey;                    // we have found a good candidate
 		// when we have a tblkey, all other keys are ignored....
 
 		
-		if(this.debug){console.log("****  Control:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey);};
+		if(this.debug){console.log("   => Control:",testkey,":",JSON.stringify(sel),JSON.stringify(rest),tblkey);};
 	    }
 	}
 	//if(this.debug){console.log("Sel/Val:",JSON.stringify(sel),JSON.stringify(val));};
 	var ret={sel:sel,val:val,rest:rest,trash:trash,tblkey:tblkey,othkeys:othkeys};
-	if(this.debug){console.log("analyse Done:",JSON.stringify(ret));};
+	if(this.debug){console.log("Done ANALYSE:",JSON.stringify(ret));};
 	return ret;
     };
     // check if keys are inter-dependent, ("common", "unique", "dependent", "unknown") 
@@ -297,7 +316,7 @@ function Auto() {
 	    }
 	    if (hits[key]  !== undefined) {
 		if (Object.keys(hits[key]).length > 1) {
-		    ret.val[key]=null;
+		    ret.val[key]="";
 		}
 	    } else {
 		//console.log("No hits for key:",key);

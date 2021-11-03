@@ -982,9 +982,11 @@ function Database() {
 	var lend=docs.length;
 	for (var ii=0;ii<lend;ii++) {
 	    var doc=docs[ii];
-	    vals.push(doc[key]);
+	    var val=doc[key];
+	    if (val === null || val === undefined) {val="";}
+	    vals.push(val);
 	}
-	//console.log("Key vals",JSON.stringify(vals));
+	if (state.Auto.debug) {console.log("getValues:",key,"=>",JSON.stringify(vals));};
 	return vals;
     };
     this.getKeytrg=function(state,key,val) {

@@ -52,7 +52,7 @@ class Value extends Component {
 	};
 	var chip=(tpos!==-1 ? classes.selchip : classes.othchip);
 	var icon=null;
-	if (label === "") {
+	if (label===undefined || label === null || label === "") {
 	    label="<none>";
 	    icon=<UndefinedIcon/>;
 	} else if (label.substring(0,3) === "MAX") {
