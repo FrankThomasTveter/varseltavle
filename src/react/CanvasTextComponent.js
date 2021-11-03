@@ -7,15 +7,11 @@ const styles = theme => ({
 	overflow:"hidden",
 	width:"100%",
 	height:"100%",
-	//border: '1px dotted red',
+	//pointerEvents:"none",
+	"&:hover":{backdropFilter:"brightness(90%)"},
     },
-    pointer: {
-	cursor:"pointer",
-	padding: theme.spacing(0),
-    },
-    nopointer: {
-	padding: theme.spacing(0),
-    },
+    pointer: {},
+    nopointer: {},
 });
 function drawMarker(ctx,height,offset,width) {
     ctx.strokeStyle='blue';

@@ -64,7 +64,7 @@ class Config extends Component {
 	//console.log("Rendering Config...");
 	var cls={button:classes.button};
 	return (<div className={classes.horisontal}>
-		<Reload state={state} classes={cls} visible={false}/>
+		<Reload state={state} classes={cls} visible={false} style={{width:"100%",height:"100%"}}/>
 		<Home state={state} classes={cls} visible={false}/>
 		<Undo state={state} classes={classes} visible={false}/>
                 <Redo state={state} classes={classes} visible={false}/>

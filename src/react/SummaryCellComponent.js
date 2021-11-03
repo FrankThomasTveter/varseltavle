@@ -9,18 +9,25 @@ const styles = theme => ({
 	display: 'table-cell',
 	padding: '0px 0px',
 	//overflow: 'hidden',
+	"&:hover":{backdropFilter:"brightness(90%)"},
 	//boxShadow: '0px -3px 0px red inset',
 	//backgroundClip:'content-box',
+	border: '1px solid #000',
     },
     divTableCellCursor:{
 	cursor: "pointer",
 	display: 'table-cell',
 	padding: '0px 0px',
 	//overflow: 'hidden',
+	"&:hover":{backdropFilter:"brightness(90%)"},
 	//backgroundClip:'content-box',
+	border: '1px solid #000',
+	//pointerEvents:"none",
+	"&:hover":{background:"red"},
     },
 });
 
+// ,"&:hover":{backdropFilter:"brightness(90%)"}
 //	borderCollapse: 'collapse',
 
 function SummaryCell(props) {
@@ -70,17 +77,23 @@ function SummaryCell(props) {
     //console.log("SummaryCell data:",JSON.stringify(data),layout);
     var sheight=(plan.height)+'px';
     var swidth=(plan.width)+'px';
-    var style={color:fgcolor,backgroundColor:bgcolor,height:sheight,maxHeight:sheight,width:swidth,border:'1px solid #EEE'};
+    //#EEE
+    var style={color:fgcolor,backgroundColor:bgcolor,height:sheight,
+	       maxHeight:sheight,width:swidth,border:'1px solid #EEE'};
     //console.log("Summary:",JSON.stringify(style));
     return (
             <div className={(onclick !== undefined?classes.divTableCellCursor:classes.divTableCell)} key={key}
 	         style={style} onClick={onclick} height={plan.height} width={plan.width}
-	         data-for='cell' data-tip={data}>
-		<CanvasText state={state} label={lab} plan={plan} key={key} invalid={invalid} index={index}
-					   colkey={colkey} colvalues={colvalues} rowkey={rowkey} rowval={rowval} color={fgcolor}/>
+	data-for='cell' data-tip={data}>
+	    <CanvasText state={state} label={lab} plan={plan} key={key} invalid={invalid} index={index}
+	colkey={colkey} colvalues={colvalues} rowkey={rowkey} rowval={rowval} color={fgcolor}/>
 	    </div>
-           );
+    );
 }
+
+
+
+
 
 SummaryCell.propTypes = {
     classes: PropTypes.object.isRequired,

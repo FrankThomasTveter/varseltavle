@@ -4,12 +4,10 @@ import { withStyles } from '@material-ui/core/styles';
 
 import {teal_palette} from '../mui/metMuiThemes';
 
-//import Paper from '@material-ui/core/Paper';
-//import Grid from '@material-ui/core/Grid';
-
 import SummaryCell from './SummaryCellComponent';
 import SeriesCell  from './SeriesCellComponent';
 import CanvasText  from './CanvasTextComponent';
+import TableMenu  from './TableMenuComponent';
 import TooltipFixedComponent  from './TooltipFixedComponent';
 
 const styles = theme => ({
@@ -23,17 +21,15 @@ const styles = theme => ({
 	display: 'inline-block',
 	justifyContent: 'left',
 	cursor: "pointer",
+//	"&:hover":{background:"yellow"},
+//	"&:hover":{filter:"brightness(50%)"},
+	// "&:hover":{backdropFilter:"brightness(90%)"},
     },
     divHdrRight : {
 	display: 'inline-block',
 	justifyContent: 'right',
 	cursor: "pointer",
-    },
-    paper: {
-//	overflow: 'hidden',
-	tableLayout: 'fixed',
-	padding:0,
-	margin:0,
+	// "&:hover":{backdropFilter:"brightness(90%)"},
     },
     divEmpty :{
 	width: '100%',
@@ -42,6 +38,7 @@ const styles = theme => ({
     divTable :{
 	display: 'table',
 	width: '100%',
+	// "&:hover":{backdropFilter:"brightness(90%)"},
         //border:  '10px solid green',
     },
     divTableRow:  {
@@ -50,41 +47,26 @@ const styles = theme => ({
 	border: '0px solid #999999',
 	display: 'table-row',
 	padding: '0px',
+	// "&:hover":{backdropFilter:"brightness(90%)"},
     },
     divTableCell:{
 	border: '0px solid #999999',
 	display: 'table-cell',
 	padding: '0px',
+	//pointerEvents:"auto",
+	//"&:hover":{backdropFilter:"brightness(90%)"},
     },
     divTableCellCursor:{
 	cursor: "pointer",
 	border: '0px solid #999999',
 	display: 'table-cell',
 	padding: '0px',
-    },
-    divTableHead : {
-	border: '0px',
-	display: 'table-cell',
-	padding: '0px',
-    },
-    divTableHeading : {
-	display: 'table-header-group',
-    },
-    divTableHeadingCenter : {
-	display: 'flex',
-	justifyContent: 'center',
-    },
-    divTableFoot : {
-	backgroundColor: '#DDD',
-	display: 'table-footer-group',
-	fontWeight: 'bold',
+	//borderRadius: "5px",
+	// "&:hover":{backdropFilter:"brightness(90%)"},
     },
     divTableBody : {
 	display: 'table-row-group',
-    },
-    paperImage: {
-        textAlign: 'center',
-        padding: theme.spacing(2),
+	// "&:hover":{backdropFilter:"brightness(90%)"},
     },
     button:{},
     buttonInvisible:{},
@@ -96,11 +78,12 @@ const styles = theme => ({
 // ---------------- DATA
 function FirstDataCell (props) {
     const { classes, state, colkey, rowkey, rowval, onclick, plan, rowindex } = props;
-    var cursor=classes.divTableCell;
+    var cursor;
     if (onclick !== undefined) {
 	cursor=classes.divTableCellCursor;
+    } else {
+	cursor=classes.divTableCell;
     }
-    // width={plan.width} height={plan.height}
     var data;
     if (colkey==="" && rowkey==="") {
 	data=null;
@@ -108,9 +91,10 @@ function FirstDataCell (props) {
 	data=JSON.stringify({keys:[rowkey,colkey],vals:[[rowval],[]]}); 
     };
     if (rowindex%2 === 1) {
-	return (<div className={cursor} onClick={onclick} style={{backgroundColor:'#DDD'}}
+	return (<div className={cursor} onClick={onclick}
+		style={{backgroundColor:'#DDD'}}
 		data-for='cell' data-tip={data}>
-		   <CanvasText state={state} label={rowval} plan={plan}/>
+		<CanvasText state={state} label={rowval} plan={plan}/>
 		</div>);
     } else {
 	return (<div className={cursor} onClick={onclick} style={{backgroundColor:'#EEE'}}
@@ -202,35 +186,6 @@ function DataRows(props) {
     }
 }
 // ---------------- HDR
-function FirstHdrCell (props) {
-    const { classes, state, colkey, rowkey, plans } = props; // plan
-    //var width=plans.hdr.width;
-    //var height=plans.hdr.height;
-    //teal_palette
-    //console.log("Making first header cell.",colkey,rowkey,plan.width,plan.height);
-    //style={{backgroundColor:teal_palette.main,color:'white'}}
-    var onclickCol=() => state.Navigate.switchTableKey(state,colkey);
-    var onclickRow=() => state.Navigate.switchTableKey(state,rowkey);
-    var data;
-    if (colkey==="" && rowkey==="") {
-	data=null;
-    } else {
-	data=JSON.stringify({keys:[rowkey,colkey],vals:[[],[]]}); 
-    };
-    
-    //console.log("Hdr:",JSON.stringify(plans.hdr),JSON.stringify(plans.hd2),JSON.stringify(plans.hd1));
-    
-    return (<div style={{width:plans.hdr.width}}>
-	       <div className={classes.divHdrRight} width={plans.hd2.width} onClick={onclickRow} data-for='cell' data-tip={data}>
-	          <CanvasText state={state} label={rowkey} plan={plans.hd2} color={'white'}/>
-	       </div>
-	       <div className={classes.divHdrLeft} width={plans.hd1.width} onClick={onclickCol} data-for='cell' data-tip={data}>
-	          <CanvasText state={state} label={colkey} plan={plans.hd1} color={'white'}/>
-	       </div>
-	    </div>);
-}
-//
-
 function renderHdrCell(classes,state,colkey,colvalues,rowkey,plan,val,index) {
     if (index%plan.step === 0) {
 	//console.log("HdrCell:",index,plan.step);
@@ -262,7 +217,7 @@ function HdrRow(props) {
     //console.log("Making header row.",colkey,JSON.stringify(colvalues));
     var mapFunction= (val,index)=>{return renderHdrCell(classes,state,colkey,colvalues,rowkey,plans.col,val,index);};
     return (<div className={classes.divTableRow} key={0}>
-	       <FirstHdrCell classes={classes} state={state} colkey={colkey} rowkey={rowkey} plans={plans} style={{height:"100%"}}/>
+	    <TableMenu classes={classes} state={state} colkey={colkey} rowkey={rowkey} plans={plans}/>
 	       {colvalues.map(mapFunction)}
 	    </div>);
 }
