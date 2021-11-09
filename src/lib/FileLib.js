@@ -90,11 +90,11 @@ function File() {
 	    regHttp.onload = function() {
 		// This is called even on 404 etc
 		// so check the status
-		if (regHttp.status === 200) {
+		if (regHttp.status === 200 && !/^<!DOCTYPE html>/.test(regHttp.response)) {
 		    // Resolve the promise with the response text
+		    //console.log(regHttp.response);
 		    resolve(regHttp.response);
-		}
-		else {
+		} else {
 		    // Otherwise reject with the status text
 		    // which will hopefully be a meaningful error
 		    reject(Error(regHttp.statusText));

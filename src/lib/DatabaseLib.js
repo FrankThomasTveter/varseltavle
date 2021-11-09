@@ -57,9 +57,43 @@ function Database() {
 		 Max:3
 		};
     this.db=null;
+    this.beep0 = new Audio("/alarm/media/level00.mp3");
+    this.beep1 = new Audio("/alarm/media/level01.mp3");
+    this.beep2 = new Audio("/alarm/media/level02.mp3");
+    this.beep3 = new Audio("/alarm/media/level03.mp3");
+    this.beep4 = new Audio("/alarm/media/level04.mp3");
+    this.beep5 = new Audio("/alarm/media/level05.mp3");
+    this.beep6 = new Audio("/alarm/media/level06.mp3");
+    this.beep7 = new Audio("/alarm/media/level07.mp3");
+    this.beep8 = new Audio("/alarm/media/level08.mp3");
+    this.beep9 = new Audio("/alarm/media/level09.mp3");
     this.init=function(state){
 	//state.Utils.init("Database",this);
     };
+    this.playAudio=function(state,level) {
+	var playPromise;
+	if (state.Database["beep"+level] !== undefined) {
+	    //state.Database["beep"+level].muted=true;
+	    playPromise=state.Database["beep"+level].play();
+	} else if ( state.Database.beep0 !== undefined) {
+	    //state.Database.beep0.muted=true;
+	    playPromise=state.Database.beep0.play();
+	} else {
+	    console.log("Invalid sounds...",state.Database.beep0);
+	};
+	if (playPromise !== undefined) {
+            playPromise
+		.then(_ => {
+		    console.log("Audio played (",level,")");
+		})
+		.catch(error => {
+		    state.Html.broadcast(state,"Unable to play audio.",'warning');
+		    console.log("playback prevented (",level,")" );
+		});
+	} else {
+	    console.log("No sound available...");
+	}
+    }.bind(this);
     this.toggleDisplayOld=function(state) {
 	//console.log("Show.view before:",this.state.viewMode,JSON.stringify(this.state),JSON.stringify(this.modes));
 	state.Database.viewOldData=!state.Database.viewOldData;
@@ -68,6 +102,7 @@ function Database() {
     this.toggleNotification=function(state) {
 	//console.log("Show.view before:",this.state.viewMode,JSON.stringify(this.state),JSON.stringify(this.modes));
 	state.Database.notification.mode=(state.Database.notification.mode+1)%3
+	state.Database.playAudio(state,0);
 	state.Show.showConfig(state);
     };
     this.getNotificationMode=function(state) {
@@ -401,20 +436,27 @@ function Database() {
 		    function() {
 			return state.File.get(path);
 		    }
+		).catch(
+		    function(err) {
+			state.Html.broadcast(state,"Unable to load summary:"+path,'warning');
+			//console.log("Unable to load:"+name," ("+err.message+")");
+		    }
 		).then(complete).catch(
 		    function(err) {
 			//console.log("Unable to load:"+name," ("+err.message+")");
-		    });
+		    }
+		);
 	    };
 	};
 	sequence.then(function() {
 	    if (state.Database.summary.length === 0) {
-		state.Html.broadcast(state,"Summary contains no fragments.",'warning');
+		state.Html.broadcast(state,"Summaries contain no fragments.",'warning');
 	    };
 	    //console.log("Normal end...");
 	    //console.log(JSON.stringify(state.Database.sumcnt));
 	}).catch(function(err) {
 	    // Catch any error that happened along the way
+	    state.Html.broadcast(state,err.message,'warning');
 	    console.log("Error msg: " + err.message);
 	}).then(function() {
 	    // always do this
@@ -629,6 +671,11 @@ function Database() {
 		let readRegister=function() {
 		    return state.File.get(path);
 		};
+		let errorRead=function(err) {
+		    //state.Html.broadcast(state,"Register error: "+frag,'warning');
+		    state.Html.broadcast(state,"Unable to load register:"+path,'warning');
+		    console.log("Unable to load: "+path+" ("+err.message+")");
+		};
 		let processRegister=function(result) {
 		    var files=result.split('\n');
 		    state.Database.files[frag]=files;
@@ -678,7 +725,7 @@ function Database() {
 		sequence = sequence.then(
 		    readRegister
 		).then(
-		    processRegister
+		    processRegister,errorRead
 		).catch(
 		    errorRegister
 		).then(
@@ -744,6 +791,7 @@ function Database() {
 		    if (state.Database.notification.mode === 2 &&
 			(state.Database.notification.maxLevel === undefined ||
 			 state.Database.notification.maxLevel < state.Database.maxLevel)) {
+			state.Database.playAudio(state,state.Database.maxLevel);
 			state.Database.notification.maxLevel=state.Database.maxLevel;
 			ttl='Warning tablau: Load cnt ' + state.Database.loadcnt;
 			stl= 'Level increased';
@@ -757,6 +805,7 @@ function Database() {
 			    native: true // when using native, your OS will handle theming.
 			});
 		    } else if (state.Database.notification.mode === 1) {
+			state.Database.playAudio(state,state.Database.maxLevel);
 			ttl='Warning tablau: Load cnt ' + state.Database.loadcnt;
 			stl= 'Data loaded.';
 			msg="Loaded: " + state.Database.dbcnt;

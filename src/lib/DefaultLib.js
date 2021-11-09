@@ -269,6 +269,7 @@ function Default() {
 	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateOther);
 	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateHome);
 	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateVisible);
+	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateThr);
 	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateColors);
 	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateTooltips);
 	state.Utils.copyMap(state,state.Utils.type.fill,url,state.Default.config.url,this.stateFocus);
@@ -295,11 +296,6 @@ function Default() {
 	    // ,state.Utils.type.splice
 	    state.Utils.pushChanged(state,url,this.stateData);
 	};
-	if (this.useUrl(state,"Thresholds")) {
-	    //console.log("Url:",JSON.stringify(url));
-	    // ,state.Utils.type.splice
-	    state.Utils.pushChanged(state,url,this.stateThr);
-	};
 	if (this.useUrl(state,"Trash")) {
 	    state.Utils.pushChanged(state,url,this.stateTrash);
 	};
@@ -311,6 +307,11 @@ function Default() {
 	};
 	if (this.useUrl(state,"Visible")) {
 	    state.Utils.pushChanged(state,url,this.stateVisible);
+	};
+	if (this.useUrl(state,"Thresholds")) {
+	    //console.log("Url:",JSON.stringify(url));
+	    // ,state.Utils.type.splice
+	    state.Utils.pushChanged(state,url,this.stateThr);
 	};
 	if (this.useUrl(state,"Colors")) {
 	    state.Utils.pushChanged(state,url,this.stateColors);
@@ -344,10 +345,6 @@ function Default() {
 	if (this.useUrl(state,"Data")) {
 	    state.Utils.pushChanged(state,url,this.stateData);
 	};
-	if (this.useUrl(state,"Thresholds")) {
-	    //console.log("Url:",JSON.stringify(url));
-	    state.Utils.pushChanged(state,url,this.stateThr);
-	};
 	if (this.useUrl(state,"Trash")) {
 	    state.Utils.pushChanged(state,url,this.stateTrash);
 	};
@@ -359,6 +356,10 @@ function Default() {
 	};
 	if (this.useUrl(state,"Visible")) {
 	    state.Utils.pushChanged(state,url,this.stateVisible);
+	};
+	if (this.useUrl(state,"Thresholds")) {
+	    //console.log("Url:",JSON.stringify(url));
+	    state.Utils.pushChanged(state,url,this.stateThr);
 	};
 	if (this.useUrl(state,"Colors")) {
 	    state.Utils.pushChanged(state,url,this.stateColors);
@@ -430,6 +431,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.url, merge, this.stateOther);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.url, merge, this.stateHome);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.url, merge, this.stateVisible);
+	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.url, merge, this.stateThrs);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.url, merge, this.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.url, merge, this.stateTooltips);
 	state.Utils.copyMap(state, state.Utils.type.any, state.Default.config.url, merge, this.stateFocus);
@@ -623,6 +625,7 @@ function Default() {
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateOther);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateHome);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateVisible);
+	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateThr);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateColors);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateTooltips);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateFocus);
@@ -630,7 +633,6 @@ function Default() {
 //	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateCustom);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateFilm);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateURL);
-	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateThr);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateOrder);
 	    state.Utils.copyMap(state, state.Utils.type.force, state.Default.config.current, state, this.stateSvg);
 	    //console.log("SETUP:",JSON.stringify(setup.visible));
@@ -683,6 +685,7 @@ function Default() {
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateHome);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateFilm);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateURL);
+	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateThr);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateColors);
 	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateData);
 //	state.Utils.copyMap(state, state.Utils.type.force, state, current, this.stateCustom);
