@@ -87,7 +87,11 @@ function Database() {
 		    console.log("Audio played (",level,")");
 		})
 		.catch(error => {
-		    state.Html.broadcast(state,"Unable to play audio.",'warning');
+		    if (error.name === "NotAllowedError") {
+			state.Html.broadcast(state,"Audio permission denied.",'warning');
+		    } else {
+			state.Html.broadcast(state,"Unable to play audio.",'warning');
+		    }
 		    console.log("playback prevented (",level,")" );
 		});
 	} else {
