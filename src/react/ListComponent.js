@@ -88,7 +88,7 @@ class List extends Component {
 	    //console.log("BBX width/height:",this.bbx.width,this.bbx.height);
 	};
     };
-    renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index){
+    renderDataList(classes,state,doc,plan,skey,index){
 	if (doc===undefined) {
 	    return <div className={classes.divTableCell} style={{backgroundColor:'#EEE'}}/>
 	} else {
@@ -96,6 +96,12 @@ class List extends Component {
 	    var where=state.Database.getWhereValue(skey,val);
 	    var range;
 	    var title=state.Matrix.getTooltipTitle(state,doc,skey); // get threshold... ala 
+	    var lev=doc.__lev;
+	    if (doc._thr !== undefined && doc._thr.level !== undefined) {
+		lev=doc._thr.level;
+	    }
+	    var bgcolor=state.Colors.getLevelBgColor(lev);
+	    var fgcolor=state.Colors.getLevelFgColor(lev);
 	    var onClick=()=>{state.Navigate.selectKeys(state,skey,val,range,where,1);};
 	    if (val === undefined) {val="";};
 	    //console.log("Key:",skey," Val:",JSON.stringify(val),JSON.stringify(doc[skey]));
@@ -108,11 +114,7 @@ class List extends Component {
     };
     renderDoc(classes,state,skeys,plan,doc,index) {
 	//console.log("We have a matrix(",rowval,") with range:",JSON.stringify(range));
-	//var lev=doc.level;
-	var lev=doc.__lev;
-	var bgcolor=state.Colors.getLevelBgColor(lev);
-	var fgcolor=state.Colors.getLevelFgColor(lev);
-	var mapFunction= (skey,index)=>this.renderDataList(classes,state,doc,plan,skey,fgcolor,bgcolor,index);
+	var mapFunction= (skey,index)=>this.renderDataList(classes,state,doc,plan,skey,index);
 	return (<div className={classes.divTableRow} key={index.toString()}>
 		{skeys.map(mapFunction)}
 		</div>);
