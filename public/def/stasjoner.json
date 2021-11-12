@@ -83,10 +83,10 @@
 		"Phenomenon","Airport","Station","Place","Region","Method","Issued"],
     "state":{"viewMode":0,"cellMode":0,"layoutMode":0},
     "home":{"path":[],"val":{"Partner":[]}},
-    "tooltip":{"keys":["Phenomenon","Region","Duration","Airport","alarm_key","alarm_val","Unit","Model","Method","Output","dtg","lat","lon","max"],
+    "tooltip":{"keys":["Place","Phenomenon","Region","Duration","Airport","alarm_key","alarm_val","Unit","Model","Method","Output","dtg","lat","lon","max"],
 	       "select":["Phenomenon","Duration"],
 	       "sort":["Phenomenon","Duration","Region"],
-               "click":["Phenomenon","Region","Duration","Output","Airport","dtg"]
+               "click":["Place","Phenomenon","Region","Duration","Output","Airport","dtg"]
 	      },
     "polygons":{"dir":"simplified/","seperator":"_","keys":["Type","Region","Request"]},
     "custom":{},
