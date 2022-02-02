@@ -8,6 +8,7 @@ const styles = theme => ({
         whiteSpace: 'nowrap',
         textAlign: 'center',
 	width:'100%',
+	cursor: 'pointer',
     },
 });
 
@@ -24,13 +25,14 @@ class LocationComponent extends Component {
     };
     render() {
         const { classes, state } = this.props;
+	var onclick= () => {console.log("clicked2");state.Layout.toggleView(state);};
 	var title=state.Path.getTitle(state);
 	var tooltip=state.Path.getTooltipTitle(state);
 	if (state.Layout.title !== undefined && state.Layout.title !== "") {
 	    document.title = state.Layout.title;
 	}
         return (
-		<div className={classes.location} title={tooltip}>
+		<div className={classes.location} title={tooltip} onClick={onclick}>
      		{title}
             </div>
         );

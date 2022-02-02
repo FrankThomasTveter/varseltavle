@@ -304,6 +304,10 @@ function Database() {
 	var ss=parseInt(epoch.substring(17,23));
 	return (new Date(Date.UTC(yy,mm-1,dd,hh,mi,ss)));
     };
+    this.parseDtgString=function(s) {
+	var b = s.split(/\D+/);
+	return new Date(Date.UTC(b[0], --b[1], b[2], b[3], 0, 0, 0));
+    };
     this.getFragThr=function(state) {
 	return this.fragthr;
     };
@@ -1099,6 +1103,9 @@ function Database() {
 	state.Show.showAll(state);
     };
     this.dbInsert=function(state,json) {
+	var dt = new Date();
+	var noon = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 12, 0, 0);
+	var then = new Date();
 	state.Database.maxLevel=-1;
 	var ii,key;
 	try {
@@ -1113,6 +1120,14 @@ function Database() {
 		if (lev > state.Database.maxLevel) {
 		    state.Database.maxLevel=lev;
 		}
+		var dtg=doc.dtg;
+		if (dtg !== undefined) {
+		    var then=this.parseDtgString(dtg);
+		    var seconds = (then.getTime() - noon.getTime()) / 1000;
+		    var day=Math.round(seconds/86400.0);
+		    doc.day=(day<0?"":"+") + day;
+		    //console.log("Day:",doc.dtg,doc.day,seconds,day);
+		};
 	    };
 	    // get modified date
 	    //console.log("Setting time.");
@@ -1728,14 +1743,14 @@ function Database() {
     this.getTimeDiff=function(state,dt) {
 	var s="";
 	if (dt  === undefined || isNaN(state,dt)) {return s;};
-	var msec=Math.abs(state,dt);
-	var dd = Math.floor(state,((state,(msec / 1000) / 60) / 60) / 24);
+	var msec=Math.abs(dt);
+	var dd = Math.floor((((msec / 1000) / 60) / 60) / 24);
 	msec -= dd * 1000 * 60 * 60 * 24;
-	var hh = Math.floor(state,((state,msec / 1000) / 60) / 60);
+	var hh = Math.floor(((msec / 1000) / 60) / 60);
 	msec -= hh * 1000 * 60 * 60;
-	var mm = Math.floor(state,(msec / 1000) / 60);
+	var mm = Math.floor((msec / 1000) / 60);
 	msec -= mm * 1000 * 60;
-	var ss = Math.floor(state,msec / 1000);
+	var ss = Math.floor(msec / 1000);
 	msec -= ss * 1000;
 	if (dt<0) {
 	    s="-";

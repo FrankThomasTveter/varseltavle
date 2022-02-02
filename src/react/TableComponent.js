@@ -54,7 +54,7 @@ const styles = theme => ({
 	display: 'table-cell',
 	padding: '0px',
 	//pointerEvents:"auto",
-	//"&:hover":{backdropFilter:"brightness(90%)"},
+	"&:hover":{backdropFilter:"brightness(90%)"},
     },
     divTableCellCursor:{
 	cursor: "pointer",

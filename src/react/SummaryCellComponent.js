@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 
 import CanvasText  from './CanvasTextComponent';
+import Button from '@material-ui/core/Button';
 
 const styles = theme => ({
     divTableCell:{
@@ -23,7 +24,6 @@ const styles = theme => ({
 	//backgroundClip:'content-box',
 	border: '1px solid #000',
 	//pointerEvents:"none",
-	"&:hover":{background:"red"},
     },
 });
 

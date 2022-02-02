@@ -275,22 +275,24 @@ function Auto() {
 	return ret;
     };
     this.getDependancy=function(state,where,keys) {
-	//if(this.debug){console.log("getDependancy Entering:",where,JSON.stringify(keys));};
+	if(this.debug){console.log("getDependancy Entering:",where,JSON.stringify(keys));};
 	var key;
 	//var where = state.Database.getWhere(state);
 	var ret={dep:{},val:{}};
 	var hits={};
 	var maxhits={};
 	var docs=state.Database.getDocsCnt(state,where,keys); // current table keys
-	//if(this.debug){console.log("getDependancy:",JSON.stringify(docs));};
+	if(this.debug){console.log("getDependancy:",JSON.stringify(docs));};
 	var slen=keys.length;
 	var dlen = docs.length;
 	for (var ii = 0; ii < dlen; ii++) {
     	    var doc=docs[ii];
 	    for (var jj=0;jj<slen;jj++) {
 		key=keys[jj];
-		if (doc[key] !== undefined) {
-		    var val=doc[key];
+		var dval=doc[key];
+		if (dval===undefined) {dval="";};
+		if (dval !== undefined) {
+		    var val=dval;
 		    ret.val[key]=val;
 		    if (hits[key]  === undefined) {hits[key]={};}
 		    hits[key][val] = 1+ (hits[key][val]||0);
@@ -300,7 +302,7 @@ function Auto() {
 		};
 	    }
 	};
-	//if(this.debug){console.log("Hits:",dlen,JSON.stringify(hits),where);};
+	if(this.debug){console.log("Hits:",dlen,JSON.stringify(hits),where);};
 	for (var kk=0;kk<slen;kk++) {
 	    key=keys[kk];
 	    if (maxhits[key] !== undefined) {
@@ -323,7 +325,7 @@ function Auto() {
 	    }
 	};
 	ret.intprt=this.getInterpretation(state,keys,ret.dep);
-	//if(this.debug){console.log("getDependancy Done:",JSON.stringify(ret));};
+	if(this.debug){console.log("getDependancy Done:",JSON.stringify(ret));};
 	return ret;
     };
     this.getInterpretation=function(state,keys,dep){

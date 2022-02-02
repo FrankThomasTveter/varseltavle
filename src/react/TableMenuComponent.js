@@ -59,7 +59,7 @@ class TableMenu extends Component {
 	items=items.sort(state.Utils.ascending);
 	var mapFunctionCol= (item,index)=>renderMenuItem(classes,state,item,index,colkey,this.onClose);
 	var mapFunctionRow= (item,index)=>renderMenuItem(classes,state,item,index,rowkey,this.onClose);
-	var cls={button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled};
+	//var cls={button:classes.button,buttonInvisible:classes.buttonInvisible,buttonDisabled:classes.buttonDisabled};
 	this.onclickCol=() => state.Navigate.switchTableKey(state,colkey);
 	this.onclickRow=() => state.Navigate.switchTableKey(state,rowkey);
 	this.onClose = () => {
