@@ -192,7 +192,7 @@
     "summaries":["summary_ext"],
     "fragments":["regn.*meps"],
     "title":"Landområder og Fiskebanker (bare ekstremer)",
-    "viewOldData":false,
+    "viewOldData":true,
     "colors":{
 	"background":["rgb(182,219,255)","rgb(255,182,119)","rgb(36,255,36)","rgb(0,0,0)"],
 	"foreground":["black","blue","red","white"]
@@ -200,7 +200,7 @@
     "keys":{"other":["Issued","Phenomenon","date","dtg","Height","Partner",
 		    "Type","Station","Airport","Station","Place",
 		    "Region","Model","Method","Output","Duration",
-		    "ILS_direction","Unit"],
+		    "ILS_direction","Unit","day"],
 	    "trash":["cnt","lat","lon",
 		     "max","maxlat","maxlon",
 		     "min","minlat","minlon",
