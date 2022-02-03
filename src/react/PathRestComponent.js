@@ -41,7 +41,7 @@ function renderPathRest(classes,state,item,type,index,focusPoints) {
 	//onclick=() => state.Navigate.onClickPath(state,'rest',item);
 	onclick=() => state.Navigate.pushRestToTable(state,item);
 	title="'"+item+"'";
-	return (<span  key={`rest$-ignore-{item}`} title={title}>
+	return (<span  key={`rest-ignore-${item}`} title={title}>
 		<RestValueMenu state={state} classes={cls} keyitem={item} keyindex={index} label={lab} remove={remove} target={target} onclick={onclick} title={title} focusPoints={focusPoints}/>
 		</span>);
     }
