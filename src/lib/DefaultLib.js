@@ -63,7 +63,8 @@ function Default() {
     ];
     this.toStateColors= [
 	[["monitoring"],    ["Database","fragthr"]],
-	[["colors"],  ["Colors","colors"]]
+	[["colors"],  ["Colors","colors"]],
+	[["fixed"],  ["Colors","fixed"]]
     ];
     this.toStateTooltip = [
 	[["tooltip"], ["Path","tooltip"]],

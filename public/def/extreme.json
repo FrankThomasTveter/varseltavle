@@ -190,8 +190,8 @@
 		   {"background":"Lime",       "foreground":"Black","range":[null,10800000]},
 		   {"background":"Yellow",     "foreground":"Black","range":[null,null]}],
     "summaries":["summary_ext"],
-    "fragments":["track","turbulens","snowfall","ising_skip","middelvind","skogbrann","vannstand","vindkast","cape","thunder"],
-    "title":"Landområder og Fiskebanker (bare ekstremer)",
+    "fragments":["track.*land","ising_skip.*land","middelvind.*land","snowfall","skogbrann","vannstand","vindkast","cape","thunder"],
+    "title":"Fenomen utenom regn for landområder (bare ekstremer)",
     "viewOldData":true,
     "colors":{
 	"background":["rgb(182,219,255)","rgb(255,182,119)","rgb(36,255,36)","rgb(0,0,0)"],

@@ -47,8 +47,10 @@ function SummaryCell(props) {
     var info=state.Matrix.getTooltipInfo(state,elements);
     //console.log(info);
     var cnt=info.cnt;
+    var maxrank=info.maxrank;
     var maxlev=info.maxlev;
     var minlev=info.minlev;
+    //console.log("Rank:",JSON.stringify(info));
     var lab="";
     if (label === undefined) {
 	if (cnt > 1) {
@@ -64,7 +66,7 @@ function SummaryCell(props) {
 	lab=label;
     };
     var invalid=(minlev < 0); 
-    var bgcolor=state.Colors.getLevelBgColor(maxlev);
+    var bgcolor=state.Colors.getLevelBgColor(maxrank);
     var fgcolor=state.Colors.getLevelFgColor(maxlev);
     //console.log("Sending color:",fgcolor,maxlev);
     //var stylec={height:plan.height+"px",backgroundColor:bgcolor};

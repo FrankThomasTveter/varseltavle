@@ -190,7 +190,8 @@
 		   {"background":"Lime",       "foreground":"Black","range":[null,10800000]},
 		   {"background":"Yellow",     "foreground":"Black","range":[null,null]}],
     "summaries":["summary"],
-    "fragments":["turbulens","snowfall","regn","skogbrann","vannstand","vindkast","cape","thunder"],
+    "fragments":["track.*land","ising_skip.*land","middelvind.*land",
+		 "turbulens","snowfall","regn","skogbrann","vannstand","vindkast","cape","thunder"],
     "title":"Landområder",
     "viewOldData":false,
     "colors":{

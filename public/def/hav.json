@@ -190,7 +190,7 @@
 		   {"background":"Lime",       "foreground":"Black","range":[null,10800000]},
 		   {"background":"Yellow",     "foreground":"Black","range":[null,null]}],
     "summaries":["summary"],
-    "fragments":["track","ising_skip","middelvind.*hav"],
+    "fragments":["track.*hav","ising_skip.*hav","middelvind.*hav"],
     "title":"Havområder",
     "viewOldData":false,
     "colors":{

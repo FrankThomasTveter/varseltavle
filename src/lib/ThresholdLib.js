@@ -42,8 +42,13 @@ function Threshold() {
 	};
 	var rank=0; // universal rank
 	if (doclev > -1) {
-	    rank= doclev+((docmax-Number(maxs[doclev]))/(Number(maxs[mlen-1])-Number(maxs[0])))/1000.0;
-	    //console.log("Doclev:",doclev," max:",docmax,jj,mlen,maxs[doclev],maxs[mlen-1],maxs[0]);
+	    if ( mlen > 2 ) {
+		var dlev=Number(maxs[Math.min(doclev+1,mlen-1)])-Number(maxs[Math.min(doclev,mlen-2)]);
+		rank= doclev + (docmax-Number(maxs[doclev]))/dlev;
+		//console.log("Doclev:",doclev," max:",docmax,jj,mlen,maxs[doclev],maxs[mlen-1],maxs[0]);
+	    } else {
+		rank=doclev;
+	    }
 	};
 	if (this.debug) {console.log("Level:",docmax,doclev,JSON.stringify(maxs));}
 	var ret={};

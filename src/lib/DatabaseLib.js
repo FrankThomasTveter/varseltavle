@@ -1105,7 +1105,7 @@ function Database() {
     this.dbInsert=function(state,json) {
 	var dt = new Date();
 	var noon = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 12, 0, 0);
-	noon.setUTCHours(11); // 0 - 23
+	noon.setUTCHours(12); // 0 - 23
 	var then = new Date();
 	state.Database.maxLevel=-1;
 	var ii,key;

@@ -780,6 +780,7 @@ function Matrix() {
 	var cnt=0;
 	var maxlev=-1;
 	var minlev=0;
+	var maxrank=-1;
 	var docs=[];
 	if (elements === undefined) {
 	    console.log("No elements found.");
@@ -794,6 +795,7 @@ function Matrix() {
 		} else {
 		    maxlev=Math.max(maxlev,elements[ee].maxlev);
 		    minlev=Math.min(minlev,elements[ee].minlev);
+		    maxrank=Math.max(maxrank,elements[ee].maxrank);
 		}
 		// loop over tooltips and put maxrank-docs into tooltip array
 		this.mergeTooltipElement(state,elements[ee].tooltip,tooltip,state.Path.tooltip.select.length);
@@ -807,6 +809,7 @@ function Matrix() {
 	return {cnt:cnt,
 		minlev:minlev,
 		maxlev:maxlev,
+		maxrank:maxrank,
 		docs:this.sortTooltipDocs(state,docs)};
     }
     this.mergeTooltipElement=function(state,nel,mel,pos) {

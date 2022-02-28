@@ -190,8 +190,8 @@
 		   {"background":"Lime",       "foreground":"Black","range":[null,10800000]},
 		   {"background":"Yellow",     "foreground":"Black","range":[null,null]}],
     "summaries":["summary"],
-    "fragments":["track","turbulens","snowfall","ising_skip","middelvind","regn","skogbrann","vannstand","vindkast","cape","thunder"],
-    "title":"Landområder og Fiskebanker",
+    "fragments":["track.*land","ising_skip.*land","middelvind.*land","turbulens","snowfall","regn","skogbrann","vannstand","vindkast","cape","thunder"],
+    "title":"Landområder med ekstra info i tooltip",
     "viewOldData":false,
     "colors":{
 	"background":["rgb(182,219,255)","rgb(255,182,119)","rgb(36,255,36)","rgb(0,0,0)"],

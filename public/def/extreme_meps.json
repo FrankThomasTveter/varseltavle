@@ -191,7 +191,7 @@
 		   {"background":"Yellow",     "foreground":"Black","range":[null,null]}],
     "summaries":["summary_ext"],
     "fragments":["regn.*meps"],
-    "title":"Landområder og Fiskebanker (bare ekstremer)",
+    "title":"Meps Regn (bare ekstremer)",
     "viewOldData":true,
     "colors":{
 	"background":["rgb(182,219,255)","rgb(255,182,119)","rgb(36,255,36)","rgb(0,0,0)"],
