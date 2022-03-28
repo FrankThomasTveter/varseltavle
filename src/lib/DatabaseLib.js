@@ -1774,6 +1774,7 @@ function Database() {
     }
     this.query=function(sql) {
 	try {
+	    console.log("Sql:",sql);
 	    return this.db.exec(sql);
 	} catch (e) {
 	    alert(sql + ":" + e);
