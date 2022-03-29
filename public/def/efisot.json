@@ -1,7 +1,7 @@
 {
     "title":"EFI og SOT",
     "thresholds":[
-	{"Method":{"efi":{"key":"a100", ">": [-1,0.7] },"sot":{"key":"a100", ">": [-5,0,1,2] }}}
+	{"Method":{"efi":{"key":"a100", ">": [-1,0.7] },"sot":{"key":"a100", ">": [-10,0,1,2] }}}
     ],
     "default":{"thresholds":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"a100"}},
     "summaries":["summary_efisot"],
