@@ -24,7 +24,7 @@ function drawMarker(ctx,height,offset,width) {
     ctx.stroke();
 };
 function updateCanvas(item) {
-    const {label,plan,color} = item.props;
+    const {label,plan,fgcolor,bgcolor} = item.props;
     const cnv=item.refs.text;
     if (cnv === undefined) {return;}
     const ctx = cnv.getContext('2d');
@@ -44,9 +44,9 @@ function updateCanvas(item) {
     //ctx.rect(0,0,100,100);
     //ctx.stroke();
     //console.log(">>>> Plan:",JSON.stringify(plan),item.width,item.height);
-    if (color !== undefined) {
-	//console.log("Using color:",color);
-	ctx.fillStyle=color;
+    if (fgcolor !== undefined) {
+	//console.log("Using color:",fgcolor);
+	ctx.fillStyle=fgcolor;
     } else {
 	ctx.fillStyle='black';
 	//console.log("Using black...");
@@ -88,15 +88,15 @@ class CanvasTextComponent extends Component {
         updateCanvas(this);
     }
     render() {
-        const { classes, onclick, title, plan, color, invalid, ...other } = this.props;
+        const { classes, onclick, title, plan, invalid, fgcolor, bgcolor, ...other } = this.props;
 	this.width=plan.width;
 	this.height=plan.height;
 	this.invalid=invalid;
-	this.color=color;
+	//this.color=fgcolor;
 	//console.log("Text plan:",JSON.stringify(plan));
         return (
 		<canvas {...other} className={classes.canvas} classes={classes} onClick={onclick} title={title} 
-	            plan={plan} width={plan.width} height={plan.height-1} ref="text" />
+	    plan={plan} width={plan.width} height={plan.height-1} color={bgcolor} ref="text" />
         );
     }
 }

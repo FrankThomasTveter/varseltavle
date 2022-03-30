@@ -66,7 +66,7 @@ function SummaryCell(props) {
 	lab=label;
     };
     var invalid=(minlev < 0); 
-    var bgcolor=state.Colors.getLevelBgColor(maxrank);
+    var bgcolor=state.Colors.getLevelBgColor(maxlev);
     var fgcolor=state.Colors.getLevelFgColor(maxlev);
     //console.log("Sending color:",fgcolor,maxlev);
     //var stylec={height:plan.height+"px",backgroundColor:bgcolor};
@@ -88,7 +88,7 @@ function SummaryCell(props) {
 	         style={style} onClick={onclick} height={plan.height} width={plan.width}
 	data-for='cell' data-tip={data}>
 	    <CanvasText state={state} label={lab} plan={plan} key={key} invalid={invalid} index={index}
-	colkey={colkey} colvalues={colvalues} rowkey={rowkey} rowval={rowval} color={fgcolor}/>
+	colkey={colkey} colvalues={colvalues} rowkey={rowkey} rowval={rowval} fgcolor={fgcolor} bgcolor={bgcolor} color={fgcolor}/>
 	    </div>
     );
 }
