@@ -32,7 +32,7 @@
                                             "NesttunVassdraget":{"key":"max", ">": [0,70,97,129] }}}}}}},
     "default":{"thresholds":{"lat":"maxlat","lon":"maxlon","unit":"Unit","key":"max"}},
 
-    "summaries":["summary_avkroker"],
+    "summaries":["summary_avkroker_ext"],
     "fragments":[".*"],
     "colors":{
 	"background":["rgb(36,230,36)","rgb(0,109,219)","rgb(73,0,146)","rgb(146,0,0)"],
@@ -40,7 +40,7 @@
     },
     "keys":{
 	"other":[
-	    "Area","date","dtg","Method","Duration","Phenomenon"
+	    "Issued","date","dtg","Area","Method","Duration","Phenomenon"
 	],
 	"trash":["cnt","lat","lon",
 		 "max","maxlat","maxlon",
