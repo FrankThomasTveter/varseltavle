@@ -75,7 +75,7 @@
 	"foreground":["black","white","white","white"]
     },
     "keys":{"other":["Phenomenon","date","dtg","Height","Partner",
-		    "Type","Region","Span","Model","Method",
+		     "Type","Region","Span","Crossing","Model","Method",
 		    "Issued","Duration","Output","Unit"],
 	    "trash":["cnt","lat","lon",
 		     "max","maxlat","maxlon",
