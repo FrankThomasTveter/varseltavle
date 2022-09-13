@@ -75,9 +75,8 @@
 	"foreground":["black","white","white","white"]
     },
     "keys":{"other":["Phenomenon","date","dtg","Height","Partner",
-		    "Type","Station","Airport","Station","Place",
-		    "Region","Crossing","Span","Model","Method",
-		    "Issued","Duration","Output","ILS_direction","Unit"],
+		    "Type","Region","Span","Model","Method",
+		    "Issued","Duration","Output","Unit"],
 	    "trash":["cnt","lat","lon",
 		     "max","maxlat","maxlon",
 		     "min","minlat","minlon",
@@ -94,12 +93,7 @@
 	    {"label":"Vindkast","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Vindkast"]}}},
 	    {"label":"Regn","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued","Duration"]},"select":{"val":{"Phenomenon":["Regn"]}}},
 	    {"label":"Styrtregn","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued","Duration"]},"select":{"val":{"Phenomenon":["Styrtregn"]}}},
-	    {"label":"Snø","keys":{"path":["Phenomenon"],"other":["date","Height","dtg","Type","Region","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Snø"]}}},
-	    {"label":"Vannstand","keys":{"path":["Phenomenon"],"other":["date","Station","dtg","Type","Method","Issued"]},"select":{"val":{"Phenomenon":["Vannstand"]}}},
-	    {"label":"Skogbrann","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Skogbrann"]}}},
-	    {"label":"Ising på skip","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Ising på skip"]}}},
-	    {"label":"Polare lavtrykk","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Type","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Polare lavtrykk"]}}},
-	    {"label":"Turbulens","keys":{"path":["Phenomenon"],"other":["date","Region","dtg","Airport","Method","Issued"]},"select":{"val":{"Phenomenon":["Turbulens"]}}}
+	    {"label":"Snø","keys":{"path":["Phenomenon"],"other":["date","Height","dtg","Type","Region","Model","Method","Issued"]},"select":{"val":{"Phenomenon":["Snø"]}}}
 		],
 	"play": false
     },
@@ -119,13 +113,13 @@
     "C5","D2","D3","Dype D4","E2","E3","Dype E4","F2","F3"]
     },
     "priority":["dtg","date","Height","Unit","Type","Model","Partner","Output","Duration",
-		"Phenomenon","Airport","Station","Place","Region","Method","Issued"],
+		"Phenomenon","Crossing","Region","Method","Issued"],
     "state":{"viewMode":0,"cellMode":0,"layoutMode":0,"tooltip":0},
     "home":{"path":["Method"],"val":{"Method":["mb0","p100","p65","p50","prb",""]}},
-    "tooltip":{"keys":["Phenomenon","Region","Duration","Airport","alarm_key","alarm_val","Model","Method","dtg","lat","lon","max"],
+    "tooltip":{"keys":["Phenomenon","Crossing","Region","Duration","alarm_key","alarm_val","Model","Method","dtg","lat","lon","max"],
 	       "select":["Phenomenon","Duration"],
 	       "sort":["Duration","Phenomenon","Region"],
-               "click":["Phenomenon","Region","Duration","Output","Airport","dtg"]
+               "click":["Phenomenon","Region","Duration","Output","Crossing","dtg"]
 	      },
     "polygons":{"dir":"simplified/","seperator":"_","keys":["Type","Region","Request"]},
     "custom":{},
