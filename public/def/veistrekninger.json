@@ -75,7 +75,7 @@
 	"foreground":["black","white","white","white"]
     },
     "keys":{"other":["Phenomenon","date","dtg","Height","Partner",
-		     "Type","Region","Span","Crossing","Model","Method",
+		     "Type","Region","Crossing","Span","Model","Method",
 		    "Issued","Duration","Output","Unit"],
 	    "trash":["cnt","lat","lon",
 		     "max","maxlat","maxlon",
@@ -113,13 +113,13 @@
     "C5","D2","D3","Dype D4","E2","E3","Dype E4","F2","F3"]
     },
     "priority":["dtg","date","Height","Unit","Type","Model","Partner","Output","Duration",
-		"Phenomenon","Crossing","Region","Method","Issued"],
+		"Phenomenon","Crossing","Region","Span","Method","Issued"],
     "state":{"viewMode":0,"cellMode":0,"layoutMode":0,"tooltip":0},
     "home":{"path":["Method"],"val":{"Method":["mb0","p100","p65","p50","prb",""]}},
-    "tooltip":{"keys":["Phenomenon","Crossing","Region","Duration","alarm_key","alarm_val","Model","Method","dtg","lat","lon","max"],
+    "tooltip":{"keys":["Phenomenon","Region","Crossing","Span","Duration","alarm_key","alarm_val","Model","Method","dtg","lat","lon","max"],
 	       "select":["Phenomenon","Duration"],
 	       "sort":["Duration","Phenomenon","Region"],
-               "click":["Phenomenon","Region","Duration","Output","Crossing","dtg"]
+               "click":["Phenomenon","Region","Duration","Output","Crossing","Span","dtg"]
 	      },
     "polygons":{"dir":"simplified/","seperator":"_","keys":["Type","Region","Request"]},
     "custom":{},
