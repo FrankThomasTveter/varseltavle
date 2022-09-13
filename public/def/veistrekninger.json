@@ -2,10 +2,10 @@
     "title":"Veistrekninger",
     "thresholds":[{
 	"Phenomenon":{
-	    "Middelvind":{"Type":{"Fjellovergang":{"key":"max", ">": [0,13.9,24.5,32.7] }}},
-	    "Vindkast":{"Type":{"Fjellovergang":{"key":"max", ">": [0,25.0,35.0,45.0] }}},
+	    "Middelvind":{"Type":{"Veistrekning":{"key":"max", ">": [0,13.9,24.5,32.7] }}},
+	    "Vindkast":{"Type":{"Veistrekning":{"key":"max", ">": [0,25.0,35.0,45.0] }}},
 	    "Styrtregn":{"Duration":{"1t" :{"key":"max", ">": [0,15,20] },
-                                 "3t" :{"key":"max", ">": [0,25,30] }}},
+                                     "3t" :{"key":"max", ">": [0,25,30] }}},
 	    "Regn":{"Method":[{"mb0":{"key":"max", ">": [0,5,10,25] },
 			       "p50":{"key":"max", ">": [0,5,10,25] },
 			       "p65":{"key":"max", ">": [0,10,25] },
@@ -76,7 +76,7 @@
     },
     "keys":{"other":["Phenomenon","date","dtg","Height","Partner",
 		    "Type","Station","Airport","Station","Place",
-		     "Crossing","Region","Span","Model","Method",
+		    "Region","Crossing","Span","Model","Method",
 		    "Issued","Duration","Output","ILS_direction","Unit"],
 	    "trash":["cnt","lat","lon",
 		     "max","maxlat","maxlon",
