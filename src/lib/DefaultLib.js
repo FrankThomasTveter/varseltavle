@@ -38,7 +38,8 @@ function Default() {
 	[["summaries"],    ["Database","summaries"]],
 	[["fragments"],    ["Database","fragments"]],
 	[["viewOldData"],  ["Database","viewOldData"]],
-	[["notification"], ["Database","notification"]]
+	[["notification"], ["Database","notification"]],
+	[["complete"],     ["Auto","complete"]]
     ];
     this.toStateTrash  = [
 	[["keys","trash"],   ["Path","keys","trash"]]
