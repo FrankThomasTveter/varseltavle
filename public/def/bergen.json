@@ -2,6 +2,7 @@
     "title":"Bergen",
     "thresholds":{
 	"Phenomenon":{
+	    "Vannstand":{"Method":{"mb0":{"Station":{"Bergen"       :{"key":"max", ">": [-1.50,1.12,1.25,1.40] }}}}},
 	    "Styrtregn":[{"Threshold":{"10mm":{"key":"max", ">": [0,35,50] },
 				       "15mm":{"key":"max", ">": [0,35,50] }
 				      }},
